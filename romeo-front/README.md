@@ -1,5 +1,20 @@
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+## Important!
+
+Before running the project:  
+1. Install Less using `npm install less -g`, or `yarn global add less` if you use yarn.  
+2. Install `less-watch-compiler` using `npm install -g less-watch-compiler`, or `yarn global add less-watch-compiler` if you use yarn.  
+To run this project in development mode, run `yarn start` and `yarn less` concurrently.  
+
+## My Scripts
+
+### `yarn less`  
+
+This compiles the `index.less` file in `/src/style`. The output file is at `/src/assets/index.css`. This file is large, thus ignored by git. So, before and while running the project using `yarn start`, run this script.
+
+**Note: If the styling changes are not applied after saving, try opening `/style/index.less` and save. This is because less-watch-compiler only watches changes in `index.less`**
+
 ## Available Scripts
 
 In the project directory, you can run:
