@@ -28,9 +28,9 @@ const PrivateRoute = props => {
             component={props => (
                 <React.Fragment>
                     <Nav/>
-                    <div>
+                    <main className="main-content">
                         <Component {...props} />
-                    </div>
+                    </main>
                 </React.Fragment>
             )}
         />

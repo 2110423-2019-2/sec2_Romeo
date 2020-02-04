@@ -1,16 +1,17 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { Button } from "antd";
 
 class Landing extends React.Component {
     render() {
         return (
-            <React.Fragment>
+            <div className="container mt-4">
                 <h1>Your Profile</h1>
                 <p>Your name here and other details here.</p>
                 <Link to="/profile/edit">
-                    <button>Edit Profile</button>
+                    <Button type="primary">Edit Profile</Button>
                 </Link>
-            </React.Fragment>
+            </div>
         )
     }
 }
