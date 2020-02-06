@@ -11,14 +11,9 @@ const PrivateRoute = props => {
 			path={path}
 			component={props =>
 				isAuth ? (
-					<React.Fragment>
-						<Nav/>
-						<main className="main-content">
-							<Component {...props} />
-						</main>
-					</React.Fragment>
+					<Redirect to="/" />
 				) : (
-					<Redirect exact to="/login" />
+					<Component {...props} />
 				)
 			}
         />
