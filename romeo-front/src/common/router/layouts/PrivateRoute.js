@@ -18,7 +18,7 @@ const PrivateRoute = props => {
 						</main>
 					</React.Fragment>
 				) : (
-					<Redirect exact to="/login" />
+					<Redirect exact to="/" />
 				)
 			}
         />

@@ -1,6 +1,6 @@
 import React from "react";
 import { connect } from "react-redux";
-import { Route, Redirect } from "react-router-dom";
+import { Route } from "react-router-dom";
 import Nav from "../../components/Nav";
 
 const PrivateRoute = props => {
@@ -10,11 +10,12 @@ const PrivateRoute = props => {
 			{...rest}
 			path={path}
 			component={props =>
-				isAuth ? (
-					<Redirect to="/" />
-				) : (
-					<Component {...props} />
-				)
+				<React.Fragment>
+					<Nav/>
+					<main className="main-content">
+						<Component {...props} />
+					</main>
+				</React.Fragment>
 			}
         />
 	);

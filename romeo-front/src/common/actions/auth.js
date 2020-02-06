@@ -2,11 +2,11 @@ import { SET_AUTH } from "../action-types";
 import { setAuthToken, removeAuthToken, setCurrentUser, removeCurrentUser } from "../auth";
 import Axios from "axios";
 
-// export const logIn = (credentials, history) => async dispatch => {
+// export const signIn = (credentials, history) => async dispatch => {
 // 	try {
 // 		const {
 // 			data: { user }
-// 		} = await Axios.post("/user/login", credentials);
+// 		} = await Axios.post("/user/signIn", credentials);
 // 		setAuthToken(user.token);
 // 		setCurrentUser(user.id, user.username);
 // 		dispatch(setAuth(true));
@@ -16,18 +16,22 @@ import Axios from "axios";
 // 	}
 // };
 
-export const logIn = (credentials, history) => async dispatch => {
-	setCurrentUser(credentials.id, credentials.username);
-	setAuthToken(credentials.id);
+export const signIn = (credentials, history) => async dispatch => {
+	setCurrentUser(credentials);
+	setAuthToken(credentials.username);
 	dispatch(setAuth(true));
-	history.push("/");
+	if (credentials.type = "PHOTOGRAPHER") {
+		history.push("/profile/" + credentials.username);
+	} else {
+		history.push("/");
+	}
 };
 
-export const logOut = history => dispatch => {
+export const signOut = history => dispatch => {
 	dispatch(setAuth(null));
 	removeAuthToken();
 	removeCurrentUser();
-	history.push("/login");
+	history.push("/");
 };
 
 export const setAuth = user => {

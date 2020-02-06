@@ -6,11 +6,13 @@ const initialState = {
 
 export default (state = initialState, action) => {
 	const { type, payload } = action;
-	if (type === SET_AUTH) {
-		return {
-			...state,
-			isAuth: payload.isAuth
-		};
+
+	switch (type) {
+		case SET_AUTH:
+			return {
+				...state,
+				isAuth: payload.isAuth
+			};
+		default: return state;
 	}
-	return state;
 };

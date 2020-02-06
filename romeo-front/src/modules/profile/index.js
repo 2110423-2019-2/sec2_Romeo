@@ -1,19 +1,33 @@
 import React from "react";
-import {  Route, Switch } from "react-router-dom";
-import Edit from "./edit";
-import Landing from "./landing"
+import { Link, Redirect } from "react-router-dom";
+import { Button } from "antd";
+import { connect } from "react-redux"
 
 class Profile extends React.Component {
     render() {
+        if (localStorage.getItem("userType") !== 'PHOTOGRAPHER') {
+            return <Redirect to="/" />
+        } 
+        const { username } = this.props.match.params;
+        const currentUsername = localStorage.getItem("username");
+
+        const { isAuth } = this.props;
         return (
-            <React.Fragment>
-                <Switch>
-                    <Route path="/profile/edit" exact component={Edit} />
-                    <Route path="/profile" exact component={Landing} />
-                </Switch>
-            </React.Fragment>
+            <div className="container mt-4">
+                <h1>Your Profile</h1>
+                <p>Your username: {username}</p>
+                { isAuth && currentUsername === username && (
+                    <Link to="/user/edit">
+                        <Button type="primary">Edit Profile</Button>
+                    </Link>
+                )}
+            </div>
         )
     }
 }
 
-export default Profile
+const mapStateToProps = state => ({
+    isAuth: state.auth.isAuth
+})
+
+export default connect(mapStateToProps, null)(Profile)

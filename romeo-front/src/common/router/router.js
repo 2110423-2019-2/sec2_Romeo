@@ -5,9 +5,9 @@ import PublicRoute from "./layouts/PublicRoute";
 import history from "./history";
 import { setAuth } from "common/actions/auth";
 import { connect } from "react-redux";
-import Landing from "modules/";
 import Profile from "modules/profile/";
-import Login from "modules/loginreg/"
+import Listing from "modules/listing/"
+import UserLanding from "modules/user";
 
 
 class AppRouter extends React.Component {
@@ -16,9 +16,9 @@ class AppRouter extends React.Component {
             <React.Fragment>
                 <Router history={history}>
                     <Switch>
-                        <PublicRoute path="/login" component={Login} exact/>
-                        <PrivateRoute path="/profile" component={Profile} />
-                        <PrivateRoute path="/" component={Landing} exact/>
+                        <PrivateRoute path="/user" component={UserLanding}/>
+                        <PublicRoute path="/profile/:username" component={Profile}/>
+                        <PublicRoute path="/" component={Listing} exact/>
                     </Switch>
                 </Router>
             </React.Fragment>

@@ -14,16 +14,18 @@ class Edit extends React.Component {
 
     handleSubmit = e => {
         e.preventDefault();
+        const username = localStorage.getItem("username");
         this.props.form.validateFields((err, values) => {
             if (!err) {
                 console.log('Received values of form: ', values);
-                history.push("/profile");
+                history.push("/profile/" + username);
             }
         });
     };
 
     render() {
         const { getFieldDecorator, getFieldsError, getFieldError, isFieldTouched } = this.props.form;
+        const username = localStorage.getItem("username");
 
         // Validation
         const firstNameError = isFieldTouched('firstName') && getFieldError('firstName');
@@ -31,6 +33,7 @@ class Edit extends React.Component {
         return (
             <div class="container mt-4">
                 <h1>Edit Profile</h1>
+                <p>Username: {username}</p>
                 <Form>
                     <Form.Item validateStatus={firstNameError ? 'error' : ''} help={firstNameError || ''}>
                         {getFieldDecorator('firstName', {
@@ -49,7 +52,12 @@ class Edit extends React.Component {
                             htmlType="submit" 
                             disabled={hasErrors(getFieldsError())}
                         >Confirm</Button>
-                        <Button type="secondary" onClick={() => history.push("/profile")}>Back</Button>
+                        <Button 
+                            type="secondary" 
+                            onClick={() => history.push("/profile/" + username)}
+                        >
+                            Cancel
+                        </Button>
                     </Form.Item>
                 </Form>
             </div>
