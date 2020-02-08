@@ -5,11 +5,12 @@ import { connect } from "react-redux"
 
 class Profile extends React.Component {
     render() {
-        if (localStorage.getItem("userType") !== 'PHOTOGRAPHER') {
+        const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+        const { type, username: currentUsername } = currentUser;
+        if (type !== 'PHOTOGRAPHER') {
             return <Redirect to="/" />
         } 
         const { username } = this.props.match.params;
-        const currentUsername = localStorage.getItem("username");
 
         const { isAuth } = this.props;
         return (

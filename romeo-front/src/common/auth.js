@@ -11,11 +11,9 @@ export const removeAuthToken = () => {
 };
 
 export const setCurrentUser = (user) => {
-	const { type, username } = user
-	localStorage.setItem("username", username);
-	localStorage.setItem("userType", type);
+	localStorage.setItem("currentUser", JSON.stringify(user));
 };
 
 export const removeCurrentUser = () => {
-	localStorage.removeItem("userId");
+	localStorage.removeItem("currentUser");
 };

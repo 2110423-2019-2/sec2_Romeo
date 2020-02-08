@@ -17,8 +17,10 @@ import Axios from "axios";
 // };
 
 export const signIn = (credentials, history) => async dispatch => {
+	// TODO: sign in using backend, wait for backend to return token and user information
+	// User information is now only mock data
 	setCurrentUser(credentials);
-	setAuthToken(credentials.username);
+	setAuthToken(credentials.username); // TODO: user backend token
 	dispatch(setAuth(true));
 	if (credentials.type = "PHOTOGRAPHER") {
 		history.push("/profile/" + credentials.username);

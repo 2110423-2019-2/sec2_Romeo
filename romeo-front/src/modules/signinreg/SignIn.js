@@ -1,6 +1,6 @@
-import React from 'react';
+import React from "react";
 import history from "../../common/router/history";
-import { Button, Form, Input, Select, Modal } from "antd";
+import { Button, Form, Input, Select } from "antd";
 import { signIn } from "../../common/actions/auth";
 import { connect } from "react-redux";
 
@@ -10,7 +10,7 @@ function hasErrors(fieldsError) {
 
 const { Option } = Select;
 
-class SignInRegModal extends React.Component {
+class SignIn extends React.Component {
     componentDidMount() {
         // To disable submit button at the beginning.
         this.props.form.validateFields();
@@ -20,30 +20,28 @@ class SignInRegModal extends React.Component {
         e.preventDefault();
         this.props.form.validateFields((err, values) => {
             if (!err) {
-                const { username, password, type } = values
-                this.props.signIn({ 
-                    username, 
-                    password, 
-                    type 
+                // const { username, password, type } = values
+                this.props.signIn({
+                    ...values,
+                    email: "prawcha.p@gmail.com",
+                    firstName: "Prawsang",
+                    lastName: "Chayakulkeeree",
+                    ssn: "1234567890123" // Mock
                 }, history);
+                // The mock data will not be actually needed to sign in.
+                // After signing in, the user's data will be pulled from the database instead.
             }
         });
     };
 
     render() {
         const { getFieldDecorator, getFieldsError, getFieldError, isFieldTouched } = this.props.form;
-        const { visible, show, handleCancel } = this.props;
         // Validation
         const usernameError = isFieldTouched('username') && getFieldError('username');
         const passwordError = isFieldTouched('password') && getFieldError('password');
         const typeError = isFieldTouched('type') && getFieldError('type');
-
         return (
-            <Modal 
-                visible={visible} 
-                handleCancel={handleCancel}
-                footer={null}
-            >
+            <React.Fragment>
                 <h1>Sign In</h1>
                 <Form>
                     <Form.Item validateStatus={usernameError ? 'error' : ''} help={usernameError || ''}>
@@ -54,7 +52,7 @@ class SignInRegModal extends React.Component {
                         })(
                             <Input
                                 placeholder="Username"
-                                type="username"
+                                type="text"
                             />,
                         )}
                     </Form.Item>
@@ -68,7 +66,7 @@ class SignInRegModal extends React.Component {
                             />,
                         )}
                     </Form.Item>
-                    <Form.Item>
+                    <Form.Item validateStatus={typeError ? 'error' : ''} help={typeError || ''}>
                         {getFieldDecorator('type',{rules: [{ required: true , message: 'This field is required.'}]})(
                             <Select placeholder="Type">
                                 <Option value="PHOTOGRAPHER">Photographer</Option>
@@ -86,12 +84,12 @@ class SignInRegModal extends React.Component {
                         >Sign In</Button>
                     </Form.Item>
                 </Form>
-            </Modal>
+            </React.Fragment>
         )
     }
 }
 
-const WrappedSignInForm = Form.create({ name: 'signIn' })(SignInRegModal);
+const WrappedSignInForm = Form.create({ name: 'signIn' })(SignIn);
 
 export default connect(
 	null,
