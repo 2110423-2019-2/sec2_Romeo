@@ -20,7 +20,7 @@ class Edit extends React.Component {
         this.props.form.validateFields((err, values) => {
             if (!err) {
                 console.log('Received values of form: ', values);
-                history.push("/profile/" + values.username);
+                history.push("/user/display");
 
                 // TODO: connect to backend
                 localStorage.setItem("currentUser", JSON.stringify({
@@ -48,8 +48,8 @@ class Edit extends React.Component {
         const ssnError = isFieldTouched('ssn') && getFieldError('ssn');
 
         return (
-            <div class="container mt-4">
-                <h1>Edit Profile</h1>
+            <React.Fragment>
+                <h1>Edit Personal Information</h1>
                 <Form>
                     <h3>Account Information</h3>
                     <label>Username</label>
@@ -87,7 +87,7 @@ class Edit extends React.Component {
                         )}
                     </Form.Item>
                     <Form.Item>
-                        <Link to="/user/edit/password">
+                        <Link to="/user/display/edit/password">
                             <Button 
                                 type="primary" 
                                 className="mr-2"
@@ -167,14 +167,14 @@ class Edit extends React.Component {
                             >Confirm Edits</Button>
                             <Button 
                                 type="secondary" 
-                                onClick={() => history.push("/profile/" + username)}
+                                onClick={() => history.goBack()}
                                 className="mr-2"
                                 htmlType="button" 
                             >Cancel</Button>
                         </div>
                     </Form.Item>
                 </Form>
-            </div>
+            </React.Fragment>
         )
     }
 }

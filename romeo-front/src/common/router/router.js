@@ -8,6 +8,7 @@ import { connect } from "react-redux";
 import Profile from "modules/profile/";
 import Listing from "modules/listing/"
 import UserLanding from "modules/user";
+import SignUp from "modules/signinreg/SignUp";
 
 
 class AppRouter extends React.Component {
@@ -17,6 +18,7 @@ class AppRouter extends React.Component {
                 <Router history={history}>
                     <Switch>
                         <PrivateRoute path="/user" component={UserLanding}/>
+                        <PublicRoute path="/signup" component={SignUp}/>
                         <PublicRoute path="/profile/:username" component={Profile}/>
                         <PublicRoute path="/" component={Listing} exact/>
                     </Switch>

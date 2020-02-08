@@ -71,22 +71,22 @@ class Edit extends React.Component {
             && getFieldError('confirmPassword');
 
         return (
-            <div class="container mt-4">
+            <React.Fragment>
                 <h1>Edit Password</h1>
                 <div className="mb-4">
                     { passwordsDoNotMatch && (
-                        <div className="pa-3 mt-1 mb-1 bg-error-light rounded">
+                        <div className="error-banner">
                             <b className="t-color-error">Passwords Do Not Match</b>
                         </div>
                     ) }
                     { wrongPassword && (
-                        <div className="pa-3 mt-1 mb-1 bg-error-light rounded">
-                            <b className="t-color-error">Incorrect Password</b>
+                        <div className="error-banner">
+                            <b>Incorrect Password</b>
                         </div>
                     ) }
                     { success && (
-                        <div className="pa-3 mt-1 mb-1 bg-success-light rounded">
-                            <b className="t-color-success">Password has been edited.</b>
+                        <div className="success-banner">
+                            <b>Password has been edited.</b>
                         </div>
                     ) }
                 </div>
@@ -141,14 +141,14 @@ class Edit extends React.Component {
                             >Confirm Password Edit</Button>
                             <Button 
                                 type="secondary" 
-                                onClick={() => history.push("/user/edit")}
+                                onClick={() => history.push("/user/display/edit")}
                                 className="mr-2"
                                 htmlType="button" 
-                            >Cancel</Button>
+                            >Back</Button>
                         </div>
                     </Form.Item>
                 </Form>
-            </div>
+            </React.Fragment>
         )
     }
 }

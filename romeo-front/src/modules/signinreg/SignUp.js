@@ -39,10 +39,11 @@ class SignUp extends React.Component {
         const ssnError = isFieldTouched('ssn') && getFieldError('ssn');
         console.log(this.props);
         return (
-            <React.Fragment>
+            <div className="container mt-4">
                 <h1>Sign Up</h1>
                 <Form>
                     <h3>Account Information</h3>
+                    <label>Username</label>
                     <Form.Item validateStatus={usernameError ? 'error' : ''} help={usernameError || ''}>
                         {getFieldDecorator('username', {
                             rules: [
@@ -55,6 +56,7 @@ class SignUp extends React.Component {
                             />,
                         )}
                     </Form.Item>
+                    <label>Email</label>
                     <Form.Item validateStatus={emailError ? 'error' : ''} help={emailError || ''}>
                         {getFieldDecorator('email', {
                             rules: [
@@ -67,6 +69,7 @@ class SignUp extends React.Component {
                             />,
                         )}
                     </Form.Item>
+                    <label>Password</label>
                     <Form.Item validateStatus={passwordError ? 'error' : ''} help={passwordError || ''}>
                         {getFieldDecorator('password', {
                             rules: [{ required: true, message: 'This field is required.' }],
@@ -77,6 +80,7 @@ class SignUp extends React.Component {
                             />,
                         )}
                     </Form.Item>
+                    <label>Type</label>
                     <Form.Item validateStatus={typeError ? 'error' : ''} help={typeError || ''}>
                         {getFieldDecorator('type',{rules: [{ required: true , message: 'This field is required.'}]})(
                             <Select placeholder="Type">
@@ -86,30 +90,39 @@ class SignUp extends React.Component {
                         )}
                     </Form.Item>
                     <h3>Personal Information</h3>
-                    <Form.Item validateStatus={firstNameError ? 'error' : ''} help={firstNameError || ''}>
-                        {getFieldDecorator('firstName', {
-                            rules: [
-                                { required: true,message: 'This field is required.' },
-                            ],
-                        })(
-                            <Input
-                                placeholder="First Name"
-                                type="text"
-                            />,
-                        )}
-                    </Form.Item>
-                    <Form.Item validateStatus={lastNameError ? 'error' : ''} help={lastNameError || ''}>
-                        {getFieldDecorator('lastName', {
-                            rules: [
-                                { required: true,message: 'This field is required.' },
-                            ],
-                        })(
-                            <Input
-                                placeholder="Last Name"
-                                type="text"
-                            />,
-                        )}
-                    </Form.Item>
+                    <div className="d-flex">
+                        <div className="mr-1 full-width">
+                            <label>First Name</label>
+                            <Form.Item validateStatus={firstNameError ? 'error' : ''} help={firstNameError || ''}>
+                                {getFieldDecorator('firstName', {
+                                    rules: [
+                                        { required: true,message: 'This field is required.' },
+                                    ],
+                                })(
+                                    <Input
+                                        placeholder="First Name"
+                                        type="text"
+                                    />,
+                                )}
+                            </Form.Item>
+                        </div>
+                        <div className="mr-1 full-width">
+                            <label>Last Name</label>
+                            <Form.Item validateStatus={lastNameError ? 'error' : ''} help={lastNameError || ''}>
+                                {getFieldDecorator('lastName', {
+                                    rules: [
+                                        { required: true,message: 'This field is required.' },
+                                    ],
+                                })(
+                                    <Input
+                                        placeholder="Last Name"
+                                        type="text"
+                                    />,
+                                )}
+                            </Form.Item>
+                        </div>
+                    </div>
+                    <label>Social Security Number</label>
                     <Form.Item validateStatus={ssnError ? 'error' : ''} help={ssnError || ''}>
                         {getFieldDecorator('ssn', {
                             rules: [
@@ -134,7 +147,7 @@ class SignUp extends React.Component {
                         >Sign Up</Button>
                     </Form.Item>
                 </Form>
-            </React.Fragment>
+            </div>
         )
     }
 }

@@ -18,8 +18,8 @@ class Profile extends React.Component {
                 <h1>Your Profile</h1>
                 <p>Your username: {username}</p>
                 { isAuth && currentUsername === username && (
-                    <Link to="/user/edit">
-                        <Button type="primary">Edit Profile</Button>
+                    <Link to="/user/display/edit">
+                        <Button type="primary">Edit</Button>
                     </Link>
                 )}
             </div>

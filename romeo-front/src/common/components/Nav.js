@@ -9,9 +9,7 @@ import SignInRegModal from "modules/signinreg/modal";
 
 class Nav extends React.Component {
     state = {
-        showSignIn: false,
-        showSignUp: false,
-        showModalDelay: false
+        showSignIn: false
     }
     render() {
         const { showSignUp, showSignIn, showModalDelay } = this.state;
@@ -36,23 +34,29 @@ class Nav extends React.Component {
                                     </Menu.Item>
                                     <Menu.Divider />
                                     <Menu.Item key="1">
-                                        <Link to="/user/edit">Edit Personal Information</Link>
+                                        <Link to="/user/display">Personal Information</Link>
                                     </Menu.Item>
-                                    <Menu.Item key="2" onClick={() => signOut(history)}>
-                                        <span className="text-error">Sign Out</span>
+                                    <Menu.Item key="2">
+                                        <Link to="/user/edit-portfolio">Edit Portfolio</Link>
+                                    </Menu.Item>
+                                    <Menu.Item key="3" onClick={() => signOut(history)}>
+                                        <span className="t-color-error">Sign Out</span>
                                     </Menu.Item>
                                 </Menu>
                             ) : (
                                 <Menu>
-                                    <Menu.Item key="0">
+                                    <Menu.Item key="0" style={{ pointerEvents: 'none' }}>
                                         <Icon type="user" className="mr-2"/><b>{currentUser.username}</b>
                                     </Menu.Item>
                                     <Menu.Divider />
                                     <Menu.Item key="1">
-                                        <Link to="/user/edit">Edit Personal Information</Link>
+                                        <Link to="/user/display">Personal Information</Link>
                                     </Menu.Item>
-                                    <Menu.Item key="2" onClick={() => signOut(history)}>
-                                        <span className="text-error">Sign Out</span>
+                                    <Menu.Item key="2">
+                                        <Link to="/user/reservations">My Reservations</Link>
+                                    </Menu.Item>
+                                    <Menu.Item key="3" onClick={() => signOut(history)}>
+                                        <span className="t-color-error">Sign Out</span>
                                     </Menu.Item>
                                 </Menu>
                             )
@@ -61,28 +65,25 @@ class Nav extends React.Component {
                         </Dropdown>
                     ) : (
                         <div>
-                            <Button type="secondary" className="mr-2" onClick={() => this.setState({
-                                showSignIn: true,
-                                showModalDelay: true
+                            <Button 
+                            type="secondary" 
+                            className="mr-2"
+                            htmlType="button" 
+                            onClick={() => this.setState({
+                                showSignIn: true
                             })}>Sign In</Button>
-                            <Button type="primary" onClick={() => this.setState({
-                                showSignUp: true,
-                                showModalDelay: true
-                            })}>Sign Up</Button>
+                            <Link to="/signup">
+                                <Button type="primary" htmlType="button">Sign Up</Button>
+                            </Link>
                         </div>
                     )}
-                    { showModalDelay && (
+                    { showSignIn && (
                         <SignInRegModal 
                             visible={showSignIn || showSignUp} 
-                            defaultActive={showSignIn ? "1" : "2" } 
                             onCancel={() => {
                                 this.setState({
                                     showSignIn: false,
-                                    showSignUp: false
                                 })
-                                setTimeout(() => {
-                                    this.setState({ showModalDelay: false })
-                                }, 300)
                             }}
                         />
                     )}
