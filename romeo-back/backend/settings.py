@@ -37,6 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    'customers.apps.CustomersConfig'
 ]
 
 MIDDLEWARE = [
@@ -78,9 +80,9 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'romeo-database',
         'USER': 'root',
-        'PASSWORD': 'P@ssw0rd',
+        'PASSWORD': 'password',
         'HOST': 'localhost',
-        'PORT':'3306',
+        'PORT': '3306',
     }
 }
 
