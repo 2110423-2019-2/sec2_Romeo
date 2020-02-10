@@ -12,7 +12,7 @@ class Nav extends React.Component {
         showSignIn: false
     }
     render() {
-        const { showSignUp, showSignIn, showModalDelay } = this.state;
+        const { showSignUp, showSignIn } = this.state;
         const { signOut, isAuth } = this.props;
 
         const currentUser = JSON.parse(localStorage.getItem('currentUser'))
@@ -34,7 +34,7 @@ class Nav extends React.Component {
                                     </Menu.Item>
                                     <Menu.Divider />
                                     <Menu.Item key="1">
-                                        <Link to="/user/display">Personal Information</Link>
+                                        <Link to="/user/edit">Personal Information</Link>
                                     </Menu.Item>
                                     <Menu.Item key="2">
                                         <Link to="/user/edit-portfolio">Edit Portfolio</Link>
@@ -50,7 +50,7 @@ class Nav extends React.Component {
                                     </Menu.Item>
                                     <Menu.Divider />
                                     <Menu.Item key="1">
-                                        <Link to="/user/display">Personal Information</Link>
+                                        <Link to="/user/edit">Personal Information</Link>
                                     </Menu.Item>
                                     <Menu.Item key="2">
                                         <Link to="/user/reservations">My Reservations</Link>

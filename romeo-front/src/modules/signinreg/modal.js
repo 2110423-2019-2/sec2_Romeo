@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal, Tabs } from "antd";
+import { Modal } from "antd";
 import SignIn from "./SignIn";
 
 class SignInRegModal extends React.Component {

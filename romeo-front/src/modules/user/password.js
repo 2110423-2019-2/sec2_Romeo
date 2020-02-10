@@ -1,7 +1,6 @@
 import React from 'react';
 import history from "../../common/router/history";
 import { Button, Form, Input } from "antd";
-import { Link } from 'react-router-dom';
 
 function hasErrors(fieldsError) {
     return Object.keys(fieldsError).some(field => fieldsError[field]);
@@ -141,7 +140,7 @@ class Edit extends React.Component {
                             >Confirm Password Edit</Button>
                             <Button 
                                 type="secondary" 
-                                onClick={() => history.push("/user/display/edit")}
+                                onClick={() => history.push("/user/edit")}
                                 className="mr-2"
                                 htmlType="button" 
                             >Back</Button>

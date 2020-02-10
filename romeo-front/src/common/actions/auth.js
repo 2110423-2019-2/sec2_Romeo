@@ -1,6 +1,6 @@
 import { SET_AUTH } from "../action-types";
 import { setAuthToken, removeAuthToken, setCurrentUser, removeCurrentUser } from "../auth";
-import Axios from "axios";
+// import Axios from "axios";
 
 // export const signIn = (credentials, history) => async dispatch => {
 // 	try {
@@ -22,7 +22,7 @@ export const signIn = (credentials, history) => async dispatch => {
 	setCurrentUser(credentials);
 	setAuthToken(credentials.username); // TODO: user backend token
 	dispatch(setAuth(true));
-	if (credentials.type = "PHOTOGRAPHER") {
+	if (credentials.type === "PHOTOGRAPHER") {
 		history.push("/profile/" + credentials.username);
 	} else {
 		history.push("/");

@@ -1,18 +1,17 @@
 import React from "react"
 import { Switch, Route, Redirect, NavLink} from "react-router-dom";
 import Edit from "./edit";
-import Display from "./display";
 import Password from "./password"
 import Reservations from "./reservations";
 import EditPortfolio from "./edit-portfolio"
+import EditProfile from "./edit-profile/"
 
-import { Menu, Icon } from 'antd';
+import { Menu } from 'antd';
 
 class UserLanding extends React.Component {
     render() {
         const currentUser = JSON.parse(localStorage.getItem("currentUser"));
         const { type } = currentUser;
-        console.log(type);
         return (
             <div className="d-flex align-stretch">
                 <Menu
@@ -25,7 +24,7 @@ class UserLanding extends React.Component {
                         <NavLink 
                             className="ant-menu-item" 
                             activeClassName="ant-menu-item-selected"
-                            to="/user/display"
+                            to="/user/edit"
                         >
                             Personal Information
                         </NavLink>
@@ -36,6 +35,15 @@ class UserLanding extends React.Component {
                             to="/user/edit-portfolio"
                         >
                                 Edit Portfolio
+                        </NavLink>
+                    )}
+                    { type === 'PHOTOGRAPHER' && (
+                        <NavLink 
+                            className="ant-menu-item" 
+                            activeClassName="ant-menu-item-selected"
+                            to="/user/edit-profile"
+                        >
+                                Edit Profile
                         </NavLink>
                     )}
                     { type === 'CUSTOMER' && (
@@ -50,12 +58,12 @@ class UserLanding extends React.Component {
                 </Menu>
                 <div className="container mt-4 with-sidebar pl-4">
                     <Switch>
-                        <Route path="/user/display/edit/password" component={Password} />
-                        <Route path="/user/display/edit" component={Edit} />
-                        <Route path="/user/display" exact component={Display} />
+                        <Route path="/user/edit/password" component={Password} />
+                        <Route path="/user/edit" component={Edit} />
                         <Route path="/user/reservations" exact component={Reservations} />
                         <Route path="/user/edit-portfolio" exact component={EditPortfolio} />
-                        <Route path="/user" exact component={RedirectToDisplay} />
+                        <Route path="/user/edit-profile" exact component={EditProfile} />
+                        <Route path="/user" exact component={RedirectToEdit} />
                     </Switch>
                 </div>
             </div>
@@ -63,8 +71,8 @@ class UserLanding extends React.Component {
     }
 }
 
-const RedirectToDisplay = () => (
-    <Redirect to="/user/display" />
+const RedirectToEdit = () => (
+    <Redirect to="/user/edit" />
 )
 
 export default UserLanding
