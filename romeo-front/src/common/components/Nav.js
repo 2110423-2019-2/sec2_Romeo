@@ -15,7 +15,7 @@ class Nav extends React.Component {
         const { showSignUp, showSignIn } = this.state;
         const { signOut, isAuth } = this.props;
 
-        const currentUser = JSON.parse(localStorage.getItem('currentUser'))
+        const currentClient = JSON.parse(localStorage.getItem('currentClient'))
         console.log(this.state);
         return (
             <nav className="main-nav">
@@ -23,21 +23,21 @@ class Nav extends React.Component {
                     <Link to="/">
                         <h3 className="ma-0">Photo Bro</h3>
                     </Link>
-                    { isAuth && currentUser ? (
+                    { isAuth && currentClient ? (
                         <Dropdown overlay={() => (
-                            currentUser.type === "PHOTOGRAPHER" ? (
+                            currentClient.type === "PHOTOGRAPHER" ? (
                                 <Menu>
                                     <Menu.Item key="0">
-                                        <Link to={"/profile/" + currentUser.username}>
-                                            <Icon type="user" className="mr-2"/><b>{currentUser.username}</b>
+                                        <Link to={"/profile/" + currentClient.username}>
+                                            <Icon type="user" className="mr-2"/><b>{currentClient.username}</b>
                                         </Link>
                                     </Menu.Item>
                                     <Menu.Divider />
                                     <Menu.Item key="1">
-                                        <Link to="/user/edit">Personal Information</Link>
+                                        <Link to="/client/edit">Personal Information</Link>
                                     </Menu.Item>
                                     <Menu.Item key="2">
-                                        <Link to="/user/edit-portfolio">Edit Portfolio</Link>
+                                        <Link to="/client/edit-portfolio">Edit Portfolio</Link>
                                     </Menu.Item>
                                     <Menu.Item key="3" onClick={() => signOut(history)}>
                                         <span className="t-color-error">Sign Out</span>
@@ -46,7 +46,7 @@ class Nav extends React.Component {
                             ) : (
                                 <Menu>
                                     <Menu.Item key="0" style={{ pointerEvents: 'none' }}>
-                                        <Icon type="user" className="mr-2"/><b>{currentUser.username}</b>
+                                        <Icon type="user" className="mr-2"/><b>{currentClient.username}</b>
                                     </Menu.Item>
                                     <Menu.Divider />
                                     <Menu.Item key="1">
@@ -95,7 +95,7 @@ class Nav extends React.Component {
 
 const mapStateToProps = state => ({
     isAuth: state.auth.isAuth,
-    currentUser: state.auth.currentUser
+    currentClient: state.auth.currentClient
 })
 
 export default connect(

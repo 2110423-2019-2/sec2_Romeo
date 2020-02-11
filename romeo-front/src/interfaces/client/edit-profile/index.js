@@ -3,6 +3,7 @@ import { Button, Form, Input, Row, Col, Icon } from "antd";
 import { Redirect } from 'react-router-dom';
 import { animateScroll as scroll } from 'react-scroll'
 import history from "common/router/history";
+import { getCurrentClient, editCurrentClient } from "logic/Client";
 
 function hasErrors(fieldsError) {
     return Object.keys(fieldsError).some(field => fieldsError[field]);
@@ -13,8 +14,8 @@ class EditProfile extends React.Component {
         // To disable submit button at the beginning.
         this.props.form.validateFields();
         // TODO: Connect to backend
-        const currentUser = JSON.parse(localStorage.getItem("currentUser"));
-        const { equipment, styles, availTimes } = currentUser;
+        const currentClient = getCurrentClient();
+        const { equipment, styles, availTimes } = currentClient;
         this.setState({
             currentEquipment: equipment ? equipment : [],
             currentStyles: styles ? styles : [],
@@ -48,8 +49,8 @@ class EditProfile extends React.Component {
 
     handleSubmit = e => {
         e.preventDefault();
-        const currentUser = JSON.parse(localStorage.getItem("currentUser"));
-        // const { username } = currentUser
+        const currentClient = getCurrentClient();
+        // const { username } = currentClient
         this.props.form.validateFields((err, values) => {
             if (!err) {
                 //console.log('Received values of form: ', values);
@@ -58,10 +59,10 @@ class EditProfile extends React.Component {
                 } = this.state;
 
                 // TODO: connect to backend
-                localStorage.setItem("currentUser", JSON.stringify({
-                    ...currentUser,
+                editCurrentClient({
+                    ...currentClient,
                     equipment: currentEquipment
-                }))
+                })
                 scroll.scrollToTop();
                 this.setState({ success: true })
                 this.setState({ error: false })
@@ -75,9 +76,9 @@ class EditProfile extends React.Component {
 
     render() {
         const { getFieldDecorator, getFieldsError, getFieldError, isFieldTouched } = this.props.form;
-        const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+        const currentClient = JSON.parse(localStorage.getItem("currentClient"));
 
-        if (currentUser.type !== "PHOTOGRAPHER") {
+        if (currentClient.type !== "PHOTOGRAPHER") {
             return <Redirect to="/"/>
         }
 

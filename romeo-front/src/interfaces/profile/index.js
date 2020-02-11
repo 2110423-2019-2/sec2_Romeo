@@ -5,8 +5,8 @@ import { connect } from "react-redux"
 
 class Profile extends React.Component {
     render() {
-        const currentUser = JSON.parse(localStorage.getItem("currentUser"));
-        const { type, username: currentUsername } = currentUser;
+        const currentClient = JSON.parse(localStorage.getItem("currentClient"));
+        const { type, username: currentClientName } = currentClient;
         if (type !== 'PHOTOGRAPHER') {
             return <Redirect to="/" />
         } 
@@ -17,8 +17,8 @@ class Profile extends React.Component {
             <div className="container mt-4">
                 <h1>Your Profile</h1>
                 <p>Your username: {username}</p>
-                { isAuth && currentUsername === username && (
-                    <Link to="/user/edit">
+                { isAuth && currentClientName === username && (
+                    <Link to="/client/edit">
                         <Button type="primary">Edit</Button>
                     </Link>
                 )}

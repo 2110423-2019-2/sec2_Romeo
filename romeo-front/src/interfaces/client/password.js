@@ -14,8 +14,8 @@ class Edit extends React.Component {
 
     handleSubmit = e => {
         e.preventDefault();
-        const currentUser = JSON.parse(localStorage.getItem("currentUser"));
-        const { password } = currentUser
+        const currentClient = JSON.parse(localStorage.getItem("currentClient"));
+        const { password } = currentClient
 
         this.props.form.validateFields((err, values) => {
             if ( values.oldPassword !== password) {
@@ -42,8 +42,8 @@ class Edit extends React.Component {
                 console.log('Received values of form: ', values);
                 
                 // TODO: connect to backend
-                localStorage.setItem("currentUser", JSON.stringify({
-                    ...currentUser,
+                localStorage.setItem("currentClient", JSON.stringify({
+                    ...currentClient,
                     password: values.newPassword
                 }));
                 this.setState({

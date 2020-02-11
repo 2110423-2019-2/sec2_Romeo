@@ -8,28 +8,20 @@ import store from "./common/store.js";
 import initHttp from "./common/http.js";
 import { setAuth } from "./common/actions/auth";
 import * as serviceWorker from './serviceWorker';
-import { removeCurrentUser } from 'common/auth';
+import { removeCurrentClient, setCurrentClient } from 'common/auth';
+import { getCurrentClient, mockValues } from 'logic/Client';
 
 initHttp();
 
 const token = localStorage.getItem("token");
 if (token) {
 	store.dispatch(setAuth(true));
-	if (!localStorage.getItem("currentUser")) {
-		const user = {
-			firstName: "Prawsang",
-			lastName: "Chayakulkeeree",
-			password: "123",
-			username: "prawsang",
-			ssn:"1234567890123",
-			email: "prawcha.p@gmail.com",
-			type: "PHOTOGRAPHER"
-		}
-		localStorage.setItem("currentUser", JSON.stringify(user));
+	if (!getCurrentClient()) {
+		setCurrentClient(mockValues);
 	}
 } else {
 	store.dispatch(setAuth(false));
-	removeCurrentUser();
+	removeCurrentClient();
 }
 
 ReactDOM.render(

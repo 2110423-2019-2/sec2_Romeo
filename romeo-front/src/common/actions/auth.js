@@ -1,5 +1,5 @@
 import { SET_AUTH } from "../action-types";
-import { setAuthToken, removeAuthToken, setCurrentUser, removeCurrentUser } from "../auth";
+import { setAuthToken, removeAuthToken, setCurrentClient, removeCurrentClient } from "../auth";
 // import Axios from "axios";
 
 // export const signIn = (credentials, history) => async dispatch => {
@@ -8,7 +8,7 @@ import { setAuthToken, removeAuthToken, setCurrentUser, removeCurrentUser } from
 // 			data: { user }
 // 		} = await Axios.post("/user/signIn", credentials);
 // 		setAuthToken(user.token);
-// 		setCurrentUser(user.id, user.username);
+// 		setCurrentClient(user.id, user.username);
 // 		dispatch(setAuth(true));
 // 		history.push("/");
 // 	} catch (error) {
@@ -19,7 +19,7 @@ import { setAuthToken, removeAuthToken, setCurrentUser, removeCurrentUser } from
 export const signIn = (credentials, history) => async dispatch => {
 	// TODO: sign in using backend, wait for backend to return token and user information
 	// User information is now only mock data
-	setCurrentUser(credentials);
+	setCurrentClient(credentials);
 	setAuthToken(credentials.username); // TODO: user backend token
 	dispatch(setAuth(true));
 	if (credentials.type === "PHOTOGRAPHER") {
@@ -32,7 +32,7 @@ export const signIn = (credentials, history) => async dispatch => {
 export const signOut = history => dispatch => {
 	dispatch(setAuth(null));
 	removeAuthToken();
-	removeCurrentUser();
+	removeCurrentClient();
 	history.push("/");
 };
 

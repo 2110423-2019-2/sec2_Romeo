@@ -3,8 +3,8 @@ import { Redirect } from "react-router-dom";
 
 class EditPortfolio extends React.Component {
     render() {
-        const currentUser = JSON.parse(localStorage.getItem("currentUser"));
-        if (currentUser.type !== 'PHOTOGRAPHER') {
+        const currentClient = JSON.parse(localStorage.getItem("currentClient"));
+        if (currentClient.type !== 'PHOTOGRAPHER') {
             return <Redirect to="/"/>
         }
         return (

@@ -20,8 +20,8 @@ class Edit extends React.Component {
 
     handleSubmit = e => {
         e.preventDefault();
-        const currentUser = JSON.parse(localStorage.getItem("currentUser"));
-        // const { username } = currentUser
+        const currentClient = JSON.parse(localStorage.getItem("currentClient"));
+        // const { username } = currentClient
         this.props.form.validateFields((err, values) => {
             if (!err) {
                 //console.log('Received values of form: ', values);
@@ -38,8 +38,8 @@ class Edit extends React.Component {
                 } = values;
 
                 // TODO: connect to backend
-                localStorage.setItem("currentUser", JSON.stringify({
-                    ...currentUser,
+                localStorage.setItem("currentClient", JSON.stringify({
+                    ...currentClient,
                     firstName,
                     lastName,
                     username,
@@ -63,7 +63,7 @@ class Edit extends React.Component {
 
     render() {
         const { getFieldDecorator, getFieldsError, getFieldError, isFieldTouched } = this.props.form;
-        const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+        const currentClient = JSON.parse(localStorage.getItem("currentClient"));
         const { 
             username, 
             firstName, 
@@ -75,7 +75,7 @@ class Edit extends React.Component {
             bankAccountName,
             type,
             phone
-        } = currentUser
+        } = currentClient
 
         const { success, error } = this.state;
 

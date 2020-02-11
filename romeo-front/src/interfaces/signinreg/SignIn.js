@@ -3,6 +3,7 @@ import history from "../../common/router/history";
 import { Button, Form, Input, Select } from "antd";
 import { signIn } from "../../common/actions/auth";
 import { connect } from "react-redux";
+import { mockValues } from "logic/Client";
 
 function hasErrors(fieldsError) {
     return Object.keys(fieldsError).some(field => fieldsError[field]);
@@ -20,13 +21,9 @@ class SignIn extends React.Component {
         e.preventDefault();
         this.props.form.validateFields((err, values) => {
             if (!err) {
-                // const { username, password, type } = values
                 this.props.signIn({
+                    ...mockValues(),
                     ...values,
-                    email: "prawcha.p@gmail.com",
-                    firstName: "Prawsang",
-                    lastName: "Chayakulkeeree",
-                    ssn: "1234567890123" // Mock
                 }, history);
                 // The mock data will not be actually needed to sign in.
                 // After signing in, the user's data will be pulled from the database instead.

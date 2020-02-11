@@ -4,14 +4,15 @@ import Edit from "./edit";
 import Password from "./password"
 import Reservations from "./reservations";
 import EditPortfolio from "./edit-portfolio"
-import EditProfile from "./edit-profile"
+import EditProfile from "./edit-profile/"
+import { getCurrentClient } from "logic/Client";
 
 import { Menu } from 'antd';
 
-class UserLanding extends React.Component {
+class ClientLanding extends React.Component {
     render() {
-        const currentUser = JSON.parse(localStorage.getItem("currentUser"));
-        const { type } = currentUser;
+        const currentClient = getCurrentClient();
+        const { type } = currentClient;
         return (
             <div className="d-flex align-stretch">
                 <Menu
@@ -24,7 +25,7 @@ class UserLanding extends React.Component {
                         <NavLink 
                             className="ant-menu-item" 
                             activeClassName="ant-menu-item-selected"
-                            to="/user/edit"
+                            to="/client/edit"
                         >
                             Personal Information
                         </NavLink>
@@ -32,7 +33,7 @@ class UserLanding extends React.Component {
                         <NavLink 
                             className="ant-menu-item" 
                             activeClassName="ant-menu-item-selected"
-                            to="/user/edit-portfolio"
+                            to="/client/edit-portfolio"
                         >
                                 Edit Portfolio
                         </NavLink>
@@ -41,7 +42,7 @@ class UserLanding extends React.Component {
                         <NavLink 
                             className="ant-menu-item" 
                             activeClassName="ant-menu-item-selected"
-                            to="/user/edit-profile"
+                            to="/client/edit-profile"
                         >
                                 Edit Profile
                         </NavLink>
@@ -50,7 +51,7 @@ class UserLanding extends React.Component {
                         <NavLink 
                             className="ant-menu-item" 
                             activeClassName="ant-menu-item-selected"
-                            to="/user/reservations"
+                            to="/client/reservations"
                         >
                                 My Reservations
                         </NavLink>
@@ -58,12 +59,12 @@ class UserLanding extends React.Component {
                 </Menu>
                 <div className="container mt-4 with-sidebar pl-4">
                     <Switch>
-                        <Route path="/user/edit/password" component={Password} />
-                        <Route path="/user/edit" component={Edit} />
-                        <Route path="/user/reservations" exact component={Reservations} />
-                        <Route path="/user/edit-portfolio" exact component={EditPortfolio} />
-                        <Route path="/user/edit-profile" exact component={EditProfile} />
-                        <Route path="/user" exact component={RedirectToEdit} />
+                        <Route path="/client/edit/password" component={Password} />
+                        <Route path="/client/edit" component={Edit} />
+                        <Route path="/client/reservations" exact component={Reservations} />
+                        <Route path="/client/edit-portfolio" exact component={EditPortfolio} />
+                        <Route path="/client/edit-profile" exact component={EditProfile} />
+                        <Route path="/client" exact component={RedirectToEdit} />
                     </Switch>
                 </div>
             </div>
@@ -75,4 +76,4 @@ const RedirectToEdit = () => (
     <Redirect to="/user/edit" />
 )
 
-export default UserLanding
+export default ClientLanding
