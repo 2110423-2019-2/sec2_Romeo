@@ -18,8 +18,11 @@ from django.urls import path, include
 
 from customers.views import customers
 
+
 urlpatterns = [
     path('admin/', admin.site.urls),
-
-    path('customers/', customers)
+    path('api/', include('api.urls')),
+    path('api-auth/', include('rest_framework.urls')),
+    path('customers/', customers),
+    #path('photographers/', include('photographers.urls'))
 ]
