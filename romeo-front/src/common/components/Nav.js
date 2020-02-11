@@ -33,11 +33,14 @@ class Nav extends React.Component {
                                         </Link>
                                     </Menu.Item>
                                     <Menu.Divider />
-                                    <Menu.Item key="1">
-                                        <Link to="/client/edit">Personal Information</Link>
-                                    </Menu.Item>
                                     <Menu.Item key="2">
                                         <Link to="/client/edit-portfolio">Edit Portfolio</Link>
+                                    </Menu.Item>
+                                    <Menu.Item key="2">
+                                        <Link to="/client/edit-profile">Edit Profile</Link>
+                                    </Menu.Item>
+                                    <Menu.Item key="1">
+                                        <Link to="/client/edit">Personal Information</Link>
                                     </Menu.Item>
                                     <Menu.Item key="3" onClick={() => signOut(history)}>
                                         <span className="t-color-error">Sign Out</span>
@@ -49,11 +52,11 @@ class Nav extends React.Component {
                                         <Icon type="user" className="mr-2"/><b>{currentClient.username}</b>
                                     </Menu.Item>
                                     <Menu.Divider />
-                                    <Menu.Item key="1">
-                                        <Link to="/user/edit">Personal Information</Link>
-                                    </Menu.Item>
                                     <Menu.Item key="2">
-                                        <Link to="/user/reservations">My Reservations</Link>
+                                        <Link to="/client/reservations">My Reservations</Link>
+                                    </Menu.Item>
+                                    <Menu.Item key="1">
+                                        <Link to="/client/edit">Personal Information</Link>
                                     </Menu.Item>
                                     <Menu.Item key="3" onClick={() => signOut(history)}>
                                         <span className="t-color-error">Sign Out</span>

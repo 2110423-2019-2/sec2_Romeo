@@ -18,7 +18,8 @@ export const mockValues = () => {
         bankName: "Kasikorn Thai",
         bankAccountName: "Prawsang Chayakulkeeree",
         phone: "0820960005",
-        equipment: ["Canon Something", "Flash"]
+        equipment: ["Canon Something", "Flash"],
+        styles: ["GRADUATION", "PRODUCT", "FASHION"]
     }
 }
 

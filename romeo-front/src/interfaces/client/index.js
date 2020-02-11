@@ -22,13 +22,6 @@ class ClientLanding extends React.Component {
                     mode="inline"
                     className="pt-0"
                 >
-                        <NavLink 
-                            className="ant-menu-item" 
-                            activeClassName="ant-menu-item-selected"
-                            to="/client/edit"
-                        >
-                            Personal Information
-                        </NavLink>
                     { type === 'PHOTOGRAPHER' && (
                         <NavLink 
                             className="ant-menu-item" 
@@ -56,6 +49,13 @@ class ClientLanding extends React.Component {
                                 My Reservations
                         </NavLink>
                     )}
+                    <NavLink 
+                        className="ant-menu-item" 
+                        activeClassName="ant-menu-item-selected"
+                        to="/client/edit"
+                    >
+                        Personal Information
+                    </NavLink>
                 </Menu>
                 <div className="container mt-4 with-sidebar pl-4">
                     <Switch>

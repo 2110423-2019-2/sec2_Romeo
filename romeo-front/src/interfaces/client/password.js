@@ -140,7 +140,7 @@ class Edit extends React.Component {
                             >Confirm Password Edit</Button>
                             <Button 
                                 type="secondary" 
-                                onClick={() => history.push("/user/edit")}
+                                onClick={() => history.goBack()}
                                 className="mr-2"
                                 htmlType="button" 
                             >Back</Button>

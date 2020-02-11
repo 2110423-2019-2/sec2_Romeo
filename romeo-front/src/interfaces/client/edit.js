@@ -146,7 +146,7 @@ class Edit extends React.Component {
                         )}
                     </Form.Item>
                     <Form.Item>
-                        <Link to="/user/edit/password">
+                        <Link to="/client/edit/password">
                             <Button 
                                 type="primary" 
                                 className="mr-2"
@@ -233,60 +233,21 @@ class Edit extends React.Component {
                             />,
                         )}
                     </Form.Item>
-                    { type === 'PHOTOGRAPHER' && (
-                        <React.Fragment>
-                            <h3>Payment Information</h3>
-                            <div className="d-flex">
-                                <div className="mr-1">
-                                    <label>Bank Account Number</label>
-                                    <Form.Item 
-                                        validateStatus={bankAccountNumberError ? 'error' : ''} 
-                                        help={bankAccountNumberError || ''}
-                                    >
-                                        {getFieldDecorator('bankAccountNumber', {
-                                            rules: [
-                                                { required: true,message: 'This field is required.' },
-                                            ],
-                                            initialValue: bankAccountNumber
-                                        })(
-                                            <Input
-                                                placeholder="Account Number"
-                                                type="text"
-                                            />,
-                                        )}
-                                    </Form.Item>
-                                </div>
-                                <div className="ml-1">
-                                    <label>Bank Name</label>
-                                    <Form.Item 
-                                        validateStatus={bankNameError ? 'error' : ''} 
-                                        help={bankNameError || ''}
-                                    >
-                                        {getFieldDecorator('bankName', {
-                                            rules: [
-                                                { required: true,message: 'This field is required.' },
-                                            ],
-                                            initialValue: bankName
-                                        })(
-                                            <Input
-                                                placeholder="Bank Name"
-                                                type="text"
-                                            />,
-                                        )}
-                                    </Form.Item>
-                                </div>
-                            </div>
-                            <div className="mr-1">
-                                <label>Bank Account Name</label>
+                    <React.Fragment>
+                        <h3>Payment Information</h3>
+                        <div className="d-flex">
+                            <div className="mr-1 full-width">
+                                <label>Bank Account Number</label>
                                 <Form.Item 
-                                    validateStatus={bankAccountNameError ? 'error' : ''} 
-                                    help={bankAccountNameError || ''}
+                                    validateStatus={bankAccountNumberError ? 'error' : ''} 
+                                    help={bankAccountNumberError || ''}
+                                    className="full-width"
                                 >
-                                    {getFieldDecorator('bankAccountName', {
+                                    {getFieldDecorator('bankAccountNumber', {
                                         rules: [
                                             { required: true,message: 'This field is required.' },
                                         ],
-                                        initialValue: bankAccountName
+                                        initialValue: bankAccountNumber
                                     })(
                                         <Input
                                             placeholder="Account Number"
@@ -295,8 +256,47 @@ class Edit extends React.Component {
                                     )}
                                 </Form.Item>
                             </div>
-                        </React.Fragment>
-                    )}
+                            <div className="ml-1 full-width">
+                                <label>Bank Name</label>
+                                <Form.Item 
+                                    validateStatus={bankNameError ? 'error' : ''} 
+                                    help={bankNameError || ''}
+                                    className="full-width"
+                                >
+                                    {getFieldDecorator('bankName', {
+                                        rules: [
+                                            { required: true,message: 'This field is required.' },
+                                        ],
+                                        initialValue: bankName
+                                    })(
+                                        <Input
+                                            placeholder="Bank Name"
+                                            type="text"
+                                        />,
+                                    )}
+                                </Form.Item>
+                            </div>
+                        </div>
+                        <div className="mr-1">
+                            <label>Bank Account Name</label>
+                            <Form.Item 
+                                validateStatus={bankAccountNameError ? 'error' : ''} 
+                                help={bankAccountNameError || ''}
+                            >
+                                {getFieldDecorator('bankAccountName', {
+                                    rules: [
+                                        { required: true,message: 'This field is required.' },
+                                    ],
+                                    initialValue: bankAccountName
+                                })(
+                                    <Input
+                                        placeholder="Account Number"
+                                        type="text"
+                                    />,
+                                )}
+                            </Form.Item>
+                        </div>
+                    </React.Fragment>
                     <Form.Item>
                         <div className="d-flex">
                             <Button 
