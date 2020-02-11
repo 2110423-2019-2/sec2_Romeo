@@ -10,6 +10,11 @@ nav.main-nav {
     .container {
         height: 64px;
     }
+    .logo img {
+        padding: 2px;
+        width: 72px;
+        height: auto;
+    }
 }
 .ant-dropdown {
     z-index: 9999;
@@ -22,5 +27,14 @@ nav.main-nav {
 @media screen and (max-width: 599px) {
     .ant-menu-inline {
         display: none !important;
+    }
+}
+
+nav.main-nav.transparent {
+    background-color: transparent !important;
+    box-shadow: none !important;
+    .logo {
+        background-color: white;
+        border-radius: 4px;
     }
 }

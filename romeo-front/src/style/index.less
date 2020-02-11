@@ -17,7 +17,7 @@ body {
 }
 main.main-content {
     padding-top: 64px;
-    padding-bottom: 64px;
+    padding-bottom: 32px;
 }
 .container {
     margin: auto;
@@ -50,6 +50,22 @@ main.main-content {
         }
     }
 }
+
+.sidebar-profile {
+    width: 256px; 
+    height: 100%;
+    position: fixed;
+    @media screen and (max-width: 599px) {
+        & {
+            position: relative;
+            width: 100%;
+            height: auto;
+            text-align: center;
+        }
+    }
+}
+
+
 a {
     color: inherit;
     text-decoration: none;

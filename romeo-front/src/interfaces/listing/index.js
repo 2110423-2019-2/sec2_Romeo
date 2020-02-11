@@ -10,7 +10,7 @@ class Listing extends React.Component {
                     <div className="full-width bg-primary t-color-white">
                         <div className="container pb-5 pt-5">
                             <h1>Photo Bro</h1>
-                            <p>Slogan here.</p>
+                            <p className="t-color-white">Slogan here.</p>
                         </div>
                     </div>
                 )}

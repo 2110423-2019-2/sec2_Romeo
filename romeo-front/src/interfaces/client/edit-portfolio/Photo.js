@@ -6,7 +6,7 @@ class Photo extends React.Component {
         const { src, className, onDelete } = this.props;
         return (
             <div className="photo-grid-photo">
-                {/* <Button 
+                <Button 
                     type="danger" 
                     shape="circle"
                     size="large"
@@ -14,7 +14,7 @@ class Photo extends React.Component {
                     onClick={onDelete}
                 >
                     <Icon type="delete"/>
-                </Button> */}
+                </Button>
                 <img src={src} alt="" className={className} />
             </div>
         )

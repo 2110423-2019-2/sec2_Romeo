@@ -1,8 +1,9 @@
 import React from "react";
 import history from "../../common/router/history";
-import { Button, Form, Input, Select } from "antd";
+import { Button, Form, Input, Select, Row, Col } from "antd";
 import { signIn } from "../../common/actions/auth";
 import { connect } from "react-redux";
+import image from "assets/signup.jpg";
 
 function hasErrors(fieldsError) {
     return Object.keys(fieldsError).some(field => fieldsError[field]);
@@ -31,122 +32,217 @@ class SignUp extends React.Component {
         const { getFieldDecorator, getFieldsError, getFieldError, isFieldTouched } = this.props.form;
         // Validation
         const usernameError = isFieldTouched('username') && getFieldError('username');
-        const emailError = isFieldTouched('email') && getFieldError('email');
-        const passwordError = isFieldTouched('password') && getFieldError('password');
-        const typeError = isFieldTouched('type') && getFieldError('type');
         const firstNameError = isFieldTouched('firstName') && getFieldError('firstName');
         const lastNameError = isFieldTouched('lastName') && getFieldError('lastName');
+        const passwordError = isFieldTouched('password') && getFieldError('password');
+        const emailError = isFieldTouched('email') && getFieldError('email');
+        const typeError = isFieldTouched('type') && getFieldError('type');
+        const phoneError = isFieldTouched('phone') && getFieldError('phone');
         const ssnError = isFieldTouched('ssn') && getFieldError('ssn');
-        console.log(this.props);
+        const bankNameError = isFieldTouched('bankName') && getFieldError('bankName');
+        const bankAccountNumberError = isFieldTouched('bankAccountNumber') && getFieldError('bankAccountNumber');
+        const bankAccountNameError = isFieldTouched('bankAccountName') && getFieldError('bankAccountName');
         return (
-            <div className="container mt-4">
-                <h1>Sign Up</h1>
-                <Form>
-                    <h3>Account Information</h3>
-                    <label>Username</label>
-                    <Form.Item validateStatus={usernameError ? 'error' : ''} help={usernameError || ''}>
-                        {getFieldDecorator('username', {
-                            rules: [
-                                { required: true,message: 'This field is required.' },
-                            ],
-                        })(
-                            <Input
-                                placeholder="Username"
-                                type="text"
-                            />,
-                        )}
-                    </Form.Item>
-                    <label>Email</label>
-                    <Form.Item validateStatus={emailError ? 'error' : ''} help={emailError || ''}>
-                        {getFieldDecorator('email', {
-                            rules: [
-                                { required: true,message: 'This field is required.' },
-                            ],
-                        })(
-                            <Input
-                                placeholder="Email"
-                                type="email"
-                            />,
-                        )}
-                    </Form.Item>
-                    <label>Password</label>
-                    <Form.Item validateStatus={passwordError ? 'error' : ''} help={passwordError || ''}>
-                        {getFieldDecorator('password', {
-                            rules: [{ required: true, message: 'This field is required.' }],
-                        })(
-                            <Input
-                                placeholder="Password"
-                                type="password"
-                            />,
-                        )}
-                    </Form.Item>
-                    <label>Type</label>
-                    <Form.Item validateStatus={typeError ? 'error' : ''} help={typeError || ''}>
-                        {getFieldDecorator('type',{rules: [{ required: true , message: 'This field is required.'}]})(
-                            <Select placeholder="Type">
-                                <Option value="PHOTOGRAPHER">Photographer</Option>
-                                <Option value="CUSTOMER">Customer</Option>
-                            </Select>
-                        )}
-                    </Form.Item>
-                    <h3>Personal Information</h3>
-                    <div className="d-flex">
-                        <div className="mr-1 full-width">
-                            <label>First Name</label>
-                            <Form.Item validateStatus={firstNameError ? 'error' : ''} help={firstNameError || ''}>
-                                {getFieldDecorator('firstName', {
-                                    rules: [
-                                        { required: true,message: 'This field is required.' },
-                                    ],
-                                })(
-                                    <Input
-                                        placeholder="First Name"
-                                        type="text"
-                                    />,
-                                )}
-                            </Form.Item>
+            <div className="full-width">
+                <Row gutter={0}>
+                    <Col xs={{ span:24 }} sm={{ span: 12}} className="mb-4 d-flex d-none-sm"
+                    style={{ 
+                        backgroundImage: `url(${image})`, 
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center',
+                        height: '100vh',
+                        position: 'fixed',
+                        top: 0,
+                        bottom: 0
+                    }}>
+                    </Col>
+                    <Col xs={{ span:24 }} sm={{ span: 12}} className="mb-4" style={{ float: 'right' }}>
+                        <div className="pa-4">
+                            <h1>Sign Up</h1>
+                            <Form>
+                                <h3>Account Information</h3>
+                                <label>Username</label>
+                                <Form.Item validateStatus={usernameError ? 'error' : ''} help={usernameError || ''}>
+                                    {getFieldDecorator('username', {
+                                        rules: [
+                                            { required: true,message: 'This field is required.' },
+                                        ],
+                                    })(
+                                        <Input
+                                            placeholder="Username"
+                                            type="text"
+                                        />,
+                                    )}
+                                </Form.Item>
+                                <label>Email</label>
+                                <Form.Item validateStatus={emailError ? 'error' : ''} help={emailError || ''}>
+                                    {getFieldDecorator('email', {
+                                        rules: [
+                                            { required: true,message: 'This field is required.' },
+                                        ],
+                                    })(
+                                        <Input
+                                            placeholder="Email"
+                                            type="email"
+                                        />,
+                                    )}
+                                </Form.Item>
+                                <label>Password</label>
+                                <Form.Item validateStatus={passwordError ? 'error' : ''} help={passwordError || ''}>
+                                    {getFieldDecorator('password', {
+                                        rules: [{ required: true, message: 'This field is required.' }],
+                                    })(
+                                        <Input
+                                            placeholder="Password"
+                                            type="password"
+                                        />,
+                                    )}
+                                </Form.Item>
+                                <label>Type</label>
+                                <Form.Item validateStatus={typeError ? 'error' : ''} help={typeError || ''}>
+                                    {getFieldDecorator('type',{rules: [{ required: true , message: 'This field is required.'}]})(
+                                        <Select placeholder="Type">
+                                            <Option value="PHOTOGRAPHER">Photographer</Option>
+                                            <Option value="CUSTOMER">Customer</Option>
+                                        </Select>
+                                    )}
+                                </Form.Item>
+                                <h3>Contact Information</h3>
+                                <label>Phone Number</label>
+                                <Form.Item 
+                                    validateStatus={phoneError ? 'error' : ''} 
+                                    help={phoneError || ''}
+                                >
+                                    {getFieldDecorator('phone', {
+                                        rules: [
+                                            { required: true,message: 'This field is required.' },
+                                        ]
+                                    })(
+                                        <Input
+                                            placeholder="Phone Number"
+                                            type="phone"
+                                        />,
+                                    )}
+                                </Form.Item>
+                                <h3>Personal Information</h3>
+                                <div className="d-flex">
+                                    <div className="mr-1 full-width">
+                                        <label>First Name</label>
+                                        <Form.Item validateStatus={firstNameError ? 'error' : ''} help={firstNameError || ''}>
+                                            {getFieldDecorator('firstName', {
+                                                rules: [
+                                                    { required: true,message: 'This field is required.' },
+                                                ],
+                                            })(
+                                                <Input
+                                                    placeholder="First Name"
+                                                    type="text"
+                                                />,
+                                            )}
+                                        </Form.Item>
+                                    </div>
+                                    <div className="mr-1 full-width">
+                                        <label>Last Name</label>
+                                        <Form.Item validateStatus={lastNameError ? 'error' : ''} help={lastNameError || ''}>
+                                            {getFieldDecorator('lastName', {
+                                                rules: [
+                                                    { required: true,message: 'This field is required.' },
+                                                ],
+                                            })(
+                                                <Input
+                                                    placeholder="Last Name"
+                                                    type="text"
+                                                />,
+                                            )}
+                                        </Form.Item>
+                                    </div>
+                                </div>
+                                <label>Social Security Number</label>
+                                <Form.Item validateStatus={ssnError ? 'error' : ''} help={ssnError || ''}>
+                                    {getFieldDecorator('ssn', {
+                                        rules: [
+                                            { required: true,message: 'This field is required.' },
+                                        ],
+                                    })(
+                                        <Input
+                                            placeholder="Social Security Number"
+                                            type="text"
+                                            maxLength="13"
+                                        />,
+                                    )}
+                                </Form.Item>
+                                <h3>Payment Information</h3>
+                                <div className="d-flex">
+                                    <div className="mr-1 full-width">
+                                        <label>Bank Account Number</label>
+                                        <Form.Item 
+                                            validateStatus={bankAccountNumberError ? 'error' : ''} 
+                                            help={bankAccountNumberError || ''}
+                                            className="full-width"
+                                        >
+                                            {getFieldDecorator('bankAccountNumber', {
+                                                rules: [
+                                                    { required: true,message: 'This field is required.' },
+                                                ]
+                                            })(
+                                                <Input
+                                                    placeholder="Account Number"
+                                                    type="text"
+                                                />,
+                                            )}
+                                        </Form.Item>
+                                    </div>
+                                    <div className="ml-1 full-width">
+                                        <label>Bank Name</label>
+                                        <Form.Item 
+                                            validateStatus={bankNameError ? 'error' : ''} 
+                                            help={bankNameError || ''}
+                                            className="full-width"
+                                        >
+                                            {getFieldDecorator('bankName', {
+                                                rules: [
+                                                    { required: true,message: 'This field is required.' },
+                                                ]
+                                            })(
+                                                <Input
+                                                    placeholder="Bank Name"
+                                                    type="text"
+                                                />,
+                                            )}
+                                        </Form.Item>
+                                    </div>
+                                </div>
+                                <div className="mr-1">
+                                    <label>Bank Account Name</label>
+                                    <Form.Item 
+                                        validateStatus={bankAccountNameError ? 'error' : ''} 
+                                        help={bankAccountNameError || ''}
+                                    >
+                                        {getFieldDecorator('bankAccountName', {
+                                            rules: [
+                                                { required: true,message: 'This field is required.' },
+                                            ]
+                                        })(
+                                            <Input
+                                                placeholder="Account Number"
+                                                type="text"
+                                            />,
+                                        )}
+                                    </Form.Item>
+                                </div>
+                                <Form.Item>
+                                    <Button 
+                                        type="primary" 
+                                        onClick={e => this.handleSubmit(e)}
+                                        className="mr-2"
+                                        htmlType="submit" 
+                                        disabled={hasErrors(getFieldsError())}
+                                    >Sign Up</Button>
+                                </Form.Item>
+                            </Form>
                         </div>
-                        <div className="mr-1 full-width">
-                            <label>Last Name</label>
-                            <Form.Item validateStatus={lastNameError ? 'error' : ''} help={lastNameError || ''}>
-                                {getFieldDecorator('lastName', {
-                                    rules: [
-                                        { required: true,message: 'This field is required.' },
-                                    ],
-                                })(
-                                    <Input
-                                        placeholder="Last Name"
-                                        type="text"
-                                    />,
-                                )}
-                            </Form.Item>
-                        </div>
-                    </div>
-                    <label>Social Security Number</label>
-                    <Form.Item validateStatus={ssnError ? 'error' : ''} help={ssnError || ''}>
-                        {getFieldDecorator('ssn', {
-                            rules: [
-                                { required: true,message: 'This field is required.' },
-                            ],
-                        })(
-                            <Input
-                                placeholder="Social Security Number"
-                                type="text"
-                                maxLength="13"
-                            />,
-                        )}
-                    </Form.Item>
-                    
-                    <Form.Item>
-                        <Button 
-                            type="primary" 
-                            onClick={e => this.handleSubmit(e)}
-                            className="mr-2"
-                            htmlType="submit" 
-                            disabled={hasErrors(getFieldsError())}
-                        >Sign Up</Button>
-                    </Form.Item>
-                </Form>
+                    </Col>
+                </Row>
             </div>
         )
     }

@@ -7,7 +7,7 @@ import { signOut } from "common/actions/auth";
 import history from "common/router/history";
 import SignInRegModal from "interfaces/signinreg/modal";
 
-class Nav extends React.Component {
+class TransparentNav extends React.Component {
     state = {
         showSignIn: false
     }
@@ -18,7 +18,7 @@ class Nav extends React.Component {
         const currentClient = JSON.parse(localStorage.getItem('currentClient'))
         console.log(this.state);
         return (
-            <nav className="main-nav">
+            <nav className="main-nav transparent">
                 <div className="container d-flex align-center justify-space-between">
                     <Link to="/">
                         <div className="logo">
@@ -66,7 +66,7 @@ class Nav extends React.Component {
                                 </Menu>
                             )
                         )} trigger={['click']}>
-                            <Button type="primary" shape="circle" icon="user" size="large"/>
+                            <Button type="primary" shape="circle" icon="user" size="large" />
                         </Dropdown>
                     ) : (
                         <div>
@@ -84,7 +84,7 @@ class Nav extends React.Component {
                     )}
                     { showSignIn && (
                         <SignInRegModal 
-                            visible={showSignIn} 
+                            visible={showSignIn || showSignUp} 
                             onCancel={() => {
                                 this.setState({
                                     showSignIn: false,
@@ -106,5 +106,5 @@ const mapStateToProps = state => ({
 export default connect(
     mapStateToProps,
     { signOut }
-)(Nav);
+)(TransparentNav);
 

@@ -76,6 +76,16 @@
             opacity: 1;
             pointer-events: initial;
         }
+        @media screen and (hover: none) {
+            .del-button {
+                opacity: 1;
+                pointer-events: initial;
+                top: initial;
+                bottom: 60px;
+                right: 30px;
+                transform: scale(1.7)
+            }
+        }
     }
     @media screen and (max-width:599px) {
         & {
@@ -85,7 +95,23 @@
             .photo-grid-photo {
                 padding-left: 0;
                 padding-right: 0;
+                padding-bottom: 32px;
             }
         }
+    }
+}
+
+.profile-image {
+    width: 200px;
+    height: 200px;
+    border-radius: 999px;
+    background-color: @primary-color;
+    .d-flex();
+    .align-center();
+    .justify-center();
+    margin: auto;
+    i {
+        color: white;
+        font-size: 100px;
     }
 }

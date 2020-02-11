@@ -1,9 +1,9 @@
 import React from "react";
 import { connect } from "react-redux";
 import { Route } from "react-router-dom";
-import Nav from "../../components/Nav";
+import TransparentNav from "../../components/TransparentNav";
 
-const PrivateRoute = props => {
+const PublicRoute = props => {
     let { isAuth, path, component: Component, ...rest } = props;
 	return (
 		<Route
@@ -11,7 +11,7 @@ const PrivateRoute = props => {
 			path={path}
 			component={props =>
 				<React.Fragment>
-					<Nav/>
+					<TransparentNav/>
 					<main className="main-content">
 						<Component {...props} />
 					</main>
@@ -24,4 +24,4 @@ const PrivateRoute = props => {
 const mapStateToProps = state => ({
 	isAuth: state.auth.isAuth
 });
-export default connect(mapStateToProps)(PrivateRoute);
+export default connect(mapStateToProps)(PublicRoute);
