@@ -10,6 +10,7 @@ import { setAuth } from "./common/actions/auth";
 import * as serviceWorker from './serviceWorker';
 import { removeCurrentClient, setCurrentClient } from 'common/auth';
 import { getCurrentClient, mockValues } from 'logic/Client';
+require('dotenv').config();
 
 initHttp();
 

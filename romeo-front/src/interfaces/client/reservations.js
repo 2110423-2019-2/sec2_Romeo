@@ -49,12 +49,12 @@ class Reservations extends React.Component {
 
         const { reservations } = this.state;
         return (
-            <React.Fragment>
+            <div className="container mt-4 with-sidebar pl-4">
                 <h1>My Reservations</h1>
                 { reservations.length >= 0 && (
                     <Table dataSource={reservations} columns={columns} />
                 )}
-            </React.Fragment>
+            </div>
         )
     }
 }

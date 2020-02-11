@@ -27,7 +27,7 @@ class Style extends React.Component {
                                 defaultValue={currentStyles}
                             />
                         )}
-                        { currentStyles.length == 0 && (
+                        { currentStyles.length === 0 && (
                             <Checkbox.Group 
                                 className="vertical"
                                 options={availableStyles} 

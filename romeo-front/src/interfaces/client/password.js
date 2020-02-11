@@ -70,7 +70,7 @@ class Edit extends React.Component {
             && getFieldError('confirmPassword');
 
         return (
-            <React.Fragment>
+            <div className="container mt-4 with-sidebar pl-4">
                 <h1>Edit Password</h1>
                 <div className="mb-4">
                     { passwordsDoNotMatch && (
@@ -147,7 +147,7 @@ class Edit extends React.Component {
                         </div>
                     </Form.Item>
                 </Form>
-            </React.Fragment>
+            </div>
         )
     }
 }

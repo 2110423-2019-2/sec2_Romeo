@@ -57,7 +57,7 @@ class EditProfile extends React.Component {
         } = this.state;
 
         return (
-            <React.Fragment>
+            <div className="container mt-4 with-sidebar pl-4">
                 <h1>Edit Profile</h1>
                 { success && 
                     <React.Fragment>
@@ -99,7 +99,7 @@ class EditProfile extends React.Component {
                         >Cancel</Button>
                     </div>
                 </div>
-            </React.Fragment>
+            </div>
         )
     }
 }

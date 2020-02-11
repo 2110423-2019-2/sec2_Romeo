@@ -91,7 +91,7 @@ class Edit extends React.Component {
         const bankAccountNameError = isFieldTouched('bankAccountName') && getFieldError('bankAccountName');
 
         return (
-            <React.Fragment>
+            <div className="container mt-4 with-sidebar pl-4">
                 <h1>Personal Information</h1>
                 { success && 
                     <React.Fragment>
@@ -318,7 +318,7 @@ class Edit extends React.Component {
                         </div>
                     </Form.Item>
                 </Form>
-            </React.Fragment>
+            </div>
         )
     }
 }
