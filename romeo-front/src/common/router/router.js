@@ -5,10 +5,10 @@ import PublicRoute from "./layouts/PublicRoute";
 import history from "./history";
 import { setAuth } from "common/actions/auth";
 import { connect } from "react-redux";
-import Profile from "modules/profile/";
-import Listing from "modules/listing/"
-import UserLanding from "modules/user";
-import SignUp from "modules/signinreg/SignUp";
+import Profile from "interfaces/profile";
+import Listing from "interfaces/listing"
+import UserLanding from "interfaces/user";
+import SignUp from "interfaces/signinreg/SignUp";
 
 
 class AppRouter extends React.Component {

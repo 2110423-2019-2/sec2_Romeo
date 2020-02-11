@@ -5,7 +5,7 @@ import { Button, Dropdown, Menu, Icon } from 'antd';
 import { connect } from "react-redux";
 import { signOut } from "common/actions/auth";
 import history from "common/router/history";
-import SignInRegModal from "modules/signinreg/modal";
+import SignInRegModal from "interfaces/signinreg/modal";
 
 class Nav extends React.Component {
     state = {

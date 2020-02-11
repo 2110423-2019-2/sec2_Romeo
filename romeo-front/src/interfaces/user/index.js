@@ -4,7 +4,7 @@ import Edit from "./edit";
 import Password from "./password"
 import Reservations from "./reservations";
 import EditPortfolio from "./edit-portfolio"
-import EditProfile from "./edit-profile/"
+import EditProfile from "./edit-profile"
 
 import { Menu } from 'antd';
 
