@@ -7,6 +7,10 @@ verify_ssl = true
 
 [packages]
 django = "*"
+djangorestframework = "*"
+serializers = "*"
+django-rest-auth = "*"
+django-allauth = "*"
 
 [requires]
 python_version = "3.7"

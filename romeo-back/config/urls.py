@@ -1,4 +1,4 @@
-"""backend URL Configuration
+"""config URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/3.0/topics/http/urls/
@@ -16,13 +16,9 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
-from customers.views import customers
-
-
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include('api.urls')),
-    path('api-auth/', include('rest_framework.urls')),
-    path('customers/', customers),
-    #path('photographers/', include('photographers.urls'))
+    path('api/v1/', include('api.urls')),
+    path('api/rest-auth/', include('rest_auth.urls')),
+    path('api/rest-auth/registration', include('rest_auth.registration.urls')),
 ]

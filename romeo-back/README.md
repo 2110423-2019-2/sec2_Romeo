@@ -1,3 +1,4 @@
+# REQUIRED
 djangorestframework
 mysql
 mysqlconnection
