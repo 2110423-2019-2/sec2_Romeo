@@ -8,6 +8,7 @@ import { getCurrentClient, editCurrentClient } from "logic/Client";
 import { setCurrentEquipment, setCurrentStyles, setCurrentAvailTimes } from "./actions";
 import Equipment from "./equipment";
 import Style from "./style";
+import AvailTimes from "./availTimes";
 
 class EditProfile extends React.Component {
     componentDidMount() {
@@ -75,6 +76,9 @@ class EditProfile extends React.Component {
                         <div className="pb-2"/>
                     </React.Fragment>
                 }
+                <div className="mb-4">
+                    <AvailTimes />
+                </div>
                 <div>
                     <Row gutter={{ xs: 0, sm: 32 }}>
                         <Col xs={{ span:24 }} lg={{ span: 12 }} className="mb-4">

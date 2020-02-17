@@ -74,11 +74,12 @@ class Nav extends React.Component {
                             type="secondary" 
                             className="mr-2"
                             htmlType="button" 
+                            shape="round"
                             onClick={() => this.setState({
                                 showSignIn: true
                             })}>Sign In</Button>
                             <Link to="/signup">
-                                <Button type="primary" htmlType="button">Sign Up</Button>
+                                <Button type="primary" shape="round" htmlType="button">Sign Up</Button>
                             </Link>
                         </div>
                     )}

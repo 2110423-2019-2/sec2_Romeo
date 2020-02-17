@@ -6,8 +6,13 @@ import { getPortfolio } from "logic/Portfolio";
 import { connect } from "react-redux"
 import { formatDate } from "common/date";
 import moment from "moment";
+import JobCalendar from "./calendar";
 
 class Profile extends React.Component {
+    state = {
+        display: 0
+    }
+
     render() {
         const currentClient = getCurrentClient();
         const currentPortfolio = getPortfolio();
@@ -21,27 +26,47 @@ class Profile extends React.Component {
         }
 
         const { isAuth } = this.props;
+        const { display } = this.state;
+        
         return (
             <div className="d-flex-md align-stretch bg-white">
                 <div
                     className="sidebar-profile pa-4"
                 >
-                    <div className="profile-image mb-4">
-                        <Icon type="user"/>
-                    </div>
                     { currentClient && currentClient.username === username && (
-                        <h1 className="mb-1">{currentClient.firstName} {currentClient.lastName}</h1>
+                        <React.Fragment>
+                            <h1 className="mb-1">
+                                {currentClient.firstName} {currentClient.lastName}
+                            </h1>
+                        </React.Fragment>
                     )}
                     <h3 className="mb-2">{username}</h3>
                     <span className="t-color-light d-block mb-4">Last Online Time: {formatDate(moment(new Date()))}</span>
                     { isAuth && currentClient.username === username && (
                         <Link to="/client/edit-profile">
-                            <Button type="primary">Edit Profile</Button>
+                            <Button type="primary" shape="round">Edit Profile</Button>
                         </Link>
                     )}<br/>
-                    
+                    <div className="profile-tabs mt-4">
+                        <div className="secondary-label mb-2">
+                            Show
+                        </div>
+                        <div 
+                            className={`profile-tabs-item ${display === 0 && 'active'}`}
+                            onClick={() => this.setState({ display: 0})}
+                        >
+                            Portfolio
+                        </div>
+                        <div 
+                            className={`profile-tabs-item ${display === 1 && 'active'}`}
+                            onClick={() => this.setState({ display: 1})}
+                        >
+                            Available Times
+                        </div>
+                    </div>
                 </div>
                 <div className="container with-sidebar full-width-xs portfolio-container">
+                { display === 0 ? (
                     <div className="photo-grid">
                         { photos.map((e,i) => (
                             <div  className="photo-grid-photo">
@@ -49,7 +74,12 @@ class Profile extends React.Component {
                             </div>
                         ))}
                     </div>
-                </div>
+                ) : (
+                    <div className="pa-4">
+                        <JobCalendar/>
+                    </div>
+                ) }
+            </div>
             </div>
         )
     }
