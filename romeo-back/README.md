@@ -1,0 +1,4 @@
+# REQUIRED
+djangorestframework
+mysql
+mysqlconnection
