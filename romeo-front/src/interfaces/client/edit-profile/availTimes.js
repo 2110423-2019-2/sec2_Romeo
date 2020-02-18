@@ -12,11 +12,41 @@ const options = [
     { label: 'Not Available', value: "NOT_AVAILABLE"}
   ];
 
+const days = [{
+    label: "Monday",
+    value: "MONDAY",
+    color: "gold",
+},{
+    label: "Tuesday",
+    value: "TUESDAY",
+    color: "magenta",
+},{
+    label: "Wednesday",
+    value: "WEDNESDAY",
+    color: "green",
+},{
+    label: "Thursday",
+    value: "THURSDAY",
+    color: "orange",
+},{
+    label: "Friday",
+    value: "FRIDAY",
+    color: "blue",
+},{
+    label: "Saturday",
+    value: "SATURDAY",
+    color: "purple",
+},{
+    label: "Sunday",
+    value: "SUNDAY",
+    color: "volcano",
+}]
+
 class AvailTimes extends React.Component {
    
     onChange = (e, day) => {
         console.log({
-            day,
+            day: day.value,
             time: e.target.value
         });
     }
@@ -29,34 +59,12 @@ class AvailTimes extends React.Component {
             <React.Fragment>
                 <h3>Available Times</h3>
                 <Form>
-                    <div className="snippet secondary">
-                        <Tag color="gold">Monday</Tag>
-                        <Radio.Group options={options} defaultValue="NOT_AVAILABLE" onChange={(e) => this.onChange(e, 'MONDAY')} />
-                    </div>
-                    <div className="snippet secondary">
-                        <Tag color="magenta">Tuesday</Tag>
-                        <Radio.Group options={options} defaultValue="NOT_AVAILABLE" onChange={(e) => this.onChange(e, 'TUESDAY')} />
-                    </div>
-                    <div className="snippet secondary">
-                        <Tag color="green">Wednesday</Tag>
-                        <Radio.Group options={options} defaultValue="NOT_AVAILABLE" onChange={(e) => this.onChange(e, 'WEDNESDAY')} />
-                    </div>
-                    <div className="snippet secondary">
-                        <Tag color="orange">Thursday</Tag>
-                        <Radio.Group options={options} defaultValue="NOT_AVAILABLE" onChange={(e) => this.onChange(e, 'THURSDAY')} />
-                    </div>
-                    <div className="snippet secondary">
-                        <Tag color="blue">Friday</Tag>
-                        <Radio.Group options={options} defaultValue="NOT_AVAILABLE" onChange={(e) => this.onChange(e, 'FRIDAY')} />
-                    </div>
-                    <div className="snippet secondary">
-                        <Tag color="purple">Saturday</Tag>
-                        <Radio.Group options={options} defaultValue="NOT_AVAILABLE" onChange={(e) => this.onChange(e, 'SATURDAY')} />
-                    </div>
-                    <div className="snippet secondary">
-                        <Tag color="volcano">Sunday</Tag>
-                        <Radio.Group options={options} defaultValue="NOT_AVAILABLE" onChange={(e) => this.onChange(e, 'SUNDAY')} />
-                    </div>
+                    { days.map((e,i) => (
+                        <div className="snippet secondary">
+                            <Tag color={e.color}>{e.label}</Tag>
+                            <Radio.Group options={options} defaultValue="NOT_AVAILABLE" onChange={(ev) => this.onChange(ev, e)} />
+                        </div>
+                    ))}
                 </Form>
             </React.Fragment>
         )
