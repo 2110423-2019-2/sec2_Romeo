@@ -1,8 +1,5 @@
 from rest_framework import fields, serializers
 
-from allauth.account.adapter import get_adapter
-from allauth.account.utils import setup_user_email
-
 # Import App Models
 from photographers.models import Photographer
 from customers.models import Customer
@@ -87,12 +84,10 @@ class CustomerSerializer(serializers.ModelSerializer):
     #     jobs_by_customer_data.save()
 
 
-
-
-
-# class RegisterSerializer(RegisterSerializer):
+# class CustomRegisterSerializer(RegisterSerializer):
 #     first_name = serializers.CharField(required=True, write_only=True)
 #     last_name = serializers.CharField(required=True, write_only=True)
+#     password = serializers.CharField(write_only=True)
 #
 #     def get_cleaned_data(self):
 #         return {
@@ -101,12 +96,3 @@ class CustomerSerializer(serializers.ModelSerializer):
 #             'password1': self.validated_data.get('password1', ''),
 #             'email': self.validated_data.get('email', ''),
 #         }
-#
-#     def save(self, request):
-#         adapter = get_adapter()
-#         user = adapter.new_user(request)
-#         self.cleaned_data = self.get_cleaned_data()
-#         adapter.save_user(request, user, self)
-#         setup_user_email(request, user, [])
-#         user.save()
-#         return user
