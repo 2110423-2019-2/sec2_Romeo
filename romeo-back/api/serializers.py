@@ -45,11 +45,11 @@ class PhotographerSerializer(serializers.ModelSerializer):
 
 class CustomerSerializer(serializers.ModelSerializer):
     user = UserSerializer(required=True)
-    jobs_by_customer = JobSerializer(many=True)
+    #jobs_by_customer = JobSerializer(many=True)
 
     class Meta:
         model = Customer
-        fields = ['user', 'jobs_by_customer']
+        fields = ['user']
 
         # Override default create method to auto create user from photographer
         def create(self, validated_data):

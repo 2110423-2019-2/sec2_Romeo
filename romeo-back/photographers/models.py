@@ -48,6 +48,7 @@ class Equipment(models.Model):
 
 
 class Style(models.Model):
+    StyleID = models.AutoField(primary_key=True)
     StyleName = models.CharField(max_length=20, choices=STYLE_CHOICES)
 
     def __str__(self):
