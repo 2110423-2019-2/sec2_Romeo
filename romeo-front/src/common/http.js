@@ -5,7 +5,7 @@ import { removeAuthToken } from "./auth";
 import { setAuth } from "./actions/auth";
 
 export default () => {
-	Axios.defaults.baseURL = "http://localhost:3000";
+	Axios.defaults.baseURL = "http://localhost:8000";
 	Axios.defaults.headers.post["Content-Type"] = "application/json";
 	Axios.interceptors.response.use(null, function(err) {
 		// store.dispatch(setError(err.response));

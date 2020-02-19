@@ -4,6 +4,8 @@ import { Button, Form, Input, Select, Row, Col } from "antd";
 import { signIn } from "../../common/actions/auth";
 import { connect } from "react-redux";
 import image from "assets/signup.jpg";
+import Axios from "axios";
+import moment from "moment";
 
 function hasErrors(fieldsError) {
     return Object.keys(fieldsError).some(field => fieldsError[field]);
@@ -21,9 +23,63 @@ class SignUp extends React.Component {
         e.preventDefault();
         this.props.form.validateFields((err, values) => {
             if (!err) {
-                // const { username, email, password, type, name } = values
                 // TODO: Connect with backend to register instead
-                this.props.signIn(values, history);
+                const { username, 
+                    firstName, 
+                    lastName, 
+                    password, 
+                    type,
+                    email,
+                    phone,
+                    ssn,
+                    bankName,
+                    bankAccountNumber,
+                    bankAccountName,
+                    price
+                } = values
+                const userInfo = {
+                    user: {
+                        last_login: moment(new Date()),
+                        is_superuser: false,
+                        is_staff: false,
+                        is_active: false,
+                        date_joined: moment(new Date()),
+                        is_photographer: type === "PHOTOGRAPHER",
+                        is_customer: type === "CUSTOMER",
+                        first_name: firstName,
+                        last_name: lastName,
+                        username: username,
+                        password: password,
+                        email,
+                        ssn,
+                        bank_account_number: bankAccountNumber,
+                        bank_name: bankName,
+                        bank_account_name: bankAccountName,
+                        phone,
+                        groups: [],
+                        user_permissions: []
+                    },
+                }
+                const photographerInfo = {
+                    PhotographerContact: phone,
+                    PhotographerPrice: price,
+                    PhotographerLastOnlineTime: moment(new Date()),
+                    PhotographerAvailTime: null,
+                    PhotographerEquipment: null,
+                    PhotographerPhotos: null,
+                    PhotographerStyle: []
+                }
+                if (type === 'PHOTOGRAPHER') {
+                    Axios.post('/api/photographers/',{
+                        ...userInfo,
+                        ...photographerInfo
+                    }).then(res => console.log(res))
+                    .catch(err => console.log(err))
+                } else {
+                    Axios.post('/api/customers/',userInfo)
+                    .then(res => console.log(res))
+                    .catch(err => console.log(err))
+                }
             }
         });
     };

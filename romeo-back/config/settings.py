@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     # Third Party
     'djoser',
     'rest_framework',
+    'corsheaders',
 
     # JWT authentication backend library
     'rest_framework_simplejwt',
@@ -57,6 +58,10 @@ INSTALLED_APPS = [
     'users.apps.UsersConfig',
 ]
 
+CORS_ORIGIN_WHITELIST = [
+    "http://localhost:3000"
+]
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -65,6 +70,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
 ]
 
 
@@ -102,7 +109,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'romeo-database',
         'USER': 'root',
-        'PASSWORD': 'P@ssw0rd',
+        'PASSWORD': 'Pakim2541',
         'HOST': 'localhost',
         'PORT': '3306',
     }
