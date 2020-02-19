@@ -1,68 +1,47 @@
-from django.shortcuts import render
-from django.contrib.auth import get_user_model
+from rest_framework.decorators import action
 from rest_framework import generics, viewsets
-from rest_framework.permissions import BasePermission
+from .permissions import IsUser
 
 # Import Serializers of apps
-from .serializers import PhotographerSerializer, CustomerSerializer, JobSerializer
+from .serializers import PhotographerSerializer, CustomerSerializer, JobSerializer, UserSerializer
 
 # Import models of apps for queryset
-from photographers.models import PhotographerInfo
-from customers.models import CustomerInfo
+from photographers.models import Photographer
+from customers.models import Customer
 from jobs.models import JobInfo
-
-
-# Define custom permissions to allow only admin or owner to view
-class IsSuperUser(BasePermission):
-    def has_permission(self, request, view):
-        return request.user and request.user.is_superuser
-
-
-class IsUser(BasePermission):
-    def has_object_permission(self, request, view, obj):
-        if request.user:
-            if request.user.is_superuser:
-                return True
-            else:
-                return obj == request.user
-        else:
-            return False
-
-#######################
+from users.models import CustomUser
 
 
 class PhotographerViewSet(viewsets.ModelViewSet):
     serializer_class = PhotographerSerializer
-    queryset = PhotographerInfo.objects.all()
-
-    def get_permissions(self):
-        if self.action == 'list':
-            self.permission_classes = [IsSuperUser, ]
-        elif self.action in ['update', 'retrieve', 'destroy']:
-            self.permission_classes = [IsUser]
-        return super(self.__class__, self).get_permissions()
+    queryset = Photographer.objects.all()
+    permission_classes = [IsUser]
 
 
 class CustomerViewSet(viewsets.ModelViewSet):
-    queryset = CustomerInfo.objects.all()
+    queryset = Customer.objects.filter()
     serializer_class = CustomerSerializer
-
-    def get_permissions(self):
-        if self.action == 'list':
-            self.permission_classes = [IsSuperUser, ]
-        elif self.action in ['update', 'retrieve', 'destroy']:
-            self.permission_classes = [IsUser]
-        return super(self.__class__, self).get_permissions()
+    permission_classes = [IsUser]
 
 
 class JobsViewSet(viewsets.ModelViewSet):
     queryset = JobInfo.objects.all()
     serializer_class = JobSerializer
+    permission_classes = [IsUser]
 
-    def get_permissions(self):
-        if self.action == 'list':
-            self.permission_classes = [IsSuperUser, ]
-        elif self.action in ['update', 'retrieve', 'destroy']:
-            self.permission_classes = [IsUser]
-        return super(self.__class__, self).get_permissions()
+    # def get_permissions(self):
+    #     if self.action == 'list':
+    #         self.permission_classes = [IsSuperUser, ]
+    #     elif self.action in ['update', 'retrieve', 'destroy']:
+    #         self.permission_classes = [IsUser]
+    #     return super(self.__class__, self).get_permissions()
+
+
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = CustomUser.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [IsUser]
+
+
+
 

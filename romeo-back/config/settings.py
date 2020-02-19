@@ -1,3 +1,4 @@
+from datetime import timedelta
 """
 Django settings for config project.
 
@@ -40,20 +41,19 @@ INSTALLED_APPS = [
     'django.contrib.sites',
 
     # Third Party
-    'allauth',
-    'allauth.account',
-    'allauth.socialaccount',
-    'rest_auth.registration',
+    'djoser',
     'rest_framework',
-    'rest_framework.authtoken',
-    'rest_auth',
-    'multiselectfield',
+
+    # JWT authentication backend library
+    'rest_framework_simplejwt',
 
     # Local
     'customers.apps.CustomersConfig',
     'photographers.apps.PhotographersConfig',
     'jobs.apps.JobsConfig',
     'reviews.apps.ReviewsConfig',
+    'api.apps.ApiConfig',
+    'users.apps.UsersConfig',
 ]
 
 MIDDLEWARE = [
@@ -128,19 +128,24 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 # Rest Framework
-REST_FRAMEWORK:{
-    'DEFAULT_PERMISSION_CLASSES': [
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
-    ],
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.TokenAuthentication',
-    ]
+    ),
+}
+DJOSER= {
+    'SERIALIZERS':{
+        'user': 'api.serializers.UserSerializer',
+    }
 }
 
 # Rest Auth Serializer
-REST_AUTH_REGISTER_SERIALIZERS = {
-        'REGISTER_SERIALIZER': 'api.serializers.RegisterSerializer',
-}
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
@@ -157,6 +162,14 @@ USE_TZ = True
 
 SITE_ID = 1
 
+AUTH_USER_MODEL = 'users.CustomUser'
+
+SIMPLE_JWT = {
+   'AUTH_HEADER_TYPES': ('JWT',),
+    'JWT_ALLOW_REFRESH': True,
+    'JWT_EXPIRATION_DELTA': timedelta(hours=1),
+    'JWT_REFRESH_EXPIRATION_DELTA': timedelta(days=7),
+}
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
