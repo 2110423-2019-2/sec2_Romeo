@@ -3,10 +3,11 @@ from rest_framework import generics, viewsets
 from .permissions import IsUser
 
 # Import Serializers of apps
-from .serializers import PhotographerSerializer, CustomerSerializer, JobSerializer, UserSerializer
+from .serializers import PhotographerSerializer, CustomerSerializer, JobSerializer, UserSerializer, \
+    PhotoSerializer, AvailTimeSerializer, EquipmentSerializer, StyleSerializer
 
 # Import models of apps for queryset
-from photographers.models import Photographer
+from photographers.models import Photographer, Photo, AvailTime, Equipment, Style
 from customers.models import Customer
 from jobs.models import JobInfo
 from users.models import CustomUser
@@ -15,6 +16,26 @@ from users.models import CustomUser
 class PhotographerViewSet(viewsets.ModelViewSet):
     serializer_class = PhotographerSerializer
     queryset = Photographer.objects.all()
+
+
+class PhotoViewSet(viewsets.ModelViewSet):
+    serializer_class = PhotoSerializer
+    queryset = Photo.objects.all()
+
+
+class AvailTimeViewSet(viewsets.ModelViewSet):
+    serializer_class = AvailTimeSerializer
+    queryset = AvailTime.objects.all()
+
+
+class StyleViewSet(viewsets.ModelViewSet):
+    serializer_class = StyleSerializer
+    queryset = Style.objects.all()
+
+
+class EquipmentViewSet(viewsets.ModelViewSet):
+    serializer_class = EquipmentSerializer
+    queryset = Equipment.objects.all()
 
 
 class CustomerViewSet(viewsets.ModelViewSet):

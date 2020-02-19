@@ -1,7 +1,7 @@
 from rest_framework import fields, serializers
 
 # Import App Models
-from photographers.models import Photographer
+from photographers.models import Photographer, Photo, AvailTime, Equipment, Style
 from customers.models import Customer
 from jobs.models import JobInfo
 from users.models import CustomUser
@@ -41,6 +41,30 @@ class PhotographerSerializer(serializers.ModelSerializer):
                                                    PhotographerEquipment=validated_data.pop('PhotographerEquipment'),
                                                    PhotographerPhotos=validated_data.pop('PhotographerPhotos'))
         return photographer
+
+
+class PhotoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Photo
+        fields = '__all__'
+
+
+class AvailTimeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AvailTime
+        fields = '__all__'
+
+
+class StyleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Style
+        fields = '__all__'
+
+
+class EquipmentSerializer(serializers.ModelSerializer):
+    class Meta :
+        model = Equipment
+        fields = '__all__'
 
 
 class CustomerSerializer(serializers.ModelSerializer):
