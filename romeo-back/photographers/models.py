@@ -1,10 +1,15 @@
 from django.db import models
-from multiselectfield import MultiSelectField
-from django.conf import settings
-from django.db.models.signals import post_save
-from django.dispatch import receiver
-from rest_framework.authtoken.models import Token
+from users.models import CustomUser
 # Create your models here.
+
+
+DAY_CHOICES = [('SUNDAY', 'Sunday'),
+               ('MONDAY', 'Monday'),
+               ('TUESDAY', 'Tuesday'),
+               ('WEDNESDAY', 'Wednesday'),
+               ('THURSDAY', 'Thursday'),
+               ('FRIDAY', 'Friday'),
+               ('SATURDAY', 'Saturday')]
 
 STYLE_CHOICES = [('GRADUATION', 'Graduation'),
                  ('LANDSCAPE', 'Landscape'),
@@ -14,7 +19,7 @@ STYLE_CHOICES = [('GRADUATION', 'Graduation'),
                  ('EVENT', 'Event'),
                  ('WEDDING', 'Wedding')]
 
-AVAILTIME_CHOICES = [('HALF_DAY_MORNING', "Half-day(Morning-Noon)"),
+TIME_CHOICES = [('HALF_DAY_MORNING', "Half-day(Morning-Noon)"),
                      ('HALF_DAY_NOON', "Half-day(Noon-Evening)"),
                      ('FULL_DAY', "Full-Day"),
                      ('NIGHT', "Night"),
@@ -25,39 +30,54 @@ class Photo(models.Model):
     PhotoID = models.AutoField(primary_key=True)
     PhotoLink = models.URLField()
 
+    def __str__(self):
+        return self.PhotoID
+
 
 class AvailTime(models.Model):
-    AvailDate = models.DateTimeField()
-    AvailTime = models.CharField(max_length=16, choices=AVAILTIME_CHOICES)
+    AvailDate = models.CharField(max_length=20, choices=DAY_CHOICES)
+    AvailTime = models.CharField(max_length=16, choices=TIME_CHOICES)
 
 
 class Equipment(models.Model):
     EquipmentID = models.AutoField(primary_key=True)
-    EquipmentName = models.TextField()
+    EquipmentName = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.EquipmentName
 
 
-class PhotographerInfo(models.Model):
-    # General fields
-    PhotographerID = models.AutoField(primary_key=True)
-    PhotographerFName = models.CharField(max_length=50)
-    PhotographerLName = models.CharField(max_length=50)
-    PhotographerSSN = models.CharField(max_length=13)
-    PhotographerEmail = models.EmailField()
-    PhotographerPassword = models.CharField(max_length=50)
+class Style(models.Model):
+    StyleName = models.CharField(max_length=20, choices=STYLE_CHOICES)
 
+    def __str__(self):
+        return self.StyleName
+
+
+# TODO Rename common fields
+class Photographer(models.Model):
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, primary_key=True)
+    # # Common fields
+    # PhotographerID = models.AutoField(primary_key=True)
+    # PhotographerFName = models.CharField(max_length=50)
+    # PhotographerLName = models.CharField(max_length=50)
+    # PhotographerSSN = models.CharField(max_length=13)
+    # PhotographerEmail = models.EmailField()
+    # PhotographerPassword = models.CharField(max_length=50)
     # Photographer fields
     PhotographerContact = models.CharField(max_length=100)
     PhotographerPrice = models.FloatField()
+    # TODO Correctly implement fetching last online time
     PhotographerLastOnlineTime = models.DateTimeField()
     PhotographerPaymentInfo = models.TextField()
-    PhotographerStyle = MultiSelectField(choices=STYLE_CHOICES, max_choices=6)
-
+    PhotographerStyle = models.ManyToManyField(Style)
     PhotographerAvailTime = models.ForeignKey(AvailTime, related_name='photographer_avail_time', on_delete=models.CASCADE,)
     PhotographerEquipment = models.ForeignKey(Equipment, related_name='photographer_equipment', on_delete=models.CASCADE,)
-    PhotographerPhotos = models.ForeignKey(Photo, related_name='photographer_photos', on_delete=models.CASCADE, )
+    PhotographerPhotos = models.ForeignKey(Photo, related_name='photographer_photos', on_delete=models.CASCADE, blank=True )
 
     def __str__(self):
-        return self.PhotographerFName + " " + self.PhotographerLName
+        return self.user.first_name
+
 
 
 
