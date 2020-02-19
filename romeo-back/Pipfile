@@ -9,8 +9,7 @@ verify_ssl = true
 django = "*"
 djangorestframework = "*"
 serializers = "*"
-django-rest-auth = "*"
-django-allauth = "*"
+djoser = "*"
 
 [requires]
 python_version = "3.7"

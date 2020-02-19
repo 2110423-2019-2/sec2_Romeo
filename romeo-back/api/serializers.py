@@ -1,7 +1,7 @@
 from rest_framework import fields, serializers
 
 # Import App Models
-from photographers.models import Photographer
+from photographers.models import Photographer, Photo, AvailTime, Equipment, Style
 from customers.models import Customer
 from jobs.models import JobInfo
 from users.models import CustomUser
@@ -43,13 +43,37 @@ class PhotographerSerializer(serializers.ModelSerializer):
         return photographer
 
 
+class PhotoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Photo
+        fields = '__all__'
+
+
+class AvailTimeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AvailTime
+        fields = '__all__'
+
+
+class StyleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Style
+        fields = '__all__'
+
+
+class EquipmentSerializer(serializers.ModelSerializer):
+    class Meta :
+        model = Equipment
+        fields = '__all__'
+
+
 class CustomerSerializer(serializers.ModelSerializer):
     user = UserSerializer(required=True)
-    jobs_by_customer = JobSerializer(many=True)
+    #jobs_by_customer = JobSerializer(many=True)
 
     class Meta:
         model = Customer
-        fields = ['user', 'jobs_by_customer']
+        fields = ['user']
 
         # Override default create method to auto create user from photographer
         def create(self, validated_data):
