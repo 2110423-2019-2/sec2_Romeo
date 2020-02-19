@@ -15,13 +15,11 @@ from users.models import CustomUser
 class PhotographerViewSet(viewsets.ModelViewSet):
     serializer_class = PhotographerSerializer
     queryset = Photographer.objects.all()
-    permission_classes = [IsUser]
 
 
 class CustomerViewSet(viewsets.ModelViewSet):
     queryset = Customer.objects.filter()
     serializer_class = CustomerSerializer
-    permission_classes = [IsUser]
 
 
 class JobsViewSet(viewsets.ModelViewSet):
@@ -40,8 +38,6 @@ class JobsViewSet(viewsets.ModelViewSet):
 class UserViewSet(viewsets.ModelViewSet):
     queryset = CustomUser.objects.all()
     serializer_class = UserSerializer
-    permission_classes = [IsUser]
-
 
 
 

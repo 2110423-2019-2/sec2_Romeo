@@ -30,9 +30,6 @@ class Photo(models.Model):
     PhotoID = models.AutoField(primary_key=True)
     PhotoLink = models.URLField()
 
-    def __str__(self):
-        return self.PhotoID
-
 
 class AvailTime(models.Model):
     AvailDate = models.CharField(max_length=20, choices=DAY_CHOICES)
@@ -48,8 +45,7 @@ class Equipment(models.Model):
 
 
 class Style(models.Model):
-    StyleID = models.AutoField(primary_key=True)
-    StyleName = models.CharField(max_length=20, choices=STYLE_CHOICES)
+    StyleName = models.CharField(primary_key=True, max_length=20, choices=STYLE_CHOICES)
 
     def __str__(self):
         return self.StyleName
