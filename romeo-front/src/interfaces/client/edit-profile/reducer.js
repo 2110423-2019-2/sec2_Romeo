@@ -7,7 +7,28 @@ import { SET_CURRENT_EQUIPMENT,
 const initialState = {
     currentEquipment: [],
     currentStyles: [],
-    currentAvailTime: [],
+    currentAvailTimes: [{
+        day: "MONDAY",
+        time: "NOT_AVAILABLE"
+    },{
+        day: "TUESDAY",
+        time: "NOT_AVAILABLE"
+    },{
+        day: "WEDNESDAY",
+        time: "NOT_AVAILABLE"
+    },{
+        day: "THURSDAY",
+        time: "NOT_AVAILABLE"
+    },{
+        day: "FRIDAY",
+        time: "NOT_AVAILABLE"
+    },{
+        day: "SATURDAY",
+        time: "NOT_AVAILABLE"
+    },{
+        day: "SUNDAY",
+        time: "NOT_AVAILABLE"
+    }],
     fieldErrors: false
 };
 
@@ -28,7 +49,7 @@ export default (state = initialState, action) => {
         case SET_CURRENT_AVAILTIMES:
             return {
                 ...state,
-                currentAvailTime: payload.currentAvailTime
+                currentAvailTimes: payload.currentAvailTimes
             }
         case SET_FIELD_ERRORS:
             return {

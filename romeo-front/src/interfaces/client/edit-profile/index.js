@@ -1,6 +1,7 @@
 import React from 'react';
 import { Button, Row, Col } from "antd";
 import { connect } from "react-redux";
+import { Form, Input } from "antd";
 import { Redirect } from 'react-router-dom';
 import { animateScroll as scroll } from 'react-scroll'
 import history from "common/router/history";
@@ -10,6 +11,33 @@ import Equipment from "./equipment";
 import Style from "./style";
 import AvailTimes from "./availTimes";
 
+function hasErrors(fieldsError) {
+    return Object.keys(fieldsError).some(field => fieldsError[field]);
+}
+
+const defaultAvailTimes = [{
+    day: "MONDAY",
+    time: "NOT_AVAILABLE"
+},{
+    day: "TUESDAY",
+    time: "NOT_AVAILABLE"
+},{
+    day: "WEDNESDAY",
+    time: "NOT_AVAILABLE"
+},{
+    day: "THURSDAY",
+    time: "NOT_AVAILABLE"
+},{
+    day: "FRIDAY",
+    time: "NOT_AVAILABLE"
+},{
+    day: "SATURDAY",
+    time: "NOT_AVAILABLE"
+},{
+    day: "SUNDAY",
+    time: "NOT_AVAILABLE"
+}]
+
 class EditProfile extends React.Component {
     componentDidMount() {
         // TODO: Connect to backend
@@ -18,7 +46,7 @@ class EditProfile extends React.Component {
         const { setCurrentEquipment, setCurrentStyles, setCurrentAvailTimes} = this.props;
         setCurrentEquipment(equipment ? equipment : []);
         setCurrentStyles(styles ? styles : []);
-        setCurrentAvailTimes(availTimes ? availTimes : []);
+        setCurrentAvailTimes(availTimes ? availTimes : defaultAvailTimes);
     }
     state = {
         success: false,
@@ -39,7 +67,9 @@ class EditProfile extends React.Component {
         editCurrentClient({
             ...currentClient,
             equipment: currentEquipment,
-            styles: currentStyles
+            styles: currentStyles,
+            availTimes: currentAvailTimes,
+            price: this.props.form.getFieldsValue().price
         })
         scroll.scrollToTop();
         this.setState({ success: true })
@@ -56,6 +86,9 @@ class EditProfile extends React.Component {
             success, 
             error
         } = this.state;
+
+        const { getFieldDecorator, getFieldsError, getFieldError, isFieldTouched } = this.props.form;
+        const priceError = isFieldTouched('price') && getFieldError('price');
 
         return (
             <div className="container mt-4 with-sidebar pl-4">
@@ -77,6 +110,26 @@ class EditProfile extends React.Component {
                     </React.Fragment>
                 }
                 <div className="mb-4">
+                <h3>Pricing</h3>
+                    <label>Full-day Price</label>
+                    <Form.Item 
+                        validateStatus={priceError ? 'error' : ''} 
+                        help={priceError || ''}
+                    >
+                        {getFieldDecorator('price', {
+                            rules: [
+                                { required: true,message: 'This field is required.' },
+                            ],
+                            initialValue: currentClient.price
+                        })(
+                            <Input
+                                placeholder="Full-day Price"
+                                type="price"
+                            />,
+                        )}
+                    </Form.Item>
+                </div>
+                <div className="mb-4">
                     <AvailTimes />
                 </div>
                 <div>
@@ -94,6 +147,7 @@ class EditProfile extends React.Component {
                             onClick={e => this.handleSubmit(e)}
                             className="mr-2"
                             htmlType="submit" 
+                            disabled={hasErrors(getFieldsError())}
                         >Confirm Edits</Button>
                         <Button 
                             type="secondary" 
@@ -118,8 +172,9 @@ const mapDispatchToProps = {
     setCurrentStyles,
     setCurrentAvailTimes
 }
-
+const WrappedForm = Form.create({ name: 'edit_profile' })(EditProfile);
 export default connect(
     mapStateToProps,
     mapDispatchToProps
-)(EditProfile);
+)(WrappedForm);
+

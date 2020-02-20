@@ -42,6 +42,8 @@ class SignUp extends React.Component {
         const bankNameError = isFieldTouched('bankName') && getFieldError('bankName');
         const bankAccountNumberError = isFieldTouched('bankAccountNumber') && getFieldError('bankAccountNumber');
         const bankAccountNameError = isFieldTouched('bankAccountName') && getFieldError('bankAccountName');
+        const priceError = isFieldTouched('price') && getFieldError('price');
+
         return (
             <div className="full-width">
                 <Row gutter={0}>
@@ -107,6 +109,27 @@ class SignUp extends React.Component {
                                         </Select>
                                     )}
                                 </Form.Item>
+                                { this.props.form.getFieldsValue().type === "PHOTOGRAPHER" && (
+                                    <React.Fragment>
+                                        <h3>Pricing</h3>
+                                        <label>Full-day Price</label>
+                                        <Form.Item 
+                                            validateStatus={priceError ? 'error' : ''} 
+                                            help={priceError || ''}
+                                        >
+                                            {getFieldDecorator('price', {
+                                                rules: [
+                                                    { required: true,message: 'This field is required.' },
+                                                ]
+                                            })(
+                                                <Input
+                                                    placeholder="Full-day Price"
+                                                    type="price"
+                                                />,
+                                            )}
+                                        </Form.Item>
+                                    </React.Fragment>
+                                )}
                                 <h3>Contact Information</h3>
                                 <label>Phone Number</label>
                                 <Form.Item 
@@ -224,7 +247,7 @@ class SignUp extends React.Component {
                                             ]
                                         })(
                                             <Input
-                                                placeholder="Account Number"
+                                                placeholder="Account Name"
                                                 type="text"
                                             />,
                                         )}
