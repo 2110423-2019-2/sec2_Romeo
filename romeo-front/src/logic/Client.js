@@ -19,7 +19,8 @@ export const mockValues = () => {
         bankAccountName: "Prawsang Chayakulkeeree",
         phone: "0820960005",
         equipment: ["Canon Something", "Flash"],
-        styles: ["GRADUATION", "PRODUCT", "FASHION"]
+        styles: ["GRADUATION", "PRODUCT", "FASHION"],
+        price: 8000
     }
 }
 

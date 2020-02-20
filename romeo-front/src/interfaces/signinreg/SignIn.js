@@ -41,6 +41,7 @@ class SignIn extends React.Component {
             <React.Fragment>
                 <h1>Sign In</h1>
                 <Form>
+                    <label>Username</label>
                     <Form.Item validateStatus={usernameError ? 'error' : ''} help={usernameError || ''}>
                         {getFieldDecorator('username', {
                             rules: [
@@ -53,6 +54,7 @@ class SignIn extends React.Component {
                             />,
                         )}
                     </Form.Item>
+                    <label>Password</label>
                     <Form.Item validateStatus={passwordError ? 'error' : ''} help={passwordError || ''}>
                         {getFieldDecorator('password', {
                             rules: [{ required: true, message: 'This field is required.' }],
@@ -63,6 +65,7 @@ class SignIn extends React.Component {
                             />,
                         )}
                     </Form.Item>
+                    <label>Type</label>
                     <Form.Item validateStatus={typeError ? 'error' : ''} help={typeError || ''}>
                         {getFieldDecorator('type',{rules: [{ required: true , message: 'This field is required.'}]})(
                             <Select placeholder="Type">

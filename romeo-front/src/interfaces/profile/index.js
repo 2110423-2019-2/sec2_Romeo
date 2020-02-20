@@ -1,12 +1,13 @@
 import React from "react";
 import { Link, Redirect } from "react-router-dom";
-import { Button, Icon } from "antd";
+import { Button, Tag } from "antd";
 import { getCurrentClient } from "logic/Client";
 import { getPortfolio } from "logic/Portfolio";
 import { connect } from "react-redux"
 import { formatDate } from "common/date";
 import moment from "moment";
 import JobCalendar from "./calendar";
+import { styleColors } from "../../common/style-colors";
 
 class Profile extends React.Component {
     state = {
@@ -31,7 +32,7 @@ class Profile extends React.Component {
         return (
             <div className="d-flex-md align-stretch bg-white">
                 <div
-                    className="sidebar-profile pa-4"
+                    className="sidebar-profile pa-3"
                 >
                     { currentClient && currentClient.username === username && (
                         <React.Fragment>
@@ -42,6 +43,27 @@ class Profile extends React.Component {
                     )}
                     <h3 className="mb-2">{username}</h3>
                     <span className="t-color-light d-block mb-4">Last Online Time: {formatDate(moment(new Date()))}</span>
+                    <div className="mb-3">
+                        <div className="secondary-label mb-2">
+                            Equipment
+                        </div>
+                        { currentClient.equipment.map((e,i) => (
+                            <div className="snippet secondary" key={i + e}>
+                                {e}
+                            </div>
+                        ))}
+                    </div>
+                    <div className="mb-3">
+                        <div className="secondary-label mb-2">
+                            Styles
+                        </div>
+                        { currentClient.styles.map((e,i) => (
+                            <Tag color={styleColors[e]} key={i + e} className="mb-2">
+                                {e}
+                            </Tag>
+                        ))}
+                    </div>
+                    
                     { isAuth && currentClient.username === username && (
                         <Link to="/client/edit-profile">
                             <Button type="primary" shape="round">Edit Profile</Button>

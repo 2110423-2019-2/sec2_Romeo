@@ -16,44 +16,54 @@ const days = [{
     label: "Monday",
     value: "MONDAY",
     color: "gold",
+    index: 0
 },{
     label: "Tuesday",
     value: "TUESDAY",
     color: "magenta",
+    index: 1
 },{
     label: "Wednesday",
     value: "WEDNESDAY",
     color: "green",
+    index: 2
 },{
     label: "Thursday",
     value: "THURSDAY",
     color: "orange",
+    index: 3
 },{
     label: "Friday",
     value: "FRIDAY",
     color: "blue",
+    index: 4
 },{
     label: "Saturday",
     value: "SATURDAY",
     color: "purple",
+    index: 5
 },{
     label: "Sunday",
     value: "SUNDAY",
     color: "volcano",
+    index: 6
 }]
 
 class AvailTimes extends React.Component {
    
     onChange = (e, day) => {
-        console.log({
-            day: day.value,
-            time: e.target.value
-        });
+        const { currentAvailTimes, setCurrentAvailTimes } = this.props;
+        setCurrentAvailTimes([
+            ...currentAvailTimes.slice(0,day.index),
+            {
+                day: day.value,
+                time: e.target.value
+            },
+            ...currentAvailTimes.slice(day.index+1,7)
+        ]);
     }
-    
     render() {
         const { currentAvailTimes } = this.props;
-        console.log(currentAvailTimes);
         
         return (
             <React.Fragment>
@@ -62,7 +72,11 @@ class AvailTimes extends React.Component {
                     { days.map((e,i) => (
                         <div className="snippet secondary">
                             <Tag color={e.color}>{e.label}</Tag>
-                            <Radio.Group options={options} defaultValue="NOT_AVAILABLE" onChange={(ev) => this.onChange(ev, e)} />
+                            <Radio.Group 
+                                options={options} 
+                                value={currentAvailTimes[e.index].time} 
+                                onChange={(ev) => this.onChange(ev, e)} 
+                            />
                         </div>
                     ))}
                 </Form>
@@ -72,7 +86,7 @@ class AvailTimes extends React.Component {
 }
 
 const mapStateToProps = (state) => ({
-    currentAvailTimes: state.editProfile.currentStyles
+    currentAvailTimes: state.editProfile.currentAvailTimes
 })
 const mapDispatchToProps = {
     setCurrentAvailTimes
