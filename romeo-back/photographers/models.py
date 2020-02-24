@@ -27,26 +27,28 @@ TIME_CHOICES = [('HALF_DAY_MORNING', "Half-day(Morning-Noon)"),
 
 
 class Photo(models.Model):
-    PhotoID = models.AutoField(primary_key=True)
-    PhotoLink = models.URLField()
+    PhotoLink = models.URLField(primary_key=True, unique=True)
+
+    def __str__(self):
+        return self.PhotoLink
 
 
 class AvailTime(models.Model):
     AvailDate = models.CharField(max_length=20, choices=DAY_CHOICES)
     AvailTime = models.CharField(max_length=16, choices=TIME_CHOICES)
 
+    def __str__(self):
+        return self.AvailDate + " " + self.AvailTime
 
 class Equipment(models.Model):
-    EquipmentID = models.AutoField(primary_key=True)
-    EquipmentName = models.CharField(max_length=100)
+    EquipmentName = models.CharField(primary_key=True, unique=True, max_length=100)
 
     def __str__(self):
         return self.EquipmentName
 
 
 class Style(models.Model):
-    StyleID = models.AutoField(primary_key=True)
-    StyleName = models.CharField(max_length=20, choices=STYLE_CHOICES)
+    StyleName = models.CharField(primary_key=True, unique=True, max_length=20, choices=STYLE_CHOICES)
 
     def __str__(self):
         return self.StyleName
@@ -69,9 +71,9 @@ class Photographer(models.Model):
     PhotographerLastOnlineTime = models.DateTimeField()
     PhotographerPaymentInfo = models.TextField()
     PhotographerStyle = models.ManyToManyField(Style)
-    PhotographerAvailTime = models.ForeignKey(AvailTime, related_name='photographer_avail_time', on_delete=models.CASCADE,)
-    PhotographerEquipment = models.ForeignKey(Equipment, related_name='photographer_equipment', on_delete=models.CASCADE,)
-    PhotographerPhotos = models.ForeignKey(Photo, related_name='photographer_photos', on_delete=models.CASCADE, blank=True )
+    PhotographerAvailTime = models.ForeignKey(AvailTime, related_name='photographer_avail_time', on_delete=models.CASCADE)
+    PhotographerEquipment = models.ForeignKey(Equipment, related_name='photographer_equipment', on_delete=models.CASCADE)
+    PhotographerPhotos = models.ForeignKey(Photo, related_name='photographer_photos', on_delete=models.CASCADE, blank=True)
 
     def __str__(self):
         return self.user.first_name

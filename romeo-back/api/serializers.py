@@ -19,30 +19,6 @@ class JobSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class PhotographerSerializer(serializers.ModelSerializer):
-    user = UserSerializer(required=True)
-
-    class Meta:
-        model = Photographer
-        fields = '__all__'
-
-    # Override default create method to auto create user from photographer
-    def create(self, validated_data):
-        user_data = validated_data.pop('user')
-        user_data.is_Photographer = True
-        user = UserSerializer.create(UserSerializer(), validated_data=user_data)
-        photographer = Photographer.objects.create(user=user,
-                                                   PhotographerContact=validated_data.pop('PhotographerContact'),
-                                                   PhotographerPrice=validated_data.pop('PhotographerPrice'),
-                                                   PhotographerLastOnlineTime=validated_data.pop('PhotographerLastOnlineTime'),
-                                                   PhotographerPaymentInfo=validated_data.pop('PhotographerPaymentInfo'),
-                                                   PhotographerStyle=validated_data.pop('PhotographerStyle'),
-                                                   PhotographerAvailTime=validated_data.pop('PhotographerAvailTime'),
-                                                   PhotographerEquipment=validated_data.pop('PhotographerEquipment'),
-                                                   PhotographerPhotos=validated_data.pop('PhotographerPhotos'))
-        return photographer
-
-
 class PhotoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Photo
@@ -67,23 +43,94 @@ class EquipmentSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class PhotographerSerializer(serializers.ModelSerializer):
+    user = UserSerializer(required=True, partial=True)
+    photographer_photos = PhotoSerializer(many=True, required=False)
+    photographer_equipments = EquipmentSerializer(many=True, required=False)
+    photographer_styles = StyleSerializer(many=True, required=False)
+
+    class Meta:
+        model = Photographer
+        fields = '__all__'
+
+    # Override default create method to auto create user from photographer
+    def create(self, validated_data):
+        user_data = validated_data.pop('user')
+        user_data.is_Photographer = True
+        user = UserSerializer.create(UserSerializer(), validated_data=user_data)
+        photographer = Photographer.objects.create(user=user,
+                                                   PhotographerContact=validated_data.pop('PhotographerContact'),
+                                                   PhotographerPrice=validated_data.pop('PhotographerPrice'),
+                                                   PhotographerLastOnlineTime=validated_data.pop('PhotographerLastOnlineTime'),
+                                                   PhotographerPaymentInfo=validated_data.pop('PhotographerPaymentInfo'),
+                                                   PhotographerStyle=validated_data.pop('PhotographerStyle'),
+                                                   PhotographerAvailTime=validated_data.pop('PhotographerAvailTime'),
+                                                   PhotographerEquipment=validated_data.pop('PhotographerEquipment'),
+                                                   PhotographerPhotos=validated_data.pop('PhotographerPhotos'))
+        user.save()
+        return photographer
+
+    def update(self, instance, validated_data):
+        # update user information
+        user_data = validated_data.pop('user')
+        user = instance.user
+        user.first_name = user_data.get('first_name', user.first_name)
+        user.last_name = user_data.get('last_name', user.last_name)
+        user.email = user_data.get('email', user.email)
+        user.ssn = user_data.get('ssn', user.ssn)
+        user.back_account_number = user_data.get('bank_account_number', user.back_account_number)
+        user.bank_name = user_data.get('bank_name', user.bank_name)
+        user.phone = user_data.get('phone', user.phone)
+        user.save()
+
+        # update photographer's photos
+        photos_data = validated_data.pop('photographer_photo')
+        photos = (instance.photos).all()
+        photos = list(photos)
+        for photo_data in photos_data:
+            photo = photos.pop(0)
+            photo.PhotoLink = photo_data.get('PhotoLink', photo.PhotoLink)
+            photo.save()
+
+        # update photographer's equipments
+        equipments_data = validated_data.pop('photographer_equipments')
+        equipments = (instance.equipments).all()
+        equipments = list(equipments)
+        for equipment_data in equipments_data:
+            equipment = equipments.pop(0)
+            equipment.EquipmentName = equipment_data.get('EquipmentName', equipment.EquipmentName)
+            equipment.save()
+
+        # update photographer's style
+        styles_data = validated_data.pop('photographer_styles')
+        styles = (instance.styles).all()
+        styles = list(styles)
+        for style_data in styles_data:
+            style = styles.pop(0)
+            style.StyleName = style_data.get('StyleName', style.StyleName)
+            style.save()
+
+        return instance
+
+
 class CustomerSerializer(serializers.ModelSerializer):
     user = UserSerializer(required=True)
-    #jobs_by_customer = JobSerializer(many=True)
+    # jobs_by_customer = JobSerializer(many=True)
 
     class Meta:
         model = Customer
         fields = ['user']
 
-        # Override default create method to auto create user from photographer
-        def create(self, validated_data):
-            user_data = validated_data.pop('user')
-            user_data.is_Customer = True
-            user = UserSerializer.create(UserSerializer(), validated_data=user_data)
-            customer = Customer.objects.create(user=user,
-                                               PaymentInfo=validated_data.pop('PaymentInfo'))
+        # Override default create method to auto create user from customer
+    def create(self, validated_data):
+        user_data = validated_data.pop('user')
+        user_data.is_Customer = True
+        user = UserSerializer.create(UserSerializer(), validated_data=user_data)
+        customer = Customer.objects.create(user=user,
+                                           PaymentInfo=validated_data.pop('PaymentInfo'))
 
-            return customer
+        user.save()
+        return customer
 
     # def create(self, validated_data):
     #     jobs_by_customer_data = validated_data.pop('jobs_by_customer')

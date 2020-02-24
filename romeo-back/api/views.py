@@ -1,5 +1,6 @@
 from rest_framework.decorators import action
-from rest_framework import generics, viewsets
+from rest_framework import status, viewsets
+from rest_framework.response import Response
 from .permissions import IsUser
 
 # Import Serializers of apps
@@ -17,6 +18,18 @@ class PhotographerViewSet(viewsets.ModelViewSet):
     serializer_class = PhotographerSerializer
     queryset = Photographer.objects.all()
 
+    # # custom action routing for photographers to update photos
+    # @action(detail=True, methods=['get', 'post', 'delete'], url_path='update_photos')
+    # def update_photos(self, request, *args, **kwargs):
+    #     user = self.get_object()
+    #     serializer = PhotoSerializer(data=self.request.query_params.get('PhotographerPhotos'))
+    #     if serializer.is_valid():
+    #         user.update_photos(serializer.data)
+    #         user.save()
+    #         return Response({'status': 'password set'})
+    #     else:
+    #         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    #
 
 class PhotoViewSet(viewsets.ModelViewSet):
     serializer_class = PhotoSerializer
