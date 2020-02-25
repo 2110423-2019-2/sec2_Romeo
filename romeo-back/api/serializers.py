@@ -1,10 +1,11 @@
 from rest_framework import fields, serializers
-
+from djoser.serializers import UserCreateSerializer as BaseUserRegistrationSerializer
 # Import App Models
 from photographers.models import Photographer, Photo, AvailTime, Equipment, Style
 from customers.models import Customer
 from jobs.models import JobInfo
 from users.models import CustomUser
+import datetime
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -59,19 +60,19 @@ class PhotographerSerializer(serializers.ModelSerializer):
         user_data.is_Photographer = True
         user = UserSerializer.create(UserSerializer(), validated_data=user_data)
         photographer = Photographer.objects.create(user=user,
-                                                   PhotographerContact=validated_data.pop('PhotographerContact'),
-                                                   PhotographerPrice=validated_data.pop('PhotographerPrice'),
-                                                   PhotographerLastOnlineTime=validated_data.pop('PhotographerLastOnlineTime'),
-                                                   PhotographerPaymentInfo=validated_data.pop('PhotographerPaymentInfo'),
-                                                   PhotographerStyle=validated_data.pop('PhotographerStyle'),
-                                                   PhotographerAvailTime=validated_data.pop('PhotographerAvailTime'),
-                                                   PhotographerEquipment=validated_data.pop('PhotographerEquipment'),
-                                                   PhotographerPhotos=validated_data.pop('PhotographerPhotos'))
+                                                   PhotographerPrice=validated_data.pop('PhotographerPrice', ""),
+                                                   # TODO Correctly implement fetching last online time
+                                                   PhotographerLastOnlineTime=validated_data.pop('PhotographerLastOnlineTime', "2020-02-24T09:54:43.770582Z"),
+                                                   PhotographerStyle=validated_data.pop('PhotographerStyle',""),
+
+                                                   PhotographerAvailTime=validated_data.pop('PhotographerAvailTime',None),
+                                                   PhotographerEquipment=validated_data.pop('PhotographerEquipment',None),
+                                                   PhotographerPhotos=validated_data.pop('PhotographerPhotos',None))
         user.save()
         return photographer
 
     def update(self, instance, validated_data):
-        # update user information
+        # update user information except username and password
         user_data = validated_data.pop('user')
         user = instance.user
         user.first_name = user_data.get('first_name', user.first_name)

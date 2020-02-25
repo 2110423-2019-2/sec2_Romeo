@@ -40,6 +40,7 @@ class AvailTime(models.Model):
     def __str__(self):
         return self.AvailDate + " " + self.AvailTime
 
+
 class Equipment(models.Model):
     EquipmentName = models.CharField(primary_key=True, unique=True, max_length=100)
 
@@ -65,15 +66,13 @@ class Photographer(models.Model):
     # PhotographerEmail = models.EmailField()
     # PhotographerPassword = models.CharField(max_length=50)
     # Photographer fields
-    PhotographerContact = models.CharField(max_length=100)
-    PhotographerPrice = models.FloatField()
+    PhotographerPrice = models.FloatField(null=True, blank=True)
     # TODO Correctly implement fetching last online time
-    PhotographerLastOnlineTime = models.DateTimeField()
-    PhotographerPaymentInfo = models.TextField()
-    PhotographerStyle = models.ManyToManyField(Style)
-    PhotographerAvailTime = models.ForeignKey(AvailTime, related_name='photographer_avail_time', on_delete=models.CASCADE)
-    PhotographerEquipment = models.ForeignKey(Equipment, related_name='photographer_equipment', on_delete=models.CASCADE)
-    PhotographerPhotos = models.ForeignKey(Photo, related_name='photographer_photos', on_delete=models.CASCADE, blank=True)
+    PhotographerLastOnlineTime = models.DateTimeField(null=True, blank=True)
+    PhotographerStyle = models.ManyToManyField(Style, blank=True, null=True)
+    PhotographerAvailTime = models.ForeignKey(AvailTime, related_name='photographer_avail_time', on_delete=models.CASCADE, blank=True, null=True)
+    PhotographerEquipment = models.ForeignKey(Equipment, related_name='photographer_equipment', on_delete=models.CASCADE, null=True, blank=True)
+    PhotographerPhotos = models.ForeignKey(Photo, related_name='photographer_photos', on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
         return self.user.first_name
