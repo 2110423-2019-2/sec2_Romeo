@@ -9,6 +9,7 @@ import Profile from "interfaces/profile";
 import Listing from "interfaces/listing"
 import ClientLanding from "interfaces/client";
 import SignUp from "interfaces/signinreg/SignUp";
+import Sample from "interfaces/sample";
 
 
 class AppRouter extends React.Component {
@@ -20,6 +21,7 @@ class AppRouter extends React.Component {
                         <PrivateRoute path="/client" component={ClientLanding}/>
                         <PublicRoute path="/signup" component={SignUp}/>
                         <PublicRoute path="/profile/:username" component={Profile}/>
+                        <PublicRoute path="/sample" component={Sample} exact/>
                         <PublicRoute path="/" component={Listing} exact/>
                     </Switch>
                 </Router>
