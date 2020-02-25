@@ -1,7 +1,10 @@
 from rest_framework import fields, serializers
 
+from allauth.account.adapter import get_adapter
+from allauth.account.utils import setup_user_email
+
 # Import App Models
-from photographers.models import Photographer, Photo, AvailTime, Equipment, Style
+from photographers.models import Photographer
 from customers.models import Customer
 from jobs.models import JobInfo
 from users.models import CustomUser
@@ -19,35 +22,8 @@ class JobSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class PhotoSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Photo
-        fields = '__all__'
-
-
-class AvailTimeSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = AvailTime
-        fields = '__all__'
-
-
-class StyleSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Style
-        fields = '__all__'
-
-
-class EquipmentSerializer(serializers.ModelSerializer):
-    class Meta :
-        model = Equipment
-        fields = '__all__'
-
-
 class PhotographerSerializer(serializers.ModelSerializer):
-    user = UserSerializer(required=True, partial=True)
-    photographer_photos = PhotoSerializer(many=True, required=False)
-    photographer_equipments = EquipmentSerializer(many=True, required=False)
-    photographer_styles = StyleSerializer(many=True, required=False)
+    user = UserSerializer(required=True)
 
     class Meta:
         model = Photographer
@@ -67,70 +43,26 @@ class PhotographerSerializer(serializers.ModelSerializer):
                                                    PhotographerAvailTime=validated_data.pop('PhotographerAvailTime'),
                                                    PhotographerEquipment=validated_data.pop('PhotographerEquipment'),
                                                    PhotographerPhotos=validated_data.pop('PhotographerPhotos'))
-        user.save()
         return photographer
-
-    def update(self, instance, validated_data):
-        # update user information
-        user_data = validated_data.pop('user')
-        user = instance.user
-        user.first_name = user_data.get('first_name', user.first_name)
-        user.last_name = user_data.get('last_name', user.last_name)
-        user.email = user_data.get('email', user.email)
-        user.ssn = user_data.get('ssn', user.ssn)
-        user.back_account_number = user_data.get('bank_account_number', user.back_account_number)
-        user.bank_name = user_data.get('bank_name', user.bank_name)
-        user.phone = user_data.get('phone', user.phone)
-        user.save()
-
-        # update photographer's photos
-        photos_data = validated_data.pop('photographer_photo')
-        photos = (instance.photos).all()
-        photos = list(photos)
-        for photo_data in photos_data:
-            photo = photos.pop(0)
-            photo.PhotoLink = photo_data.get('PhotoLink', photo.PhotoLink)
-            photo.save()
-
-        # update photographer's equipments
-        equipments_data = validated_data.pop('photographer_equipments')
-        equipments = (instance.equipments).all()
-        equipments = list(equipments)
-        for equipment_data in equipments_data:
-            equipment = equipments.pop(0)
-            equipment.EquipmentName = equipment_data.get('EquipmentName', equipment.EquipmentName)
-            equipment.save()
-
-        # update photographer's style
-        styles_data = validated_data.pop('photographer_styles')
-        styles = (instance.styles).all()
-        styles = list(styles)
-        for style_data in styles_data:
-            style = styles.pop(0)
-            style.StyleName = style_data.get('StyleName', style.StyleName)
-            style.save()
-
-        return instance
 
 
 class CustomerSerializer(serializers.ModelSerializer):
     user = UserSerializer(required=True)
-    # jobs_by_customer = JobSerializer(many=True)
+    jobs_by_customer = JobSerializer(many=True)
 
     class Meta:
         model = Customer
-        fields = ['user']
+        fields = ['user', 'jobs_by_customer']
 
-        # Override default create method to auto create user from customer
-    def create(self, validated_data):
-        user_data = validated_data.pop('user')
-        user_data.is_Customer = True
-        user = UserSerializer.create(UserSerializer(), validated_data=user_data)
-        customer = Customer.objects.create(user=user,
-                                           PaymentInfo=validated_data.pop('PaymentInfo'))
+        # Override default create method to auto create user from photographer
+        def create(self, validated_data):
+            user_data = validated_data.pop('user')
+            user_data.is_Customer = True
+            user = UserSerializer.create(UserSerializer(), validated_data=user_data)
+            customer = Customer.objects.create(user=user,
+                                               PaymentInfo=validated_data.pop('PaymentInfo'))
 
-        user.save()
-        return customer
+            return customer
 
     # def create(self, validated_data):
     #     jobs_by_customer_data = validated_data.pop('jobs_by_customer')
@@ -155,10 +87,12 @@ class CustomerSerializer(serializers.ModelSerializer):
     #     jobs_by_customer_data.save()
 
 
-# class CustomRegisterSerializer(RegisterSerializer):
+
+
+
+# class RegisterSerializer(RegisterSerializer):
 #     first_name = serializers.CharField(required=True, write_only=True)
 #     last_name = serializers.CharField(required=True, write_only=True)
-#     password = serializers.CharField(write_only=True)
 #
 #     def get_cleaned_data(self):
 #         return {
@@ -167,3 +101,12 @@ class CustomerSerializer(serializers.ModelSerializer):
 #             'password1': self.validated_data.get('password1', ''),
 #             'email': self.validated_data.get('email', ''),
 #         }
+#
+#     def save(self, request):
+#         adapter = get_adapter()
+#         user = adapter.new_user(request)
+#         self.cleaned_data = self.get_cleaned_data()
+#         adapter.save_user(request, user, self)
+#         setup_user_email(request, user, [])
+#         user.save()
+#         return user

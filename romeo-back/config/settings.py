@@ -23,7 +23,6 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 't)-d$29f(r0(%knxrh%@%z9z63c6)p8&7kr)9)2&4-m5k4x*np'
 
-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
@@ -72,6 +71,7 @@ ROOT_URLCONF = 'config.urls'
 
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
 )
 
 TEMPLATES = [
@@ -132,9 +132,10 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
         'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
+        'rest_framework.permissions.IsAuthenticated',
     ),
 }
 DJOSER= {
@@ -162,8 +163,6 @@ USE_TZ = True
 SITE_ID = 1
 
 AUTH_USER_MODEL = 'users.CustomUser'
-
-# LOGIN_REDIRECT_URL = '/api/users'
 
 SIMPLE_JWT = {
    'AUTH_HEADER_TYPES': ('JWT',),

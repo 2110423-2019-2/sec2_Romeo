@@ -1,14 +1,12 @@
 from rest_framework.decorators import action
-from rest_framework import status, viewsets
-from rest_framework.response import Response
+from rest_framework import generics, viewsets
 from .permissions import IsUser
 
 # Import Serializers of apps
-from .serializers import PhotographerSerializer, CustomerSerializer, JobSerializer, UserSerializer, \
-    PhotoSerializer, AvailTimeSerializer, EquipmentSerializer, StyleSerializer
+from .serializers import PhotographerSerializer, CustomerSerializer, JobSerializer, UserSerializer
 
 # Import models of apps for queryset
-from photographers.models import Photographer, Photo, AvailTime, Equipment, Style
+from photographers.models import Photographer
 from customers.models import Customer
 from jobs.models import JobInfo
 from users.models import CustomUser
@@ -17,43 +15,13 @@ from users.models import CustomUser
 class PhotographerViewSet(viewsets.ModelViewSet):
     serializer_class = PhotographerSerializer
     queryset = Photographer.objects.all()
-
-    # # custom action routing for photographers to update photos
-    # @action(detail=True, methods=['get', 'post', 'delete'], url_path='update_photos')
-    # def update_photos(self, request, *args, **kwargs):
-    #     user = self.get_object()
-    #     serializer = PhotoSerializer(data=self.request.query_params.get('PhotographerPhotos'))
-    #     if serializer.is_valid():
-    #         user.update_photos(serializer.data)
-    #         user.save()
-    #         return Response({'status': 'password set'})
-    #     else:
-    #         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    #
-
-class PhotoViewSet(viewsets.ModelViewSet):
-    serializer_class = PhotoSerializer
-    queryset = Photo.objects.all()
-
-
-class AvailTimeViewSet(viewsets.ModelViewSet):
-    serializer_class = AvailTimeSerializer
-    queryset = AvailTime.objects.all()
-
-
-class StyleViewSet(viewsets.ModelViewSet):
-    serializer_class = StyleSerializer
-    queryset = Style.objects.all()
-
-
-class EquipmentViewSet(viewsets.ModelViewSet):
-    serializer_class = EquipmentSerializer
-    queryset = Equipment.objects.all()
+    permission_classes = [IsUser]
 
 
 class CustomerViewSet(viewsets.ModelViewSet):
     queryset = Customer.objects.filter()
     serializer_class = CustomerSerializer
+    permission_classes = [IsUser]
 
 
 class JobsViewSet(viewsets.ModelViewSet):
@@ -72,6 +40,8 @@ class JobsViewSet(viewsets.ModelViewSet):
 class UserViewSet(viewsets.ModelViewSet):
     queryset = CustomUser.objects.all()
     serializer_class = UserSerializer
+    permission_classes = [IsUser]
+
 
 
 

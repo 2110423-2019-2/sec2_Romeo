@@ -19,7 +19,7 @@ class JobInfo(models.Model):
     # TODO check parameters of start date so it cannot be after end date
     # TODO not allow job bookings from customers to photographers
     #  whose status is already past 'matched' for that time period
-    JobID = models.AutoField(primary_key=True, default=1)
+    JobID = models.AutoField(primary_key=True,default=1)
     JobCustomer = models.ForeignKey(Customer, related_name='jobs_by_customer', on_delete=models.CASCADE)
     JobPhotographer = models.ForeignKey(Photographer, related_name='jobs_of_photographer', on_delete=models.CASCADE)
     JobStatus = models.CharField(choices=JOB_STATUS_CHOICES, max_length=10)
