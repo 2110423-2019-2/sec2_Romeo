@@ -6,7 +6,7 @@ from users.models import CustomUser
 # TODO Rename common fields
 class Customer(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, primary_key=True)
-    PaymentInfo = models.TextField()
+    PaymentInfo = models.CharField(max_length=50)
 
     def __str__(self):
         return self.user.first_name
