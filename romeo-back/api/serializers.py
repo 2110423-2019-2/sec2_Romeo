@@ -16,7 +16,7 @@ class UserSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         user = CustomUser.objects.create_user(username=validated_data['username'],
                                               password=validated_data['password'],
-                                              user_type=validated_data['user_type']
+                                              user_type=validated_data['user_type'],
                                               )
         return user
 
@@ -75,8 +75,8 @@ class EquipmentSerializer(serializers.ModelSerializer):
 
 class PhotographerSerializer(serializers.ModelSerializer):
     profile = ProfileSerializer(required=True, partial=True)
-    photographer_photos = PhotoSerializer(many=True, required=False)
-    photographer_equipments = EquipmentSerializer(many=True, required=False)
+    photographer_photos = PhotoSerializer(many=True, required=False, allow_null=True)
+    photographer_equipments = EquipmentSerializer(many=True, required=False, allow_null=True)
     photographer_styles = StyleSerializer(many=True, required=False)
 
     class Meta:
@@ -88,13 +88,13 @@ class PhotographerSerializer(serializers.ModelSerializer):
         profile_data = validated_data.pop('profile')
         profile = ProfileSerializer.create(ProfileSerializer(), validated_data=profile_data)
         photographer = Photographer.objects.create(profile=profile,
-                                                   PhotographerPrice=validated_data.pop('PhotographerPrice', ""),
+                                                   photographer_price=validated_data.pop('photographer_price', ""),
                                                    # TODO Correctly implement fetching last online time
-                                                   PhotographerLastOnlineTime=validated_data.pop('PhotographerLastOnlineTime', "2020-02-24T09:54:43.770582Z"),
+                                                   photographer_last_online_time=validated_data.pop('photographer_last_online_time', "2020-02-24T09:54:43.770582Z"),
                                                    # PhotographerStyle=validated_data.pop('PhotographerStyle', "None"),
-                                                   PhotographerAvailTime=validated_data.pop('PhotographerAvailTime', None),
-                                                   PhotographerEquipment=validated_data.pop('PhotographerEquipment', None),
-                                                   PhotographerPhotos=validated_data.pop('PhotographerPhotos', None))
+                                                   photographer_avail_time=validated_data.pop('photographer_avail_time', None),
+                                                   photographer_equipment=validated_data.pop('photographer_equipment', None),
+                                                   photographer_photos=validated_data.pop('photographer_photos', None))
         profile.save()
         return photographer
 
@@ -117,7 +117,7 @@ class PhotographerSerializer(serializers.ModelSerializer):
         photos = list(photos)
         for photo_data in photos_data:
             photo = photos.pop(0)
-            photo.PhotoLink = photo_data.get('PhotoLink', photo.PhotoLink)
+            photo.photo_link = photo_data.get('photo_link', photo.photo_link)
             photo.save()
 
         # update photographer's equipments
@@ -126,7 +126,7 @@ class PhotographerSerializer(serializers.ModelSerializer):
         equipments = list(equipments)
         for equipment_data in equipments_data:
             equipment = equipments.pop(0)
-            equipment.EquipmentName = equipment_data.get('EquipmentName', equipment.EquipmentName)
+            equipment.equipment_name = equipment_data.get('equipment_name', equipment.equipment_name)
             equipment.save()
 
         # update photographer's style
@@ -135,7 +135,7 @@ class PhotographerSerializer(serializers.ModelSerializer):
         styles = list(styles)
         for style_data in styles_data:
             style = styles.pop(0)
-            style.StyleName = style_data.get('StyleName', style.StyleName)
+            style.style_name = style_data.get('style_name', style.style_name)
             style.save()
 
         return instance
@@ -153,8 +153,7 @@ class CustomerSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         profile_data = validated_data.pop('profile')
         profile = ProfileSerializer.create(ProfileSerializer(), validated_data=profile_data)
-        customer = Customer.objects.create(profile=profile,
-                                           PaymentInfo=validated_data.pop('PaymentInfo'))
+        customer = Customer.objects.create(profile=profile)
 
         profile.save()
         return customer

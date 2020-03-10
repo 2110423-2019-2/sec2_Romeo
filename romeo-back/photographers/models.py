@@ -28,32 +28,33 @@ TIME_CHOICES = [('HALF_DAY_MORNING', "Half-day(Morning-Noon)"),
 
 
 class Photo(models.Model):
-    PhotoLink = models.URLField(primary_key=True, unique=True)
+    photo_link = models.URLField(primary_key=True, unique=True)
 
     def __str__(self):
         return self.PhotoLink
 
 
 class AvailTime(models.Model):
-    AvailDate = models.CharField(max_length=20, choices=DAY_CHOICES)
-    AvailTime = models.CharField(max_length=16, choices=TIME_CHOICES)
+    avail_date = models.CharField(max_length=20, choices=DAY_CHOICES)
+    avail_time = models.CharField(max_length=16, choices=TIME_CHOICES)
+    photographer_price = models.FloatField()
 
     def __str__(self):
         return self.AvailDate + " " + self.AvailTime
 
 
 class Equipment(models.Model):
-    EquipmentName = models.CharField(primary_key=True, unique=True, max_length=100)
+    equipment_name = models.CharField(primary_key=True, unique=True, max_length=100)
 
     def __str__(self):
-        return self.EquipmentName
+        return self.equipment_name
 
 
 class Style(models.Model):
-    StyleName = models.CharField(primary_key=True, unique=True, max_length=20, choices=STYLE_CHOICES)
+    style_name = models.CharField(primary_key=True, unique=True, max_length=20, choices=STYLE_CHOICES)
 
     def __str__(self):
-        return self.StyleName
+        return self.style_name
 
 
 # TODO Rename common fields
@@ -67,13 +68,12 @@ class Photographer(models.Model):
     # PhotographerEmail = models.EmailField()
     # PhotographerPassword = models.CharField(max_length=50)
     # Photographer fields
-    PhotographerPrice = models.FloatField(null=True, blank=True)
     # TODO Correctly implement fetching last online time
-    PhotographerLastOnlineTime = models.DateTimeField(null=True, blank=True)
-    PhotographerStyle = models.ManyToManyField(Style, through="StylePhotographerGroup")
-    PhotographerAvailTime = models.ForeignKey(AvailTime, related_name='photographer_avail_time', on_delete=models.CASCADE, blank=True, null=True)
-    PhotographerEquipment = models.ForeignKey(Equipment, related_name='photographer_equipment', on_delete=models.CASCADE, null=True, blank=True)
-    PhotographerPhotos = models.ForeignKey(Photo, related_name='photographer_photos', on_delete=models.CASCADE, null=True, blank=True)
+    photographer_last_online_time = models.DateTimeField(null=True, blank=True)
+    photographer_style = models.ManyToManyField(Style, through="StylePhotographerGroup")
+    photographer_avail_time = models.ForeignKey(AvailTime, related_name='photographer_avail_time', on_delete=models.CASCADE, blank=True, null=True)
+    photographer_equipment = models.ForeignKey(Equipment, related_name='photographer_equipment', on_delete=models.CASCADE, null=True, blank=True)
+    photographer_photos = models.ForeignKey(Photo, related_name='photographer_photos', on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
         return self.profile.user.first_name
