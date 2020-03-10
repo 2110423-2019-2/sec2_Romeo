@@ -76,7 +76,7 @@ class EquipmentSerializer(serializers.ModelSerializer):
 class PhotographerSerializer(serializers.ModelSerializer):
     profile = ProfileSerializer(required=True, partial=True)
     photographer_photos = PhotoSerializer(many=True, required=False, allow_null=True)
-    photographer_equipments = EquipmentSerializer(many=True, required=False, allow_null=True)
+    photographer_equipment = EquipmentSerializer(many=True, required=False, allow_null=True)
     photographer_styles = StyleSerializer(many=True, required=False)
 
     class Meta:
@@ -88,7 +88,6 @@ class PhotographerSerializer(serializers.ModelSerializer):
         profile_data = validated_data.pop('profile')
         profile = ProfileSerializer.create(ProfileSerializer(), validated_data=profile_data)
         photographer = Photographer.objects.create(profile=profile,
-                                                   photographer_price=validated_data.pop('photographer_price', ""),
                                                    # TODO Correctly implement fetching last online time
                                                    photographer_last_online_time=validated_data.pop('photographer_last_online_time', "2020-02-24T09:54:43.770582Z"),
                                                    # PhotographerStyle=validated_data.pop('PhotographerStyle', "None"),
@@ -100,16 +99,16 @@ class PhotographerSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         # update user information except username and password
-        user_data = validated_data.pop('profile')
-        user = instance.user
-        user.first_name = user_data.get('first_name', user.first_name)
-        user.last_name = user_data.get('last_name', user.last_name)
-        user.email = user_data.get('email', user.email)
-        user.ssn = user_data.get('ssn', user.ssn)
-        user.back_account_number = user_data.get('bank_account_number', user.back_account_number)
-        user.bank_name = user_data.get('bank_name', user.bank_name)
-        user.phone = user_data.get('phone', user.phone)
-        user.save()
+        profile_data = validated_data.pop('profile')
+        profile = instance.profile
+        profile.first_name = profile_data.get('first_name', profile.first_name)
+        profile.last_name = profile_data.get('last_name', profile.last_name)
+        profile.email = profile_data.get('email', profile.email)
+        profile.ssn = profile_data.get('ssn', profile.ssn)
+        profile.back_account_number = profile_data.get('bank_account_number', profile.back_account_number)
+        profile.bank_name = profile_data.get('bank_name', profile.bank_name)
+        profile.phone = profile_data.get('phone', profile.phone)
+        profile.save()
 
         # update photographer's photos
         photos_data = validated_data.pop('photographer_photo')

@@ -19,6 +19,7 @@ class PhotographerViewSet(viewsets.ModelViewSet):
     serializer_class = PhotographerSerializer
     queryset = Photographer.objects.all()
     permission_classes = [AllowAny]
+    lookup_field = 'profile__user__username'
 
     # # custom action routing for photographers to update photos
     # @action(detail=True, methods=['get', 'post', 'delete'], url_path='update_photos')
@@ -57,6 +58,7 @@ class EquipmentViewSet(viewsets.ModelViewSet):
 class CustomerViewSet(viewsets.ModelViewSet):
     queryset = Customer.objects.filter()
     serializer_class = CustomerSerializer
+    permission_classes = [AllowAny]
 
 
 class JobsViewSet(viewsets.ModelViewSet):
