@@ -5,10 +5,15 @@ import Axios from "axios";
 export const signIn = (credentials, history) => async dispatch => {
 	try {
 		const {
-			data: { user }
+			refresh,
+			access
 		} = await Axios.post("/auth/jwt/create", credentials);
-		setAuthToken(user.token);
-		setCurrentClient(user.id, user.username, user.type);
+		setAuthToken(access);
+
+		const {
+			user
+		} = await Axios.post("/users/" + credentials.username);
+		setCurrentClient(credentials.username, user.profile.type);
 		dispatch(setAuth(true));
 		history.push("/");
 	} catch (error) {

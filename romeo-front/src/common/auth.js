@@ -10,8 +10,9 @@ export const removeAuthToken = () => {
 	localStorage.removeItem("token");
 };
 
-export const setCurrentClient = (id, username, type) => {
-	localStorage.setItem("currentClient", JSON.stringify({ id, username, type }));
+export const setCurrentClient = (username, type) => {
+	console.log(username);
+	localStorage.setItem("currentClient", JSON.stringify({username, type }));
 };
 
 export const getCurrentClient = () => {
