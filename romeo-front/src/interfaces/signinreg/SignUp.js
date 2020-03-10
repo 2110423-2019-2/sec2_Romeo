@@ -42,7 +42,6 @@ class SignUp extends React.Component {
                     bankName,
                     bankAccountNumber,
                     bankAccountName,
-                    price
                 } = values
                 const userInfo = {
                     user: {
@@ -51,7 +50,7 @@ class SignUp extends React.Component {
                         is_staff: false,
                         is_active: false,
                         date_joined: moment(new Date()),
-                        type,
+                        user_type: type,
                         first_name: firstName,
                         last_name: lastName,
                         username,
@@ -62,7 +61,7 @@ class SignUp extends React.Component {
                     },
                 }
                 const profile = {
-                    user: userInfo,
+                    ...userInfo,
                     ssn,
                     bank_account_number: bankAccountNumber,
                     bank_name: bankName,
@@ -70,14 +69,13 @@ class SignUp extends React.Component {
                     phone,
                 }
                 const photographerInfo = {
-                    photographer_price: price,
                     photographer_last_online_time: moment(new Date()),
                     photographer_avail_time: null,
-                    photographer_equipment: [],
-                    photographer_photos: [],
-                    photographer_style: []
+                    photographer_equipment: null,
+                    photographer_photos: null,
+                    photographer_styles: []
                 }
-                if (type === 'PHOTOGRAPHER') {
+                if (type === 1) {
                     Axios.post('/api/photographers/',{
                         profile,
                         ...photographerInfo
