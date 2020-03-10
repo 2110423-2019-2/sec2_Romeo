@@ -4,7 +4,7 @@ from djoser.serializers import UserCreateSerializer as BaseUserRegistrationSeria
 from photographers.models import Photographer, Photo, AvailTime, Equipment, Style
 from customers.models import Customer
 from jobs.models import JobInfo
-from users.models import CustomUser
+from users.models import CustomUser, CustomUserProfile
 import datetime
 
 
@@ -12,6 +12,34 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = '__all__'
+
+    def create(self, validated_data):
+        user = CustomUser.objects.create_user(username=validated_data['username'],
+                                              password=validated_data['password'],
+                                              )
+        return user
+
+
+class ProfileSerializer(serializers.ModelSerializer):
+    user = UserSerializer(required=True, partial=True)
+
+    class Meta:
+        model = CustomUserProfile
+        fields = '__all__'
+
+    def create(self, validated_data):
+        user_data = validated_data.pop('user')
+        user = UserSerializer.create(UserSerializer(), validated_data=user_data)
+        profile = CustomUserProfile.objects.create(
+            user=user,
+            ssn=validated_data.pop('ssn', ''),
+            bank_account_number=validated_data.pop('bank_account_number', ''),
+            bank_name=validated_data.pop('bank_name', ''),
+            bank_account_name=validated_data.pop('bank_account_name', ''),
+            phone=validated_data.pop('phone', '')
+        )
+        profile.save()
+        return profile
 
 
 class JobSerializer(serializers.ModelSerializer):
@@ -39,13 +67,13 @@ class StyleSerializer(serializers.ModelSerializer):
 
 
 class EquipmentSerializer(serializers.ModelSerializer):
-    class Meta :
+    class Meta:
         model = Equipment
         fields = '__all__'
 
 
 class PhotographerSerializer(serializers.ModelSerializer):
-    user = UserSerializer(required=True, partial=True)
+    profile = ProfileSerializer(required=True, partial=True)
     photographer_photos = PhotoSerializer(many=True, required=False)
     photographer_equipments = EquipmentSerializer(many=True, required=False)
     photographer_styles = StyleSerializer(many=True, required=False)
@@ -56,24 +84,22 @@ class PhotographerSerializer(serializers.ModelSerializer):
 
     # Override default create method to auto create user from photographer
     def create(self, validated_data):
-        user_data = validated_data.pop('user')
-        user_data.is_Photographer = True
-        user = UserSerializer.create(UserSerializer(), validated_data=user_data)
-        photographer = Photographer.objects.create(user=user,
+        profile_data = validated_data.pop('profile')
+        profile = ProfileSerializer.create(ProfileSerializer(), validated_data=profile_data)
+        photographer = Photographer.objects.create(profile=profile,
                                                    PhotographerPrice=validated_data.pop('PhotographerPrice', ""),
                                                    # TODO Correctly implement fetching last online time
                                                    PhotographerLastOnlineTime=validated_data.pop('PhotographerLastOnlineTime', "2020-02-24T09:54:43.770582Z"),
-                                                   PhotographerStyle=validated_data.pop('PhotographerStyle',""),
-
-                                                   PhotographerAvailTime=validated_data.pop('PhotographerAvailTime',None),
-                                                   PhotographerEquipment=validated_data.pop('PhotographerEquipment',None),
-                                                   PhotographerPhotos=validated_data.pop('PhotographerPhotos',None))
-        user.save()
+                                                   # PhotographerStyle=validated_data.pop('PhotographerStyle', "None"),
+                                                   PhotographerAvailTime=validated_data.pop('PhotographerAvailTime', None),
+                                                   PhotographerEquipment=validated_data.pop('PhotographerEquipment', None),
+                                                   PhotographerPhotos=validated_data.pop('PhotographerPhotos', None))
+        profile.save()
         return photographer
 
     def update(self, instance, validated_data):
         # update user information except username and password
-        user_data = validated_data.pop('user')
+        user_data = validated_data.pop('profile')
         user = instance.user
         user.first_name = user_data.get('first_name', user.first_name)
         user.last_name = user_data.get('last_name', user.last_name)
@@ -115,22 +141,21 @@ class PhotographerSerializer(serializers.ModelSerializer):
 
 
 class CustomerSerializer(serializers.ModelSerializer):
-    user = UserSerializer(required=True)
+    profile = ProfileSerializer(required=True, partial=True)
     # jobs_by_customer = JobSerializer(many=True)
 
     class Meta:
         model = Customer
-        fields = ['user']
+        fields = '__all__'
 
         # Override default create method to auto create user from customer
     def create(self, validated_data):
-        user_data = validated_data.pop('user')
-        user_data.is_Customer = True
-        user = UserSerializer.create(UserSerializer(), validated_data=user_data)
-        customer = Customer.objects.create(user=user,
+        profile_data = validated_data.pop('profile')
+        profile = ProfileSerializer.create(ProfileSerializer(), validated_data=profile_data)
+        customer = Customer.objects.create(profile=profile,
                                            PaymentInfo=validated_data.pop('PaymentInfo'))
 
-        user.save()
+        profile.save()
         return customer
 
     # def create(self, validated_data):
@@ -156,15 +181,18 @@ class CustomerSerializer(serializers.ModelSerializer):
     #     jobs_by_customer_data.save()
 
 
-# class CustomRegisterSerializer(RegisterSerializer):
-#     first_name = serializers.CharField(required=True, write_only=True)
-#     last_name = serializers.CharField(required=True, write_only=True)
-#     password = serializers.CharField(write_only=True)
-#
-#     def get_cleaned_data(self):
-#         return {
-#             'first_name': self.validated_data.get('first_name', ''),
-#             'last_name': self.validated_data.get('last_name', ''),
-#             'password1': self.validated_data.get('password1', ''),
-#             'email': self.validated_data.get('email', ''),
-#         }
+# class UserRegistrationSerializer(BaseUserRegistrationSerializer):
+#     class Meta(BaseUserRegistrationSerializer.Meta):
+#         fields = '__all__'
+
+    # first_name = serializers.CharField(required=True, write_only=True)
+    # last_name = serializers.CharField(required=True, write_only=True)
+    # password = serializers.CharField(write_only=True)
+    #
+    # def get_cleaned_data(self):
+    #     return {
+    #         'first_name': self.validated_data.get('first_name', ''),
+    #         'last_name': self.validated_data.get('last_name', ''),
+    #         'password1': self.validated_data.get('password1', ''),
+    #         'email': self.validated_data.get('email', ''),
+    #     }
