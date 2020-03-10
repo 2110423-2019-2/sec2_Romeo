@@ -1,5 +1,4 @@
 import Axios from "axios";
-import { editCurrentClient } from "logic/Client";
 
 export const setAuthToken = token => {
 	Axios.defaults.headers.common["Authorization"] = token;
@@ -11,9 +10,13 @@ export const removeAuthToken = () => {
 	localStorage.removeItem("token");
 };
 
-export const setCurrentClient = (client) => {
-	editCurrentClient(client);
+export const setCurrentClient = (id, username, type) => {
+	localStorage.setItem("currentClient", JSON.stringify({ id, username, type }));
 };
+
+export const getCurrentClient = () => {
+	return JSON.parse(localStorage.getItem("currentClient"));
+}
 
 export const removeCurrentClient = () => {
 	localStorage.removeItem("currentClient");

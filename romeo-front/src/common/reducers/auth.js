@@ -1,7 +1,7 @@
 import { SET_AUTH } from "../action-types";
 
 const initialState = {
-	isAuth: false
+	isAuth: false,
 };
 
 export default (state = initialState, action) => {

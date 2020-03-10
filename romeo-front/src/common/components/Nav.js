@@ -12,7 +12,7 @@ class Nav extends React.Component {
         showSignIn: false
     }
     render() {
-        const { showSignUp, showSignIn } = this.state;
+        const { showSignIn } = this.state;
         const { signOut, isAuth } = this.props;
 
         const currentClient = JSON.parse(localStorage.getItem('currentClient'))

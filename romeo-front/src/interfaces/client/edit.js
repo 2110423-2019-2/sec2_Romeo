@@ -3,6 +3,8 @@ import history from "../../common/router/history";
 import { Button, Form, Input } from "antd";
 import { Link } from 'react-router-dom';
 import { animateScroll as scroll } from 'react-scroll'
+import Axios from "axios";
+import { getCurrentClient } from "../../common/auth";
 
 function hasErrors(fieldsError) {
     return Object.keys(fieldsError).some(field => fieldsError[field]);
@@ -10,25 +12,32 @@ function hasErrors(fieldsError) {
 
 class Edit extends React.Component {
     componentDidMount() {
+        const currentClient = getCurrentClient;
+        const { id, type } = currentClient;
+        const url = type === 1 ? "/api/photographers" : "/api/customer"
+        Axios.get(`${url}/${id}`).then(res => {
+            this.setState({ currentClient: res })
+        })
         // To disable submit button at the beginning.
         this.props.form.validateFields();
     }
     state = {
         success: false,
-        error: false
+        error: false,
+        currentClient: {
+            profile: {}
+        }
     }
 
     handleSubmit = e => {
         e.preventDefault();
-        const currentClient = JSON.parse(localStorage.getItem("currentClient"));
-        // const { username } = currentClient
+        const currentClient = getCurrentClient();
+        const { id, type } = currentClient;
         this.props.form.validateFields((err, values) => {
             if (!err) {
-                //console.log('Received values of form: ', values);
                 const {
                     firstName,
                     lastName,
-                    username,
                     email,
                     ssn,
                     bankAccountNumber,
@@ -37,19 +46,19 @@ class Edit extends React.Component {
                     phone
                 } = values;
 
-                // TODO: connect to backend
-                localStorage.setItem("currentClient", JSON.stringify({
-                    ...currentClient,
-                    firstName,
-                    lastName,
-                    username,
-                    email,
+                const url = type === 1 ? "/api/photographers" : "/api/customer"
+                Axios.put(`${url}/${id}`, {
+                    profile: {
+                        firstName,
+                        lastName,
+                        email,
+                    },
                     ssn,
                     bankAccountNumber,
                     bankName,
                     bankAccountName,
                     phone
-                }))
+                });
                 scroll.scrollToTop();
                 this.setState({ success: true })
                 this.setState({ error: false })
@@ -63,24 +72,25 @@ class Edit extends React.Component {
 
     render() {
         const { getFieldDecorator, getFieldsError, getFieldError, isFieldTouched } = this.props.form;
-        const currentClient = JSON.parse(localStorage.getItem("currentClient"));
+
         const { 
             username, 
             firstName, 
             lastName, 
             email, 
+            type,
+        } = this.state.currentClient.profile;
+        const {
             ssn,
             bankAccountNumber,
             bankName,
             bankAccountName,
-            type,
             phone
-        } = currentClient
+        } = this.state.currentClient;
 
         const { success, error } = this.state;
 
         // Validation
-        const usernameError = isFieldTouched('username') && getFieldError('username');
         const firstNameError = isFieldTouched('firstName') && getFieldError('firstName');
         const lastNameError = isFieldTouched('lastName') && getFieldError('lastName');
         const emailError = isFieldTouched('email') && getFieldError('email');
@@ -111,23 +121,6 @@ class Edit extends React.Component {
                 }
                 <Form>
                     <h3>Account Information</h3>
-                    <label>Username</label>
-                    <Form.Item 
-                        validateStatus={usernameError ? 'error' : ''} 
-                        help={usernameError || ''}
-                    >
-                        {getFieldDecorator('username', {
-                            rules: [
-                                { required: true,message: 'This field is required.' },
-                            ],
-                            initialValue: username
-                        })(
-                            <Input
-                                placeholder="Username"
-                                type="text"
-                            />,
-                        )}
-                    </Form.Item>
                     <label>Email</label>
                     <Form.Item 
                         validateStatus={emailError ? 'error' : ''} 

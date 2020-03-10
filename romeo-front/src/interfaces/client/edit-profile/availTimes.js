@@ -64,6 +64,8 @@ class AvailTimes extends React.Component {
     }
     render() {
         const { currentAvailTimes } = this.props;
+        const { getFieldDecorator, getFieldsError, getFieldError, isFieldTouched } = this.props.form;
+        const priceError = isFieldTouched('price') && getFieldError('price');
         
         return (
             <React.Fragment>
@@ -77,6 +79,23 @@ class AvailTimes extends React.Component {
                                 value={currentAvailTimes[e.index].time} 
                                 onChange={(ev) => this.onChange(ev, e)} 
                             />
+                            <label>Price</label>
+                            <Form.Item 
+                                validateStatus={priceError ? 'error' : ''} 
+                                help={priceError || ''}
+                            >
+                                {getFieldDecorator('price', {
+                                    rules: [
+                                        { required: true,message: 'This field is required.' },
+                                    ],
+                                    initialValue: currentClient.price
+                                })(
+                                    <Form.Input
+                                        placeholder="Full-day Price"
+                                        type="price"
+                                    />,
+                                )}
+                            </Form.Item>
                         </div>
                     ))}
                 </Form>

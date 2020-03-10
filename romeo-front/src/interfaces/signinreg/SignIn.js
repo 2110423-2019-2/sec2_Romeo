@@ -1,15 +1,12 @@
 import React from "react";
 import history from "../../common/router/history";
-import { Button, Form, Input, Select } from "antd";
+import { Button, Form, Input } from "antd";
 import { signIn } from "../../common/actions/auth";
 import { connect } from "react-redux";
-import { mockValues } from "logic/Client";
 
 function hasErrors(fieldsError) {
     return Object.keys(fieldsError).some(field => fieldsError[field]);
 }
-
-const { Option } = Select;
 
 class SignIn extends React.Component {
     componentDidMount() {
@@ -22,11 +19,8 @@ class SignIn extends React.Component {
         this.props.form.validateFields((err, values) => {
             if (!err) {
                 this.props.signIn({
-                    ...mockValues(),
                     ...values,
                 }, history);
-                // The mock data will not be actually needed to sign in.
-                // After signing in, the user's data will be pulled from the database instead.
             }
         });
     };
@@ -36,7 +30,6 @@ class SignIn extends React.Component {
         // Validation
         const usernameError = isFieldTouched('username') && getFieldError('username');
         const passwordError = isFieldTouched('password') && getFieldError('password');
-        const typeError = isFieldTouched('type') && getFieldError('type');
         return (
             <React.Fragment>
                 <h1>Sign In</h1>
@@ -63,15 +56,6 @@ class SignIn extends React.Component {
                                 placeholder="Password"
                                 type="password"
                             />,
-                        )}
-                    </Form.Item>
-                    <label>Type</label>
-                    <Form.Item validateStatus={typeError ? 'error' : ''} help={typeError || ''}>
-                        {getFieldDecorator('type',{rules: [{ required: true , message: 'This field is required.'}]})(
-                            <Select placeholder="Type">
-                                <Option value="PHOTOGRAPHER">Photographer</Option>
-                                <Option value="CUSTOMER">Customer</Option>
-                            </Select>
                         )}
                     </Form.Item>
                     <Form.Item>

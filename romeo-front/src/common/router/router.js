@@ -5,9 +5,9 @@ import PublicRoute from "./layouts/PublicRoute";
 import history from "./history";
 import { setAuth } from "common/actions/auth";
 import { connect } from "react-redux";
-import Profile from "interfaces/profile";
+// import Profile from "interfaces/profile";
 import Listing from "interfaces/listing"
-import ClientLanding from "interfaces/client";
+// import ClientLanding from "interfaces/client";
 import SignUp from "interfaces/signinreg/SignUp";
 
 
@@ -17,9 +17,9 @@ class AppRouter extends React.Component {
             <React.Fragment>
                 <Router history={history}>
                     <Switch>
-                        <PrivateRoute path="/client" component={ClientLanding}/>
+                        {/* <PrivateRoute path="/client" component={ClientLanding}/> */}
                         <PublicRoute path="/signup" component={SignUp}/>
-                        <PublicRoute path="/profile/:username" component={Profile}/>
+                        {/* <PublicRoute path="/profile/:username" component={Profile}/> */}
                         <PublicRoute path="/" component={Listing} exact/>
                     </Switch>
                 </Router>

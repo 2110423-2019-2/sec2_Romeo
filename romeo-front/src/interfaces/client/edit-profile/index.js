@@ -88,7 +88,6 @@ class EditProfile extends React.Component {
         } = this.state;
 
         const { getFieldDecorator, getFieldsError, getFieldError, isFieldTouched } = this.props.form;
-        const priceError = isFieldTouched('price') && getFieldError('price');
 
         return (
             <div className="container mt-4 with-sidebar pl-4">
@@ -109,26 +108,6 @@ class EditProfile extends React.Component {
                         <div className="pb-2"/>
                     </React.Fragment>
                 }
-                <div className="mb-4">
-                <h3>Pricing</h3>
-                    <label>Full-day Price</label>
-                    <Form.Item 
-                        validateStatus={priceError ? 'error' : ''} 
-                        help={priceError || ''}
-                    >
-                        {getFieldDecorator('price', {
-                            rules: [
-                                { required: true,message: 'This field is required.' },
-                            ],
-                            initialValue: currentClient.price
-                        })(
-                            <Input
-                                placeholder="Full-day Price"
-                                type="price"
-                            />,
-                        )}
-                    </Form.Item>
-                </div>
                 <div className="mb-4">
                     <AvailTimes />
                 </div>

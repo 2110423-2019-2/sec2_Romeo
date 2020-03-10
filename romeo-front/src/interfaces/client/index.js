@@ -1,10 +1,10 @@
 import React from "react"
 import { Switch, Route, Redirect, NavLink} from "react-router-dom";
 import Edit from "./edit";
-import Password from "./password"
+// import Password from "./password"
 import Reservations from "./reservations";
-import EditPortfolio from "./edit-portfolio/"
-import EditProfile from "./edit-profile/"
+// import EditPortfolio from "./edit-portfolio/"
+// import EditProfile from "./edit-profile/"
 import { getCurrentClient } from "logic/Client";
 
 import { Menu } from 'antd';
@@ -58,11 +58,11 @@ class ClientLanding extends React.Component {
                     </NavLink>
                 </Menu>
                 <Switch>
-                    <Route path="/client/edit/password" component={Password} />
+                    {/* <Route path="/client/edit/password" component={Password} /> */}
                     <Route path="/client/edit" component={Edit} />
                     <Route path="/client/reservations" exact component={Reservations} />
-                    <Route path="/client/edit-portfolio" exact component={EditPortfolio} />
-                    <Route path="/client/edit-profile" exact component={EditProfile} />
+                    {/* <Route path="/client/edit-portfolio" exact component={EditPortfolio} /> */}
+                    {/* <Route path="/client/edit-profile" exact component={EditProfile} /> */}
                     <Route path="/client" exact component={RedirectToEdit} />
                 </Switch>
             </div>

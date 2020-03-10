@@ -19,11 +19,18 @@ class SignUp extends React.Component {
         this.props.form.validateFields();
     }
 
+    signInUser = (res) => {
+        const user = res[0].profile;
+        this.props.signIn({
+            username: user.username,
+            password: user.password,
+        }, history);
+    }
+
     handleSubmit = e => {
         e.preventDefault();
         this.props.form.validateFields((err, values) => {
             if (!err) {
-                // TODO: Connect with backend to register instead
                 const { username, 
                     firstName, 
                     lastName, 
@@ -44,40 +51,47 @@ class SignUp extends React.Component {
                         is_staff: false,
                         is_active: false,
                         date_joined: moment(new Date()),
-                        is_photographer: type === "PHOTOGRAPHER",
-                        is_customer: type === "CUSTOMER",
+                        type,
                         first_name: firstName,
                         last_name: lastName,
-                        username: username,
-                        password: password,
+                        username,
+                        password,
                         email,
-                        ssn,
-                        bank_account_number: bankAccountNumber,
-                        bank_name: bankName,
-                        bank_account_name: bankAccountName,
-                        phone,
                         groups: [],
                         user_permissions: []
                     },
                 }
+                const profile = {
+                    user: userInfo,
+                    ssn,
+                    bank_account_number: bankAccountNumber,
+                    bank_name: bankName,
+                    bank_account_name: bankAccountName,
+                    phone,
+                }
                 const photographerInfo = {
-                    PhotographerContact: phone,
-                    PhotographerPrice: price,
-                    PhotographerLastOnlineTime: moment(new Date()),
-                    PhotographerAvailTime: null,
-                    PhotographerEquipment: null,
-                    PhotographerPhotos: null,
-                    PhotographerStyle: []
+                    photographer_price: price,
+                    photographer_last_online_time: moment(new Date()),
+                    photographer_avail_time: null,
+                    photographer_equipment: [],
+                    photographer_photos: [],
+                    photographer_style: []
                 }
                 if (type === 'PHOTOGRAPHER') {
                     Axios.post('/api/photographers/',{
-                        ...userInfo,
+                        profile,
                         ...photographerInfo
-                    }).then(res => console.log(res))
+                    }).then(res => {
+                        this.signInUser(res);
+                    })
                     .catch(err => console.log(err))
                 } else {
-                    Axios.post('/api/customers/',userInfo)
-                    .then(res => console.log(res))
+                    Axios.post('/api/customers/',{
+                        profile
+                    })
+                    .then(res => {
+                        this.signInUser(res);
+                    })
                     .catch(err => console.log(err))
                 }
             }
@@ -98,7 +112,6 @@ class SignUp extends React.Component {
         const bankNameError = isFieldTouched('bankName') && getFieldError('bankName');
         const bankAccountNumberError = isFieldTouched('bankAccountNumber') && getFieldError('bankAccountNumber');
         const bankAccountNameError = isFieldTouched('bankAccountName') && getFieldError('bankAccountName');
-        const priceError = isFieldTouched('price') && getFieldError('price');
 
         return (
             <div className="full-width">
@@ -160,32 +173,11 @@ class SignUp extends React.Component {
                                 <Form.Item validateStatus={typeError ? 'error' : ''} help={typeError || ''}>
                                     {getFieldDecorator('type',{rules: [{ required: true , message: 'This field is required.'}]})(
                                         <Select placeholder="Type">
-                                            <Option value="PHOTOGRAPHER">Photographer</Option>
-                                            <Option value="CUSTOMER">Customer</Option>
+                                            <Option value={1}>Photographer</Option>
+                                            <Option value={2}>Customer</Option>
                                         </Select>
                                     )}
                                 </Form.Item>
-                                { this.props.form.getFieldsValue().type === "PHOTOGRAPHER" && (
-                                    <React.Fragment>
-                                        <h3>Pricing</h3>
-                                        <label>Full-day Price</label>
-                                        <Form.Item 
-                                            validateStatus={priceError ? 'error' : ''} 
-                                            help={priceError || ''}
-                                        >
-                                            {getFieldDecorator('price', {
-                                                rules: [
-                                                    { required: true,message: 'This field is required.' },
-                                                ]
-                                            })(
-                                                <Input
-                                                    placeholder="Full-day Price"
-                                                    type="price"
-                                                />,
-                                            )}
-                                        </Form.Item>
-                                    </React.Fragment>
-                                )}
                                 <h3>Contact Information</h3>
                                 <label>Phone Number</label>
                                 <Form.Item 
