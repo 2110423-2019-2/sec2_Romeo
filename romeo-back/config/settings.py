@@ -44,7 +44,6 @@ INSTALLED_APPS = [
     # Third Party
     'djoser',
     'rest_framework',
-    'multiselectfield',
 
     # JWT authentication backend library
     'rest_framework_simplejwt',
