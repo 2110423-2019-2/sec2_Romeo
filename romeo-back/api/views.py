@@ -57,6 +57,7 @@ class EquipmentViewSet(viewsets.ModelViewSet):
 class CustomerViewSet(viewsets.ModelViewSet):
     queryset = Customer.objects.filter()
     serializer_class = CustomerSerializer
+    permission_classes = [AllowAny]
 
 
 class JobsViewSet(viewsets.ModelViewSet):
