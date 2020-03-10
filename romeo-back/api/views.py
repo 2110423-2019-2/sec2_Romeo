@@ -6,13 +6,13 @@ from rest_framework.permissions import AllowAny, SAFE_METHODS
 
 # Import Serializers of apps
 from .serializers import PhotographerSerializer, CustomerSerializer, JobSerializer, UserSerializer, \
-    PhotoSerializer, AvailTimeSerializer, EquipmentSerializer, StyleSerializer
+    PhotoSerializer, AvailTimeSerializer, EquipmentSerializer, ProfileSerializer, StyleSerializer
 
 # Import models of apps for queryset
 from photographers.models import Photographer, Photo, AvailTime, Equipment, Style
 from customers.models import Customer
 from jobs.models import JobInfo
-from users.models import CustomUser
+from users.models import CustomUser, CustomUserProfile
 
 
 class PhotographerViewSet(viewsets.ModelViewSet):
@@ -75,6 +75,12 @@ class JobsViewSet(viewsets.ModelViewSet):
 class UserViewSet(viewsets.ModelViewSet):
     queryset = CustomUser.objects.all()
     serializer_class = UserSerializer
+    permission_classes = [AllowAny]
+
+
+class ProfileViewSet(viewsets.ModelViewSet):
+    queryset = CustomUserProfile.objects.all()
+    serializer_class = ProfileSerializer
     permission_classes = [AllowAny]
 
 
