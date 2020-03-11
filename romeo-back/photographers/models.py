@@ -31,7 +31,7 @@ class Photo(models.Model):
     photo_link = models.URLField(primary_key=True, unique=True)
 
     def __str__(self):
-        return self.PhotoLink
+        return self.photo_link
 
 
 class AvailTime(models.Model):
@@ -40,7 +40,7 @@ class AvailTime(models.Model):
     photographer_price = models.FloatField()
 
     def __str__(self):
-        return self.AvailDate + " " + self.AvailTime
+        return self.avail_date + " " + self.avail_time
 
 
 class Equipment(models.Model):
@@ -70,17 +70,12 @@ class Photographer(models.Model):
     # Photographer fields
     # TODO Correctly implement fetching last online time
     photographer_last_online_time = models.DateTimeField(null=True, blank=True)
-    photographer_style = models.ManyToManyField(Style, through="StylePhotographerGroup")
-    photographer_avail_time = models.ForeignKey(AvailTime, related_name='photographer_avail_time', on_delete=models.CASCADE, blank=True, null=True)
-    photographer_equipment = models.ForeignKey(Equipment, related_name='photographer_equipment', on_delete=models.CASCADE, null=True, blank=True)
-    photographer_photos = models.ForeignKey(Photo, related_name='photographer_photos', on_delete=models.CASCADE, null=True, blank=True)
+    photographer_style = models.ManyToManyField(Style, related_name='styles')
+    photographer_avail_time = models.ManyToManyField(AvailTime, blank=True, null=True)
+    photographer_equipment = models.ManyToManyField(Equipment,related_name='photographer_equipment', null=True, blank=True)
+    photographer_photos = models.ManyToManyField(Photo, related_name='photographer_photos', null=True, blank=True)
 
     def __str__(self):
         return self.profile.user.first_name
-
-
-class StylePhotographerGroup(models.Model):
-    photographer = models.ForeignKey(Photographer, on_delete=models.CASCADE)
-    style = models.ForeignKey(Style, on_delete=models.CASCADE)
 
 

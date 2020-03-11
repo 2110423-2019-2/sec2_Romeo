@@ -23,6 +23,18 @@ class UserSerializer(serializers.ModelSerializer):
                                               )
         return user
 
+    # def update(self, instance, validated_data):
+    #     username = self.data['username']
+    #     user = CustomUser.objects.get(username=username)
+    #     print(user)
+    #     user.username = validated_data.pop('username', user.username)
+    #     user.password = validated_data.pop('password', user.password)
+    #     user.email = validated_data.pop('email', user.email)
+    #     user.first_name = validated_data.pop('first_name', user.first_name)
+    #     user.last_name = validated_data.pop('last_name', user.last_name)
+    #     instance.save()
+    #     return instance
+
 
 class ProfileSerializer(serializers.ModelSerializer):
     user = UserSerializer(required=True, partial=True)
@@ -92,7 +104,7 @@ class EquipmentSerializer(serializers.ModelSerializer):
 class PhotographerSerializer(serializers.ModelSerializer):
     profile = ProfileSerializer(required=True, partial=True)
     photographer_photos = PhotoSerializer(many=True, required=False, allow_null=True)
-    photographer_equipment = EquipmentSerializer(many=True, required=False, allow_null=True)
+    photographer_equipments = EquipmentSerializer(many=True, required=False, allow_null=True)
     photographer_styles = StyleSerializer(many=True, required=False)
 
     class Meta:
@@ -102,14 +114,16 @@ class PhotographerSerializer(serializers.ModelSerializer):
     # Override default create method to auto create nested profile from photographer
     def create(self, validated_data):
         profile_data = validated_data.pop('profile')
+        # photographer_photos_data=validated_data.pop('photographer_photos')
+        # photographer_equipments_data=validated_data.pop('photographer_equipment')
         profile = ProfileSerializer.create(ProfileSerializer(), validated_data=profile_data)
-        photographer = Photographer.objects.create(profile=profile,
-                                                   # TODO Correctly implement fetching last online time
-                                                   photographer_last_online_time=validated_data.pop('photographer_last_online_time', "2020-02-24T09:54:43.770582Z"),
-                                                   # PhotographerStyle=validated_data.pop('PhotographerStyle', "None"),
-                                                   photographer_avail_time=validated_data.pop('photographer_avail_time', None),
-                                                   photographer_equipment=validated_data.pop('photographer_equipment', None),
-                                                   photographer_photos=validated_data.pop('photographer_photos', None))
+        photographer = Photographer.objects.create(profile=profile, **validated_data)
+        # for photographer_photo_data in photographer_photos_data:
+        #     Photo.objects.create(photographer=photographer, **photographer_photo_data)
+        #
+        # for photographer_equipment_data in photographer_equipments_data:
+        #     Equipment.objects.create(photographer=photographer, **photographer_equipment_data)
+
         profile.save()
         return photographer
 
