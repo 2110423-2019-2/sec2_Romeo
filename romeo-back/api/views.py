@@ -1,5 +1,5 @@
 from rest_framework.decorators import action
-from rest_framework import status, viewsets
+from rest_framework import status, viewsets, filters 
 from rest_framework.response import Response
 from .permissions import IsUser
 from rest_framework.permissions import AllowAny, SAFE_METHODS
@@ -20,6 +20,8 @@ class PhotographerViewSet(viewsets.ModelViewSet):
     queryset = Photographer.objects.all()
     permission_classes = [AllowAny]
     lookup_field = 'profile__user__username'
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['profile__user__username']
 
     # # custom action routing for photographers to update photos
     # @action(detail=True, methods=['get', 'post', 'delete'], url_path='update_photos')
@@ -79,6 +81,8 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     permission_classes = [AllowAny]
     lookup_field = 'username'
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['username']
 
 
 class ProfileViewSet(viewsets.ModelViewSet):
@@ -86,6 +90,6 @@ class ProfileViewSet(viewsets.ModelViewSet):
     serializer_class = ProfileSerializer
     permission_classes = [AllowAny]
     lookup_field = 'user__username'
-
-
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['user__username']
 
