@@ -170,6 +170,7 @@ class PhotographerSerializer(serializers.ModelSerializer):
 class CustomerSerializer(serializers.ModelSerializer):
     profile = ProfileSerializer(required=True, partial=True)
     # jobs_by_customer = JobSerializer(many=True)
+    fav_photographers = PhotographerSerializer(many=True, required=False, allow_null=True)
 
     class Meta:
         model = Customer

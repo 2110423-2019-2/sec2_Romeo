@@ -14,6 +14,7 @@ from customers.models import Customer
 from jobs.models import JobInfo
 from users.models import CustomUser, CustomUserProfile
 
+from .mmfilters import styleFilter
 
 class PhotographerViewSet(viewsets.ModelViewSet):
     serializer_class = PhotographerSerializer
@@ -22,6 +23,7 @@ class PhotographerViewSet(viewsets.ModelViewSet):
     lookup_field = 'profile__user__username'
     filter_backends = [filters.SearchFilter]
     search_fields = ['profile__user__username']
+    filter_class = styleFilter
 
     # # custom action routing for photographers to update photos
     # @action(detail=True, methods=['get', 'post', 'delete'], url_path='update_photos')

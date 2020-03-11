@@ -109,7 +109,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'romeo-database',
         'USER': 'root',
-        'PASSWORD': 'P@ssw0rd',
+        'PASSWORD': 'root',
         'HOST': 'localhost',
         'PORT': '3306',
     }
