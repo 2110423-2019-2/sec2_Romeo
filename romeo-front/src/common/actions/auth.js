@@ -4,19 +4,23 @@ import Axios from "axios";
 
 export const signIn = (credentials, history) => async dispatch => {
 	try {
-		const {
-			refresh,
-			access
-		} = await Axios.post("/auth/jwt/create", credentials);
-		setAuthToken(access);
-
-		const {
-			user
-		} = await Axios.post("/users/" + credentials.username);
-		setCurrentClient(credentials.username, user.profile.type);
-		dispatch(setAuth(true));
-		history.push("/");
+		removeAuthToken();
+		removeCurrentClient();
+		Axios.post("/auth/jwt/create", credentials)
+		.then(res => {
+			const token = res.data.access;
+			setAuthToken(token);
+			console.log(token);
+			Axios.get("/api/users/" + credentials.username)
+			.then(res1 => {
+				const userType = res1.data.user_type;
+				setCurrentClient(credentials.username, userType);
+				dispatch(setAuth(true));
+				history.push("/");
+			})
+		})
 	} catch (error) {
+		console.log(error);
 		dispatch(setAuth(null));
 	}
 };

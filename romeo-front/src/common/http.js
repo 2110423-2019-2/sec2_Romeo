@@ -9,8 +9,8 @@ export default () => {
 	Axios.defaults.headers.post["Content-Type"] = "application/json";
 	Axios.interceptors.response.use(null, function(err) {
 		// store.dispatch(setError(err.response));
-		// console.warn(err.response);
-		if (err.response.status === 403) {
+		console.warn(err);
+		if (err.status === 403) {
 			removeAuthToken();
 			store.dispatch(setAuth(false));
 		}
