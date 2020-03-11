@@ -114,17 +114,17 @@ class PhotographerSerializer(serializers.ModelSerializer):
     # Override default create method to auto create nested profile from photographer
     def create(self, validated_data):
         profile_data = validated_data.pop('profile')
-        photographer_photos_data=validated_data.pop('photographer_photos')
-        photographer_equipments_data=validated_data.pop('photographer_equipment')
+        # photographer_photos_data=validated_data.pop('photographer_photos')
+        # photographer_equipments_data=validated_data.pop('photographer_equipment')
         profile = ProfileSerializer.create(ProfileSerializer(), validated_data=profile_data)
+        photographer = Photographer.objects.create(profile=profile, **validated_data)
+        # for photographer_photo_data in photographer_photos_data:
+        #     Photo.objects.create(photographer=photographer, **photographer_photo_data)
+        #
+        # for photographer_equipment_data in photographer_equipments_data:
+        #     Equipment.objects.create(photographer=photographer, **photographer_equipment_data)
+
         profile.save()
-        photographer = Photographer.objects.create(**validated_data)
-        for photographer_photo_data in photographer_photos_data:
-            Photo.objects.create(photographer=photographer, **photographer_photo_data)
-
-        for photographer_equipment_data in photographer_equipments_data:
-            Equipment.objects.create(photographer=photographer, **photographer_equipment_data)
-
         return photographer
 
     # def update(self, instance, validated_data):
