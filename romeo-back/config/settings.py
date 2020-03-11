@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'djoser',
     'rest_framework',
 
+
     # JWT authentication backend library
     'rest_framework_simplejwt',
 

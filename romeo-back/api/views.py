@@ -78,12 +78,14 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = CustomUser.objects.all()
     serializer_class = UserSerializer
     permission_classes = [AllowAny]
+    lookup_field = 'username'
 
 
 class ProfileViewSet(viewsets.ModelViewSet):
     queryset = CustomUserProfile.objects.all()
     serializer_class = ProfileSerializer
     permission_classes = [AllowAny]
+    lookup_field = 'user__username'
 
 
 
