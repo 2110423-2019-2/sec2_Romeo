@@ -19,11 +19,10 @@ class SignUp extends React.Component {
         this.props.form.validateFields();
     }
 
-    signInUser = (res) => {
-        const user = res[0].profile;
+    signInUser = () => {
         this.props.signIn({
-            username: user.username,
-            password: user.password,
+            username: this.props.form.getFieldsValue().username,
+            password: this.props.form.getFieldsValue().password,
         }, history);
     }
 
@@ -80,7 +79,7 @@ class SignUp extends React.Component {
                         profile,
                         ...photographerInfo
                     }).then(res => {
-                        this.signInUser(res);
+                        this.signInUser();
                     })
                     .catch(err => console.log(err))
                 } else {
@@ -88,7 +87,7 @@ class SignUp extends React.Component {
                         profile
                     })
                     .then(res => {
-                        this.signInUser(res);
+                        this.signInUser();
                     })
                     .catch(err => console.log(err))
                 }

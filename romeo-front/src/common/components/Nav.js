@@ -27,7 +27,7 @@ class Nav extends React.Component {
                     </Link>
                     { isAuth && currentClient ? (
                         <Dropdown overlay={() => (
-                            currentClient.type === "PHOTOGRAPHER" ? (
+                            currentClient.type === 1 ? (
                                 <Menu>
                                     <Menu.Item key="0">
                                         <Link to={"/profile/" + currentClient.username}>
