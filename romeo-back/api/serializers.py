@@ -17,6 +17,9 @@ class UserSerializer(serializers.ModelSerializer):
         user = CustomUser.objects.create_user(username=validated_data['username'],
                                               password=validated_data['password'],
                                               user_type=validated_data['user_type'],
+                                              email=validated_data['email'],
+                                              first_name=validated_data['first_name'],
+                                              last_name=validated_data['last_name']
                                               )
         return user
 
@@ -28,6 +31,7 @@ class ProfileSerializer(serializers.ModelSerializer):
         model = CustomUserProfile
         fields = '__all__'
 
+    # Override default create method to auto create nested user from profile
     def create(self, validated_data):
         user_data = validated_data.pop('user')
         user = UserSerializer.create(UserSerializer(), validated_data=user_data)
@@ -41,6 +45,16 @@ class ProfileSerializer(serializers.ModelSerializer):
         )
         profile.save()
         return profile
+
+    def update(self, instance, validated_data):
+        user_data = validated_data.pop('user')
+        username = self.data['user']['username']
+        user = CustomUser.objects.get(username=username)
+        user.first_name = user_data.get('first_name', user_data.first_name)
+        user.last_name = user_data.get('last_name', user_data.last_name)
+        user.email = user_data.get('email', user_data.email)
+        user.save()
+        return instance
 
 
 class JobSerializer(serializers.ModelSerializer):
@@ -83,7 +97,7 @@ class PhotographerSerializer(serializers.ModelSerializer):
         model = Photographer
         fields = '__all__'
 
-    # Override default create method to auto create user from photographer
+    # Override default create method to auto create nested profile from photographer
     def create(self, validated_data):
         profile_data = validated_data.pop('profile')
         profile = ProfileSerializer.create(ProfileSerializer(), validated_data=profile_data)
@@ -101,9 +115,6 @@ class PhotographerSerializer(serializers.ModelSerializer):
         # update user information except username and password
         profile_data = validated_data.pop('profile')
         profile = instance.profile
-        profile.first_name = profile_data.get('first_name', profile.first_name)
-        profile.last_name = profile_data.get('last_name', profile.last_name)
-        profile.email = profile_data.get('email', profile.email)
         profile.ssn = profile_data.get('ssn', profile.ssn)
         profile.back_account_number = profile_data.get('bank_account_number', profile.back_account_number)
         profile.bank_name = profile_data.get('bank_name', profile.bank_name)
@@ -180,18 +191,3 @@ class CustomerSerializer(serializers.ModelSerializer):
     #     jobs_by_customer_data.save()
 
 
-# class UserRegistrationSerializer(BaseUserRegistrationSerializer):
-#     class Meta(BaseUserRegistrationSerializer.Meta):
-#         fields = '__all__'
-
-    # first_name = serializers.CharField(required=True, write_only=True)
-    # last_name = serializers.CharField(required=True, write_only=True)
-    # password = serializers.CharField(write_only=True)
-    #
-    # def get_cleaned_data(self):
-    #     return {
-    #         'first_name': self.validated_data.get('first_name', ''),
-    #         'last_name': self.validated_data.get('last_name', ''),
-    #         'password1': self.validated_data.get('password1', ''),
-    #         'email': self.validated_data.get('email', ''),
-    #     }
