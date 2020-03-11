@@ -46,15 +46,17 @@ class ProfileSerializer(serializers.ModelSerializer):
         profile.save()
         return profile
 
-    def update(self, instance, validated_data):
-        user_data = validated_data.pop('user')
-        username = self.data['user']['username']
-        user = CustomUser.objects.get(username=username)
-        user.first_name = user_data.get('first_name', user_data.first_name)
-        user.last_name = user_data.get('last_name', user_data.last_name)
-        user.email = user_data.get('email', user_data.email)
-        user.save()
-        return instance
+    # def update(self, instance, validated_data):
+    #     user_data = validated_data.pop('user')
+    #     user = UserSerializer.update(self,instance,user_data)
+    #
+    #     username = self.data['user']['username']
+    #     user = CustomUser.objects.get(username=username)
+    #     user.first_name = user_data.get('first_name', user_data.first_name)
+    #     user.last_name = user_data.get('last_name', user_data.last_name)
+    #     user.email = user_data.get('email', user_data.email)
+    #     user.save()
+    #     return instance
 
 
 class JobSerializer(serializers.ModelSerializer):
@@ -111,44 +113,44 @@ class PhotographerSerializer(serializers.ModelSerializer):
         profile.save()
         return photographer
 
-    def update(self, instance, validated_data):
-        # update user information except username and password
-        profile_data = validated_data.pop('profile')
-        profile = instance.profile
-        profile.ssn = profile_data.get('ssn', profile.ssn)
-        profile.back_account_number = profile_data.get('bank_account_number', profile.back_account_number)
-        profile.bank_name = profile_data.get('bank_name', profile.bank_name)
-        profile.phone = profile_data.get('phone', profile.phone)
-        profile.save()
-
-        # update photographer's photos
-        photos_data = validated_data.pop('photographer_photo')
-        photos = (instance.photos).all()
-        photos = list(photos)
-        for photo_data in photos_data:
-            photo = photos.pop(0)
-            photo.photo_link = photo_data.get('photo_link', photo.photo_link)
-            photo.save()
-
-        # update photographer's equipments
-        equipments_data = validated_data.pop('photographer_equipments')
-        equipments = (instance.equipments).all()
-        equipments = list(equipments)
-        for equipment_data in equipments_data:
-            equipment = equipments.pop(0)
-            equipment.equipment_name = equipment_data.get('equipment_name', equipment.equipment_name)
-            equipment.save()
-
-        # update photographer's style
-        styles_data = validated_data.pop('photographer_styles')
-        styles = (instance.styles).all()
-        styles = list(styles)
-        for style_data in styles_data:
-            style = styles.pop(0)
-            style.style_name = style_data.get('style_name', style.style_name)
-            style.save()
-
-        return instance
+    # def update(self, instance, validated_data):
+    #     # update user information except username and password
+    #     profile_data = validated_data.pop('profile')
+    #     profile = instance.profile
+    #     profile.ssn = profile_data.get('ssn', profile.ssn)
+    #     profile.back_account_number = profile_data.get('bank_account_number', profile.back_account_number)
+    #     profile.bank_name = profile_data.get('bank_name', profile.bank_name)
+    #     profile.phone = profile_data.get('phone', profile.phone)
+    #     profile.save()
+    #
+    #     # update photographer's photos
+    #     photos_data = validated_data.pop('photographer_photo')
+    #     photos = (instance.photos).all()
+    #     photos = list(photos)
+    #     for photo_data in photos_data:
+    #         photo = photos.pop(0)
+    #         photo.photo_link = photo_data.get('photo_link', photo.photo_link)
+    #         photo.save()
+    #
+    #     # update photographer's equipments
+    #     equipments_data = validated_data.pop('photographer_equipments')
+    #     equipments = (instance.equipments).all()
+    #     equipments = list(equipments)
+    #     for equipment_data in equipments_data:
+    #         equipment = equipments.pop(0)
+    #         equipment.equipment_name = equipment_data.get('equipment_name', equipment.equipment_name)
+    #         equipment.save()
+    #
+    #     # update photographer's style
+    #     styles_data = validated_data.pop('photographer_styles')
+    #     styles = (instance.styles).all()
+    #     styles = list(styles)
+    #     for style_data in styles_data:
+    #         style = styles.pop(0)
+    #         style.style_name = style_data.get('style_name', style.style_name)
+    #         style.save()
+    #
+    #     return instance
 
 
 class CustomerSerializer(serializers.ModelSerializer):

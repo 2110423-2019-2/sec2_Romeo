@@ -58,10 +58,6 @@ INSTALLED_APPS = [
     'users.apps.UsersConfig',
 ]
 
-CORS_ORIGIN_WHITELIST = [
-    "http://localhost:3000"
-]
-
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -70,6 +66,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    #CORS
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
 ]
@@ -109,7 +107,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'romeo-database',
         'USER': 'root',
-        'PASSWORD': 'Pakim2541',
+        'PASSWORD': 'P@ssw0rd',
         'HOST': 'localhost',
         'PORT': '3306',
     }
@@ -149,6 +147,14 @@ DJOSER= {
     # }
 }
 
+CORS_ORIGIN_WHITELIST = [
+    "https://example.com",
+    "https://sub.example.com",
+    "http://localhost:8080",
+    "http://localhost:3000",
+    "http://localhost:8000",
+
+]
 # Rest Auth Serializer
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
