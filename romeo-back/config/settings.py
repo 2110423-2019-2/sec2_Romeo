@@ -44,7 +44,7 @@ INSTALLED_APPS = [
     # Third Party
     'djoser',
     'rest_framework',
-
+    'corsheaders',
 
     # JWT authentication backend library
     'rest_framework_simplejwt',
@@ -66,6 +66,10 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    #CORS
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
 ]
 
 
@@ -143,6 +147,14 @@ DJOSER= {
     # }
 }
 
+CORS_ORIGIN_WHITELIST = [
+    "https://example.com",
+    "https://sub.example.com",
+    "http://localhost:8080",
+    "http://localhost:3000",
+    "http://localhost:8000",
+
+]
 # Rest Auth Serializer
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
