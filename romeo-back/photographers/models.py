@@ -70,7 +70,7 @@ class Photographer(models.Model):
     # Photographer fields
     # TODO Correctly implement fetching last online time
     photographer_last_online_time = models.DateTimeField(null=True, blank=True)
-    photographer_style = models.ManyToManyField(Style, related_name='styles')
+    photographer_style = models.ManyToManyField(Style,null=True, blank=True, related_name='styles')
     photographer_avail_time = models.ManyToManyField(AvailTime, blank=True, null=True)
     photographer_equipment = models.ManyToManyField(Equipment,related_name='photographer_equipment', null=True, blank=True)
     photographer_photos = models.ManyToManyField(Photo, related_name='photographer_photos', null=True, blank=True)

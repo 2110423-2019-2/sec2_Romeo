@@ -104,7 +104,7 @@ class EquipmentSerializer(serializers.ModelSerializer):
 class PhotographerSerializer(serializers.ModelSerializer):
     profile = ProfileSerializer(required=True, partial=True)
     photographer_photos = PhotoSerializer(many=True, required=False, allow_null=True)
-    photographer_equipments = EquipmentSerializer(many=True, required=False, allow_null=True)
+    photographer_equipment = EquipmentSerializer(many=True, required=False, allow_null=True)
     photographer_styles = StyleSerializer(many=True, required=False)
 
     class Meta:
