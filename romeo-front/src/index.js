@@ -8,8 +8,8 @@ import store from "./common/store.js";
 import initHttp from "./common/http.js";
 import { setAuth } from "./common/actions/auth";
 import * as serviceWorker from './serviceWorker';
-import { removeCurrentClient, setCurrentClient } from 'common/auth';
-import { getCurrentClient, mockValues } from 'logic/Client';
+import { removeCurrentClient } from 'common/auth';
+import { getCurrentClient } from './common/auth';
 require('dotenv').config();
 
 initHttp();
@@ -18,7 +18,8 @@ const token = localStorage.getItem("token");
 if (token) {
 	store.dispatch(setAuth(true));
 	if (!getCurrentClient()) {
-		setCurrentClient(mockValues);
+		store.dispatch(setAuth(false));
+		removeCurrentClient();
 	}
 } else {
 	store.dispatch(setAuth(false));

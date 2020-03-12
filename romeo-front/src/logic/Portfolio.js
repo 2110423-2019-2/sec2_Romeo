@@ -1,10 +1,9 @@
 import S3 from "common/s3";
 import Config from "common/s3-config";
-import { getCurrentClient } from "logic/Client";
+import { getCurrentClientInfo } from "common/auth";
 import moment from "moment";
 
 export const uploadPhotos = (event) => {
-    // TODO: Move all this to backend
     let errors = [];
     let warnings = []
     if (event.target.files && event.target.files[0]) {
@@ -24,7 +23,7 @@ export const uploadPhotos = (event) => {
                 const splitBlobName = blob.name.split(".");
                 const extension = splitBlobName[splitBlobName.length-1];
         
-                const fileName = getCurrentClient().username + moment(new Date()) + "-" + i + "." + extension;
+                const fileName = getCurrentClientInfo().username + moment(new Date()) + "-" + i + "." + extension;
                 const params = { Body: blob, Bucket: `${Config.bucketName}`, Key: fileName};
                 //Sending the file to the Spaces
                 S3.putObject(params).on('build', request => {
@@ -54,17 +53,13 @@ export const uploadPhotos = (event) => {
     };
 }
 
-export const getPortfolio = () => {
-    // TODO: Connect to Backend
-    if (!localStorage.getItem("portfolio")) {
-        const empty = {
-            hilights: [],
-            photos: []
-        }
-        localStorage.setItem("portfolio", JSON.stringify(empty));
-        // addPhoto(mockPhotos);
+export const getPortfolio = (client) => {
+    if (client) {
+        if (client.photographer_photos) {
+            return client.photographer_photos
+        } 
     }
-    return JSON.parse(localStorage.getItem("portfolio"));
+    return [];
 }
 
 export const addPhoto = (links) => {

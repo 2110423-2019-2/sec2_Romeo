@@ -12,7 +12,7 @@ class Nav extends React.Component {
         showSignIn: false
     }
     render() {
-        const { showSignUp, showSignIn } = this.state;
+        const { showSignIn } = this.state;
         const { signOut, isAuth } = this.props;
 
         const currentClient = JSON.parse(localStorage.getItem('currentClient'))
@@ -27,7 +27,7 @@ class Nav extends React.Component {
                     </Link>
                     { isAuth && currentClient ? (
                         <Dropdown overlay={() => (
-                            currentClient.type === "PHOTOGRAPHER" ? (
+                            currentClient.type === 1 ? (
                                 <Menu>
                                     <Menu.Item key="0">
                                         <Link to={"/profile/" + currentClient.username}>

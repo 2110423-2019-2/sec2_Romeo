@@ -4,7 +4,7 @@ from djoser.serializers import UserCreateSerializer as BaseUserRegistrationSeria
 from photographers.models import Photographer, Photo, AvailTime, Equipment, Style
 from customers.models import Customer
 from jobs.models import JobInfo
-from users.models import CustomUser
+from users.models import CustomUser, CustomUserProfile
 import datetime
 
 
@@ -12,6 +12,63 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = '__all__'
+
+    def create(self, validated_data):
+        user = CustomUser.objects.create_user(username=validated_data['username'],
+                                              password=validated_data['password'],
+                                              user_type=validated_data['user_type'],
+                                              email=validated_data['email'],
+                                              first_name=validated_data['first_name'],
+                                              last_name=validated_data['last_name']
+                                              )
+        return user
+
+    # def update(self, instance, validated_data):
+    #     username = self.data['username']
+    #     user = CustomUser.objects.get(username=username)
+    #     print(user)
+    #     user.username = validated_data.pop('username', user.username)
+    #     user.password = validated_data.pop('password', user.password)
+    #     user.email = validated_data.pop('email', user.email)
+    #     user.first_name = validated_data.pop('first_name', user.first_name)
+    #     user.last_name = validated_data.pop('last_name', user.last_name)
+    #     instance.save()
+    #     return instance
+
+
+class ProfileSerializer(serializers.ModelSerializer):
+    user = UserSerializer(required=True, partial=True)
+
+    class Meta:
+        model = CustomUserProfile
+        fields = '__all__'
+
+    # Override default create method to auto create nested user from profile
+    def create(self, validated_data):
+        user_data = validated_data.pop('user')
+        user = UserSerializer.create(UserSerializer(), validated_data=user_data)
+        profile = CustomUserProfile.objects.create(
+            user=user,
+            ssn=validated_data.pop('ssn', ''),
+            bank_account_number=validated_data.pop('bank_account_number', ''),
+            bank_name=validated_data.pop('bank_name', ''),
+            bank_account_name=validated_data.pop('bank_account_name', ''),
+            phone=validated_data.pop('phone', '')
+        )
+        profile.save()
+        return profile
+
+    # def update(self, instance, validated_data):
+    #     user_data = validated_data.pop('user')
+    #     user = UserSerializer.update(self,instance,user_data)
+    #
+    #     username = self.data['user']['username']
+    #     user = CustomUser.objects.get(username=username)
+    #     user.first_name = user_data.get('first_name', user_data.first_name)
+    #     user.last_name = user_data.get('last_name', user_data.last_name)
+    #     user.email = user_data.get('email', user_data.email)
+    #     user.save()
+    #     return instance
 
 
 class JobSerializer(serializers.ModelSerializer):
@@ -39,98 +96,96 @@ class StyleSerializer(serializers.ModelSerializer):
 
 
 class EquipmentSerializer(serializers.ModelSerializer):
-    class Meta :
+    class Meta:
         model = Equipment
         fields = '__all__'
 
 
 class PhotographerSerializer(serializers.ModelSerializer):
-    user = UserSerializer(required=True, partial=True)
-    photographer_photos = PhotoSerializer(many=True, required=False)
-    photographer_equipments = EquipmentSerializer(many=True, required=False)
+    profile = ProfileSerializer(required=True, partial=True)
+    photographer_photos = PhotoSerializer(many=True, required=False, allow_null=True)
+    photographer_equipment = EquipmentSerializer(many=True, required=False, allow_null=True)
     photographer_styles = StyleSerializer(many=True, required=False)
 
     class Meta:
         model = Photographer
         fields = '__all__'
 
-    # Override default create method to auto create user from photographer
+    # Override default create method to auto create nested profile from photographer
     def create(self, validated_data):
-        user_data = validated_data.pop('user')
-        user_data.is_Photographer = True
-        user = UserSerializer.create(UserSerializer(), validated_data=user_data)
-        photographer = Photographer.objects.create(user=user,
-                                                   PhotographerPrice=validated_data.pop('PhotographerPrice', ""),
-                                                   # TODO Correctly implement fetching last online time
-                                                   PhotographerLastOnlineTime=validated_data.pop('PhotographerLastOnlineTime', "2020-02-24T09:54:43.770582Z"),
-                                                   PhotographerStyle=validated_data.pop('PhotographerStyle',""),
+        profile_data = validated_data.pop('profile')
+        # photographer_photos_data=validated_data.pop('photographer_photos')
+        # photographer_equipments_data=validated_data.pop('photographer_equipment')
+        profile = ProfileSerializer.create(ProfileSerializer(), validated_data=profile_data)
+        photographer = Photographer.objects.create(profile=profile
+                                                   #photographer_last_online_time=profile_data.get('photographer_last_online_time', ""),
+                                                   )
+        # for photographer_photo_data in photographer_photos_data:
+        #     Photo.objects.create(photographer=photographer, **photographer_photo_data)
+        #
+        # for photographer_equipment_data in photographer_equipments_data:
+        #     Equipment.objects.create(photographer=photographer, **photographer_equipment_data)
 
-                                                   PhotographerAvailTime=validated_data.pop('PhotographerAvailTime',None),
-                                                   PhotographerEquipment=validated_data.pop('PhotographerEquipment',None),
-                                                   PhotographerPhotos=validated_data.pop('PhotographerPhotos',None))
-        user.save()
+        profile.save()
         return photographer
 
-    def update(self, instance, validated_data):
-        # update user information except username and password
-        user_data = validated_data.pop('user')
-        user = instance.user
-        user.first_name = user_data.get('first_name', user.first_name)
-        user.last_name = user_data.get('last_name', user.last_name)
-        user.email = user_data.get('email', user.email)
-        user.ssn = user_data.get('ssn', user.ssn)
-        user.back_account_number = user_data.get('bank_account_number', user.back_account_number)
-        user.bank_name = user_data.get('bank_name', user.bank_name)
-        user.phone = user_data.get('phone', user.phone)
-        user.save()
-
-        # update photographer's photos
-        photos_data = validated_data.pop('photographer_photo')
-        photos = (instance.photos).all()
-        photos = list(photos)
-        for photo_data in photos_data:
-            photo = photos.pop(0)
-            photo.PhotoLink = photo_data.get('PhotoLink', photo.PhotoLink)
-            photo.save()
-
-        # update photographer's equipments
-        equipments_data = validated_data.pop('photographer_equipments')
-        equipments = (instance.equipments).all()
-        equipments = list(equipments)
-        for equipment_data in equipments_data:
-            equipment = equipments.pop(0)
-            equipment.EquipmentName = equipment_data.get('EquipmentName', equipment.EquipmentName)
-            equipment.save()
-
-        # update photographer's style
-        styles_data = validated_data.pop('photographer_styles')
-        styles = (instance.styles).all()
-        styles = list(styles)
-        for style_data in styles_data:
-            style = styles.pop(0)
-            style.StyleName = style_data.get('StyleName', style.StyleName)
-            style.save()
-
-        return instance
+    # def update(self, instance, validated_data):
+    #     # update user information except username and password
+    #     profile_data = validated_data.pop('profile')
+    #     profile = instance.profile
+    #     profile.ssn = profile_data.get('ssn', profile.ssn)
+    #     profile.back_account_number = profile_data.get('bank_account_number', profile.back_account_number)
+    #     profile.bank_name = profile_data.get('bank_name', profile.bank_name)
+    #     profile.phone = profile_data.get('phone', profile.phone)
+    #     profile.save()
+    #
+    #     # update photographer's photos
+    #     photos_data = validated_data.pop('photographer_photo')
+    #     photos = (instance.photos).all()
+    #     photos = list(photos)
+    #     for photo_data in photos_data:
+    #         photo = photos.pop(0)
+    #         photo.photo_link = photo_data.get('photo_link', photo.photo_link)
+    #         photo.save()
+    #
+    #     # update photographer's equipments
+    #     equipments_data = validated_data.pop('photographer_equipments')
+    #     equipments = (instance.equipments).all()
+    #     equipments = list(equipments)
+    #     for equipment_data in equipments_data:
+    #         equipment = equipments.pop(0)
+    #         equipment.equipment_name = equipment_data.get('equipment_name', equipment.equipment_name)
+    #         equipment.save()
+    #
+    #     # update photographer's style
+    #     styles_data = validated_data.pop('photographer_styles')
+    #     styles = (instance.styles).all()
+    #     styles = list(styles)
+    #     for style_data in styles_data:
+    #         style = styles.pop(0)
+    #         style.style_name = style_data.get('style_name', style.style_name)
+    #         style.save()
+    #
+    #     return instance
 
 
 class CustomerSerializer(serializers.ModelSerializer):
-    user = UserSerializer(required=True)
+    profile = ProfileSerializer(required=True, partial=True)
     # jobs_by_customer = JobSerializer(many=True)
 
     class Meta:
         model = Customer
-        fields = ['user']
+        fields = '__all__'
 
         # Override default create method to auto create user from customer
     def create(self, validated_data):
-        user_data = validated_data.pop('user')
-        user_data.is_Customer = True
-        user = UserSerializer.create(UserSerializer(), validated_data=user_data)
-        customer = Customer.objects.create(user=user,
-                                           PaymentInfo=validated_data.pop('PaymentInfo'))
+        profile_data = validated_data.pop('profile')
+        profile = ProfileSerializer.create(ProfileSerializer(), validated_data=profile_data)
+        customer = Customer.objects.create(profile=profile)
+        customer.fav_photographers.set(validated_data.pop('fav_photographers'))
 
-        user.save()
+        customer.save()
+        profile.save()
         return customer
 
     # def create(self, validated_data):
@@ -156,15 +211,3 @@ class CustomerSerializer(serializers.ModelSerializer):
     #     jobs_by_customer_data.save()
 
 
-# class CustomRegisterSerializer(RegisterSerializer):
-#     first_name = serializers.CharField(required=True, write_only=True)
-#     last_name = serializers.CharField(required=True, write_only=True)
-#     password = serializers.CharField(write_only=True)
-#
-#     def get_cleaned_data(self):
-#         return {
-#             'first_name': self.validated_data.get('first_name', ''),
-#             'last_name': self.validated_data.get('last_name', ''),
-#             'password1': self.validated_data.get('password1', ''),
-#             'email': self.validated_data.get('email', ''),
-#         }

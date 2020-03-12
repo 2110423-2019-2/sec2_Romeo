@@ -5,3 +5,6 @@ nginx-data
 public
 
 .vscode
+
+romeo-back/.vscode/settings.json
+.DS_Store

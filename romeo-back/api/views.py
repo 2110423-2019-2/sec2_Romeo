@@ -1,24 +1,27 @@
 from rest_framework.decorators import action
-from rest_framework import status, viewsets
+from rest_framework import status, viewsets, filters 
 from rest_framework.response import Response
 from .permissions import IsUser
 from rest_framework.permissions import AllowAny, SAFE_METHODS
 
 # Import Serializers of apps
 from .serializers import PhotographerSerializer, CustomerSerializer, JobSerializer, UserSerializer, \
-    PhotoSerializer, AvailTimeSerializer, EquipmentSerializer, StyleSerializer
+    PhotoSerializer, AvailTimeSerializer, EquipmentSerializer, ProfileSerializer, StyleSerializer
 
 # Import models of apps for queryset
 from photographers.models import Photographer, Photo, AvailTime, Equipment, Style
 from customers.models import Customer
 from jobs.models import JobInfo
-from users.models import CustomUser
+from users.models import CustomUser, CustomUserProfile
 
 
 class PhotographerViewSet(viewsets.ModelViewSet):
     serializer_class = PhotographerSerializer
     queryset = Photographer.objects.all()
     permission_classes = [AllowAny]
+    lookup_field = 'profile__user__username'
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['profile__user__username']
 
     # # custom action routing for photographers to update photos
     # @action(detail=True, methods=['get', 'post', 'delete'], url_path='update_photos')
@@ -57,6 +60,7 @@ class EquipmentViewSet(viewsets.ModelViewSet):
 class CustomerViewSet(viewsets.ModelViewSet):
     queryset = Customer.objects.filter()
     serializer_class = CustomerSerializer
+    permission_classes = [AllowAny]
 
 
 class JobsViewSet(viewsets.ModelViewSet):
@@ -76,6 +80,16 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = CustomUser.objects.all()
     serializer_class = UserSerializer
     permission_classes = [AllowAny]
+    lookup_field = 'username'
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['username']
 
 
+class ProfileViewSet(viewsets.ModelViewSet):
+    queryset = CustomUserProfile.objects.all()
+    serializer_class = ProfileSerializer
+    permission_classes = [AllowAny]
+    lookup_field = 'user__username'
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['user__username']
 

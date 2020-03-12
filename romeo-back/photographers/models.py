@@ -1,5 +1,5 @@
 from django.db import models
-from users.models import CustomUser
+from users.models import CustomUserProfile
 # Create your models here.
 
 
@@ -17,7 +17,8 @@ STYLE_CHOICES = [('GRADUATION', 'Graduation'),
                  ('PRODUCT', 'Product'),
                  ('FASHION', 'Fashion'),
                  ('EVENT', 'Event'),
-                 ('WEDDING', 'Wedding')]
+                 ('WEDDING', 'Wedding'),
+                 ('NONE', 'None')]
 
 TIME_CHOICES = [('HALF_DAY_MORNING', "Half-day(Morning-Noon)"),
                      ('HALF_DAY_NOON', "Half-day(Noon-Evening)"),
@@ -27,37 +28,38 @@ TIME_CHOICES = [('HALF_DAY_MORNING', "Half-day(Morning-Noon)"),
 
 
 class Photo(models.Model):
-    PhotoLink = models.URLField(primary_key=True, unique=True)
+    photo_link = models.URLField(primary_key=True, unique=True)
 
     def __str__(self):
-        return self.PhotoLink
+        return self.photo_link
 
 
 class AvailTime(models.Model):
-    AvailDate = models.CharField(max_length=20, choices=DAY_CHOICES)
-    AvailTime = models.CharField(max_length=16, choices=TIME_CHOICES)
+    avail_date = models.CharField(max_length=20, choices=DAY_CHOICES)
+    avail_time = models.CharField(max_length=16, choices=TIME_CHOICES)
+    photographer_price = models.FloatField()
 
     def __str__(self):
-        return self.AvailDate + " " + self.AvailTime
+        return self.avail_date + " " + self.avail_time
 
 
 class Equipment(models.Model):
-    EquipmentName = models.CharField(primary_key=True, unique=True, max_length=100)
+    equipment_name = models.CharField(primary_key=True, unique=True, max_length=100)
 
     def __str__(self):
-        return self.EquipmentName
+        return self.equipment_name
 
 
 class Style(models.Model):
-    StyleName = models.CharField(primary_key=True, unique=True, max_length=20, choices=STYLE_CHOICES)
+    style_name = models.CharField(primary_key=True, unique=True, max_length=20, choices=STYLE_CHOICES)
 
     def __str__(self):
-        return self.StyleName
+        return self.style_name
 
 
 # TODO Rename common fields
 class Photographer(models.Model):
-    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, primary_key=True)
+    profile = models.OneToOneField(CustomUserProfile, on_delete=models.CASCADE, primary_key=True)
     # # Common fields
     # PhotographerID = models.AutoField(primary_key=True)
     # PhotographerFName = models.CharField(max_length=50)
@@ -66,17 +68,14 @@ class Photographer(models.Model):
     # PhotographerEmail = models.EmailField()
     # PhotographerPassword = models.CharField(max_length=50)
     # Photographer fields
-    PhotographerPrice = models.FloatField(null=True, blank=True)
     # TODO Correctly implement fetching last online time
-    PhotographerLastOnlineTime = models.DateTimeField(null=True, blank=True)
-    PhotographerStyle = models.ManyToManyField(Style, blank=True, null=True)
-    PhotographerAvailTime = models.ForeignKey(AvailTime, related_name='photographer_avail_time', on_delete=models.CASCADE, blank=True, null=True)
-    PhotographerEquipment = models.ForeignKey(Equipment, related_name='photographer_equipment', on_delete=models.CASCADE, null=True, blank=True)
-    PhotographerPhotos = models.ForeignKey(Photo, related_name='photographer_photos', on_delete=models.CASCADE, null=True, blank=True)
+    photographer_last_online_time = models.DateTimeField(null=True, blank=True)
+    photographer_style = models.ManyToManyField(Style,null=True, blank=True, related_name='styles')
+    photographer_avail_time = models.ManyToManyField(AvailTime, blank=True, null=True)
+    photographer_equipment = models.ManyToManyField(Equipment,related_name='photographer_equipment', null=True, blank=True)
+    photographer_photos = models.ManyToManyField(Photo, related_name='photographer_photos', null=True, blank=True)
 
     def __str__(self):
-        return self.user.first_name
-
-
+        return self.profile.user.first_name
 
 

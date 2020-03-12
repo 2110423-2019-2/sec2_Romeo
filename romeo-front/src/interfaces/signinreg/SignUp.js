@@ -4,6 +4,8 @@ import { Button, Form, Input, Select, Row, Col } from "antd";
 import { signIn } from "../../common/actions/auth";
 import { connect } from "react-redux";
 import image from "assets/signup.jpg";
+import Axios from "axios";
+import moment from "moment";
 
 function hasErrors(fieldsError) {
     return Object.keys(fieldsError).some(field => fieldsError[field]);
@@ -17,13 +19,78 @@ class SignUp extends React.Component {
         this.props.form.validateFields();
     }
 
+    signInUser = () => {
+        this.props.signIn({
+            username: this.props.form.getFieldsValue().username,
+            password: this.props.form.getFieldsValue().password,
+        }, history);
+    }
+
     handleSubmit = e => {
         e.preventDefault();
         this.props.form.validateFields((err, values) => {
             if (!err) {
-                // const { username, email, password, type, name } = values
-                // TODO: Connect with backend to register instead
-                this.props.signIn(values, history);
+                const { username, 
+                    firstName, 
+                    lastName, 
+                    password, 
+                    type,
+                    email,
+                    phone,
+                    ssn,
+                    bankName,
+                    bankAccountNumber,
+                    bankAccountName,
+                } = values
+                const userInfo = {
+                    user: {
+                        last_login: moment(new Date()),
+                        is_superuser: false,
+                        is_staff: false,
+                        is_active: false,
+                        date_joined: moment(new Date()),
+                        user_type: type,
+                        first_name: firstName,
+                        last_name: lastName,
+                        username,
+                        password,
+                        email,
+                        groups: [],
+                        user_permissions: [],
+                    },
+                }
+                const profile = {
+                    ...userInfo,
+                    ssn,
+                    bank_account_number: bankAccountNumber,
+                    bank_name: bankName,
+                    bank_account_name: bankAccountName,
+                    phone,
+                }
+                const photographerInfo = {
+                    photographer_last_online_time: moment(new Date()),
+                    photographer_avail_time: [],
+                    photographer_equipment: [],
+                    photographer_photos: [],
+                    photographer_style: []
+                }
+                if (type === 1) {
+                    Axios.post('/api/photographers/',{
+                        profile,
+                        ...photographerInfo
+                    }).then(res => {
+                        this.signInUser();
+                    })
+                    .catch(err => console.log(err))
+                } else {
+                    Axios.post('/api/customers/',{
+                        profile
+                    })
+                    .then(res => {
+                        this.signInUser();
+                    })
+                    .catch(err => console.log(err))
+                }
             }
         });
     };
@@ -42,7 +109,6 @@ class SignUp extends React.Component {
         const bankNameError = isFieldTouched('bankName') && getFieldError('bankName');
         const bankAccountNumberError = isFieldTouched('bankAccountNumber') && getFieldError('bankAccountNumber');
         const bankAccountNameError = isFieldTouched('bankAccountName') && getFieldError('bankAccountName');
-        const priceError = isFieldTouched('price') && getFieldError('price');
 
         return (
             <div className="full-width">
@@ -104,32 +170,11 @@ class SignUp extends React.Component {
                                 <Form.Item validateStatus={typeError ? 'error' : ''} help={typeError || ''}>
                                     {getFieldDecorator('type',{rules: [{ required: true , message: 'This field is required.'}]})(
                                         <Select placeholder="Type">
-                                            <Option value="PHOTOGRAPHER">Photographer</Option>
-                                            <Option value="CUSTOMER">Customer</Option>
+                                            <Option value={1}>Photographer</Option>
+                                            <Option value={2}>Customer</Option>
                                         </Select>
                                     )}
                                 </Form.Item>
-                                { this.props.form.getFieldsValue().type === "PHOTOGRAPHER" && (
-                                    <React.Fragment>
-                                        <h3>Pricing</h3>
-                                        <label>Full-day Price</label>
-                                        <Form.Item 
-                                            validateStatus={priceError ? 'error' : ''} 
-                                            help={priceError || ''}
-                                        >
-                                            {getFieldDecorator('price', {
-                                                rules: [
-                                                    { required: true,message: 'This field is required.' },
-                                                ]
-                                            })(
-                                                <Input
-                                                    placeholder="Full-day Price"
-                                                    type="price"
-                                                />,
-                                            )}
-                                        </Form.Item>
-                                    </React.Fragment>
-                                )}
                                 <h3>Contact Information</h3>
                                 <label>Phone Number</label>
                                 <Form.Item 

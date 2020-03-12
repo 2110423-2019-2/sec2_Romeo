@@ -5,8 +5,10 @@ import { Form, Input } from "antd";
 import { Redirect } from 'react-router-dom';
 import { animateScroll as scroll } from 'react-scroll'
 import history from "common/router/history";
-import { getCurrentClient, editCurrentClient } from "logic/Client";
+
+import { getCurrentClientInfo } from "common/auth";
 import { setCurrentEquipment, setCurrentStyles, setCurrentAvailTimes } from "./actions";
+
 import Equipment from "./equipment";
 import Style from "./style";
 import AvailTimes from "./availTimes";
@@ -39,9 +41,9 @@ const defaultAvailTimes = [{
 }]
 
 class EditProfile extends React.Component {
-    componentDidMount() {
+    componentDidMount = async () => {
         // TODO: Connect to backend
-        const currentClient = getCurrentClient();
+        const currentClient = await getCurrentClientInfo();
         const { equipment, styles, availTimes } = currentClient;
         const { setCurrentEquipment, setCurrentStyles, setCurrentAvailTimes} = this.props;
         setCurrentEquipment(equipment ? equipment : []);
@@ -49,6 +51,7 @@ class EditProfile extends React.Component {
         setCurrentAvailTimes(availTimes ? availTimes : defaultAvailTimes);
     }
     state = {
+        currentClient: null,
         success: false,
         error: false,
     }
@@ -88,7 +91,6 @@ class EditProfile extends React.Component {
         } = this.state;
 
         const { getFieldDecorator, getFieldsError, getFieldError, isFieldTouched } = this.props.form;
-        const priceError = isFieldTouched('price') && getFieldError('price');
 
         return (
             <div className="container mt-4 with-sidebar pl-4">
@@ -109,26 +111,6 @@ class EditProfile extends React.Component {
                         <div className="pb-2"/>
                     </React.Fragment>
                 }
-                <div className="mb-4">
-                <h3>Pricing</h3>
-                    <label>Full-day Price</label>
-                    <Form.Item 
-                        validateStatus={priceError ? 'error' : ''} 
-                        help={priceError || ''}
-                    >
-                        {getFieldDecorator('price', {
-                            rules: [
-                                { required: true,message: 'This field is required.' },
-                            ],
-                            initialValue: currentClient.price
-                        })(
-                            <Input
-                                placeholder="Full-day Price"
-                                type="price"
-                            />,
-                        )}
-                    </Form.Item>
-                </div>
                 <div className="mb-4">
                     <AvailTimes />
                 </div>

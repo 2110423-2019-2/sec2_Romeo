@@ -1,31 +1,27 @@
 import { SET_AUTH } from "../action-types";
 import { setAuthToken, removeAuthToken, setCurrentClient, removeCurrentClient } from "../auth";
-// import Axios from "axios";
-
-// export const signIn = (credentials, history) => async dispatch => {
-// 	try {
-// 		const {
-// 			data: { user }
-// 		} = await Axios.post("/user/signIn", credentials);
-// 		setAuthToken(user.token);
-// 		setCurrentClient(user.id, user.username);
-// 		dispatch(setAuth(true));
-// 		history.push("/");
-// 	} catch (error) {
-// 		dispatch(setAuth(null));
-// 	}
-// };
+import Axios from "axios";
 
 export const signIn = (credentials, history) => async dispatch => {
-	// TODO: sign in using backend, wait for backend to return token and user information
-	// User information is now only mock data
-	setCurrentClient(credentials);
-	setAuthToken(credentials.username); // TODO: user backend token
-	dispatch(setAuth(true));
-	if (credentials.type === "PHOTOGRAPHER") {
-		history.push("/profile/" + credentials.username);
-	} else {
-		history.push("/");
+	try {
+		removeAuthToken();
+		removeCurrentClient();
+		Axios.post("/auth/jwt/create", credentials)
+		.then(res => {
+			const token = res.data.access;
+			setAuthToken(token);
+			console.log(token);
+			Axios.get("/api/users/" + credentials.username)
+			.then(res1 => {
+				const userType = res1.data.user_type;
+				setCurrentClient(credentials.username, userType);
+				dispatch(setAuth(true));
+				history.push("/");
+			})
+		})
+	} catch (error) {
+		console.log(error);
+		dispatch(setAuth(null));
 	}
 };
 

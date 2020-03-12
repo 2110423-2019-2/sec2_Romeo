@@ -1,7 +1,7 @@
 import React from "react";
 import { Calendar, Tag } from 'antd';
 import moment from "moment";
-import { getCurrentClient } from "logic/Client";
+import { getCurrentClientInfo } from "common/auth";
 
 const timeLabels = {
     HALF_DAY_MORNING: 'Half-Day (Morning-Noon)',
@@ -12,7 +12,7 @@ const timeLabels = {
 }
 
 function getListData(value) {
-    const currentClient = getCurrentClient();
+    const currentClient = getCurrentClientInfo();
     const { availTimes } = currentClient;
 
     switch (value.day()) {
