@@ -19,11 +19,16 @@ export const getCurrentClient = () => {
 	return JSON.parse(localStorage.getItem("currentClient"));
 }
 
-export const getCurrentClientInfo = () => {
+export const getCurrentClientInfo = async () => {
 	const currentClient = getCurrentClient()
 	if (currentClient) {
-		const info = await Axios.get(`/api/users/${currentClient.username}`);
-		return info;
+		if (currentClient.type === 1) {
+			const info = await Axios.get(`/api/photographers/${currentClient.username}`);
+			return info.data;
+		} else {
+			const info = await Axios.get(`/api/customers/${currentClient.username}`);
+			return info.data;
+		}
 	} else {
 		return null
 	}

@@ -5,8 +5,10 @@ import { Form, Input } from "antd";
 import { Redirect } from 'react-router-dom';
 import { animateScroll as scroll } from 'react-scroll'
 import history from "common/router/history";
-import { getCurrentClient, editCurrentClient } from "logic/Client";
+
+import { getCurrentClientInfo } from "common/auth";
 import { setCurrentEquipment, setCurrentStyles, setCurrentAvailTimes } from "./actions";
+
 import Equipment from "./equipment";
 import Style from "./style";
 import AvailTimes from "./availTimes";
@@ -39,9 +41,9 @@ const defaultAvailTimes = [{
 }]
 
 class EditProfile extends React.Component {
-    componentDidMount() {
+    componentDidMount = async () => {
         // TODO: Connect to backend
-        const currentClient = getCurrentClient();
+        const currentClient = await getCurrentClientInfo();
         const { equipment, styles, availTimes } = currentClient;
         const { setCurrentEquipment, setCurrentStyles, setCurrentAvailTimes} = this.props;
         setCurrentEquipment(equipment ? equipment : []);
@@ -49,6 +51,7 @@ class EditProfile extends React.Component {
         setCurrentAvailTimes(availTimes ? availTimes : defaultAvailTimes);
     }
     state = {
+        currentClient: null,
         success: false,
         error: false,
     }

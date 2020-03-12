@@ -1,11 +1,11 @@
 import React from "react"
 import { Switch, Route, Redirect, NavLink} from "react-router-dom";
 import Edit from "./edit";
-// import Password from "./password"
+import Password from "./password"
 import Reservations from "./reservations";
 // import EditPortfolio from "./edit-portfolio/"
 // import EditProfile from "./edit-profile/"
-import { getCurrentClient } from "logic/Client";
+import { getCurrentClient } from "common/auth";
 
 import { Menu } from 'antd';
 
@@ -22,43 +22,47 @@ class ClientLanding extends React.Component {
                     mode="inline"
                     className="pt-0"
                 >
-                    { type === 'PHOTOGRAPHER' && (
-                        <NavLink 
-                            className="ant-menu-item" 
-                            activeClassName="ant-menu-item-selected"
-                            to="/client/edit-portfolio"
-                        >
-                                Edit Portfolio
-                        </NavLink>
+                    { currentClient && (
+                        <React.Fragment>
+                            { type === 1 && (
+                                <NavLink 
+                                    className="ant-menu-item" 
+                                    activeClassName="ant-menu-item-selected"
+                                    to="/client/edit-portfolio"
+                                >
+                                        Edit Portfolio
+                                </NavLink>
+                            )}
+                            { type === 1 && (
+                                <NavLink 
+                                    className="ant-menu-item" 
+                                    activeClassName="ant-menu-item-selected"
+                                    to="/client/edit-profile"
+                                >
+                                        Edit Profile
+                                </NavLink>
+                            )}
+                            { type === 2 && (
+                                <NavLink 
+                                    className="ant-menu-item" 
+                                    activeClassName="ant-menu-item-selected"
+                                    to="/client/reservations"
+                                >
+                                        My Reservations
+                                </NavLink>
+                            )}
+                            <NavLink 
+                                className="ant-menu-item" 
+                                activeClassName="ant-menu-item-selected"
+                                to="/client/edit"
+                            >
+                                Personal Information
+                            </NavLink>
+                        </React.Fragment>
                     )}
-                    { type === 'PHOTOGRAPHER' && (
-                        <NavLink 
-                            className="ant-menu-item" 
-                            activeClassName="ant-menu-item-selected"
-                            to="/client/edit-profile"
-                        >
-                                Edit Profile
-                        </NavLink>
-                    )}
-                    { type === 'CUSTOMER' && (
-                        <NavLink 
-                            className="ant-menu-item" 
-                            activeClassName="ant-menu-item-selected"
-                            to="/client/reservations"
-                        >
-                                My Reservations
-                        </NavLink>
-                    )}
-                    <NavLink 
-                        className="ant-menu-item" 
-                        activeClassName="ant-menu-item-selected"
-                        to="/client/edit"
-                    >
-                        Personal Information
-                    </NavLink>
                 </Menu>
                 <Switch>
-                    {/* <Route path="/client/edit/password" component={Password} /> */}
+                    <Route path="/client/edit/password" component={Password} />
                     <Route path="/client/edit" component={Edit} />
                     <Route path="/client/reservations" exact component={Reservations} />
                     {/* <Route path="/client/edit-portfolio" exact component={EditPortfolio} /> */}

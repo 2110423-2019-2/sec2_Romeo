@@ -56,7 +56,7 @@ class SignUp extends React.Component {
                         password,
                         email,
                         groups: [],
-                        user_permissions: []
+                        user_permissions: [],
                     },
                 }
                 const profile = {
@@ -69,10 +69,10 @@ class SignUp extends React.Component {
                 }
                 const photographerInfo = {
                     photographer_last_online_time: moment(new Date()),
-                    photographer_avail_time: null,
-                    photographer_equipment: null,
-                    photographer_photos: null,
-                    photographer_styles: []
+                    photographer_avail_time: [],
+                    photographer_equipment: [],
+                    photographer_photos: [],
+                    photographer_style: []
                 }
                 if (type === 1) {
                     Axios.post('/api/photographers/',{
