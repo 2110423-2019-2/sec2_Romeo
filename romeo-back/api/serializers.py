@@ -182,7 +182,9 @@ class CustomerSerializer(serializers.ModelSerializer):
         profile_data = validated_data.pop('profile')
         profile = ProfileSerializer.create(ProfileSerializer(), validated_data=profile_data)
         customer = Customer.objects.create(profile=profile)
+        customer.fav_photographers.set(validated_data.pop('fav_photographers'))
 
+        customer.save()
         profile.save()
         return customer
 
