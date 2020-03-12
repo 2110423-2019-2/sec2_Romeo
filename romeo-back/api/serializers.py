@@ -117,7 +117,9 @@ class PhotographerSerializer(serializers.ModelSerializer):
         # photographer_photos_data=validated_data.pop('photographer_photos')
         # photographer_equipments_data=validated_data.pop('photographer_equipment')
         profile = ProfileSerializer.create(ProfileSerializer(), validated_data=profile_data)
-        photographer = Photographer.objects.create(profile=profile, **validated_data)
+        photographer = Photographer.objects.create(profile=profile
+                                                   #photographer_last_online_time=profile_data.get('photographer_last_online_time', ""),
+                                                   )
         # for photographer_photo_data in photographer_photos_data:
         #     Photo.objects.create(photographer=photographer, **photographer_photo_data)
         #
@@ -180,7 +182,9 @@ class CustomerSerializer(serializers.ModelSerializer):
         profile_data = validated_data.pop('profile')
         profile = ProfileSerializer.create(ProfileSerializer(), validated_data=profile_data)
         customer = Customer.objects.create(profile=profile)
+        customer.fav_photographers.set(validated_data.pop('fav_photographers'))
 
+        customer.save()
         profile.save()
         return customer
 
