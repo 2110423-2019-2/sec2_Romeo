@@ -54,17 +54,9 @@ export const uploadPhotos = (event) => {
     };
 }
 
-export const getPortfolio = () => {
-    // TODO: Connect to Backend
-    if (!localStorage.getItem("portfolio")) {
-        const empty = {
-            hilights: [],
-            photos: []
-        }
-        localStorage.setItem("portfolio", JSON.stringify(empty));
-        // addPhoto(mockPhotos);
-    }
-    return JSON.parse(localStorage.getItem("portfolio"));
+export const getPortfolio = (client) => {
+    return client.photographer_photos;
+
 }
 
 export const addPhoto = (links) => {

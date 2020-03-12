@@ -1,13 +1,13 @@
 import React from "react";
 import { Link, Redirect } from "react-router-dom";
 import { Button, Tag } from "antd";
-import { getCurrentClient } from "logic/Client";
 import { getPortfolio } from "logic/Portfolio";
 import { connect } from "react-redux"
 import { formatDate } from "common/date";
 import moment from "moment";
 import JobCalendar from "./calendar";
 import { styleColors } from "../../common/style-colors";
+import { getCurrentClientInfo } from "../../common/auth";
 
 class Profile extends React.Component {
     state = {
@@ -15,14 +15,13 @@ class Profile extends React.Component {
     }
 
     render() {
-        const currentClient = getCurrentClient();
-        const currentPortfolio = getPortfolio();
-
+        const currentClient = getCurrentClientInfo();
+        const currentPortfolio = getPortfolio(currentClient);
         
         const { username } = this.props.match.params;
         const { photos } = currentPortfolio;
         
-        if (currentClient && currentClient.username === username && currentClient.type !== 'PHOTOGRAPHER') {
+        if (currentClient && currentClient.username === username && currentClient.type !== 1) {
             return <Redirect to="/"/>
         }
 
@@ -47,9 +46,9 @@ class Profile extends React.Component {
                         <div className="secondary-label mb-2">
                             Equipment
                         </div>
-                        { currentClient.equipment.map((e,i) => (
-                            <div className="snippet secondary" key={i + e}>
-                                {e}
+                        { currentClient.photographer_equipment.map((e,i) => (
+                            <div className="snippet secondary" key={i + e.equipment_name}>
+                                {e.equipment_name}
                             </div>
                         ))}
                     </div>
@@ -57,7 +56,7 @@ class Profile extends React.Component {
                         <div className="secondary-label mb-2">
                             Styles
                         </div>
-                        { currentClient.styles.map((e,i) => (
+                        { currentClient.photographer_style.map((e,i) => (
                             <Tag color={styleColors[e]} key={i + e} className="mb-2">
                                 {e}
                             </Tag>

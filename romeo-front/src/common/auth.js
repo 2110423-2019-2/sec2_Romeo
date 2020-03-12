@@ -19,6 +19,16 @@ export const getCurrentClient = () => {
 	return JSON.parse(localStorage.getItem("currentClient"));
 }
 
+export const getCurrentClientInfo = () => {
+	const currentClient = getCurrentClient()
+	if (currentClient) {
+		const info = await Axios.get(`/api/users/${currentClient.username}`);
+		return info;
+	} else {
+		return null
+	}
+}
+
 export const removeCurrentClient = () => {
 	localStorage.removeItem("currentClient");
 };
