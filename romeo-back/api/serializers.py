@@ -6,7 +6,7 @@ from customers.models import Customer
 from jobs.models import JobInfo
 from users.models import CustomUser, CustomUserProfile
 import datetime
-
+from notification.models import Notification
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -75,6 +75,15 @@ class JobSerializer(serializers.ModelSerializer):
     class Meta:
         model = JobInfo
         fields = '__all__'
+    
+    # Override default create method to auto create nested profile from photographer
+    def create(self, validated_data):
+        if validated_data["job_end_date"] < validated_data["job_start_date"]:
+            validated_data["job_end_date"] = validated_data["job_start_date"]
+            # raise jobs.ValidationError("End date should be greater than start date.")
+            # print(validated_data["job_end_date"])
+        jobInfo = JobInfo.objects.create(**validated_data)
+        return jobInfo
 
 
 class PhotoSerializer(serializers.ModelSerializer):
@@ -210,4 +219,7 @@ class CustomerSerializer(serializers.ModelSerializer):
     #     jobs_by_customer.JobStatus = jobs_by_customer_data.get('JobStatus', jobs_by_customer.JobStatus)
     #     jobs_by_customer_data.save()
 
-
+class NotificationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Notification
+        fields = '__all__'

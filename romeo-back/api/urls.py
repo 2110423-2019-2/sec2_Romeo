@@ -1,7 +1,7 @@
 from django.conf.urls import url
 from rest_framework.routers import DefaultRouter
 from .views import PhotographerViewSet, PhotoViewSet, EquipmentViewSet, PhotoViewSet, AvailTimeViewSet, \
-    StyleViewSet, CustomerViewSet, JobsViewSet, UserViewSet, ProfileViewSet
+    StyleViewSet, CustomerViewSet, JobsViewSet, UserViewSet, ProfileViewSet, NotificationViewSet
 
 router = DefaultRouter()
 router.register(r'photographers', PhotographerViewSet, basename='photographers')
@@ -13,6 +13,6 @@ router.register(r'equipments', EquipmentViewSet, basename='equipments')
 router.register(r'photos', PhotoViewSet, basename='photos')
 router.register(r'availtimes', AvailTimeViewSet, basename='availtimes')
 router.register(r'styles', StyleViewSet, basename='styles')
-
+router.register(r'notification', NotificationViewSet, basename='notification')
 
 urlpatterns = router.urls
