@@ -2,6 +2,9 @@ from rest_framework import fields, serializers, status
 from rest_framework.response import Response
 from django.contrib.auth.validators import UnicodeUsernameValidator
 from djoser.serializers import UserCreateSerializer as BaseUserRegistrationSerializer
+from rest_framework.validators import UniqueValidator
+from drf_writable_nested.serializers import WritableNestedModelSerializer
+from drf_writable_nested.mixins import UniqueFieldsMixin, NestedUpdateMixin
 # Import App Models
 from photographers.models import Photographer, Photo, AvailTime, Equipment, Style
 from customers.models import Customer
@@ -19,6 +22,7 @@ class UserSerializer(serializers.ModelSerializer):
                 'validators': [UnicodeUsernameValidator()],
             }
         }
+
 
     def create(self, validated_data):
         user = CustomUser.objects.create_user(username=validated_data['username'],
@@ -76,19 +80,6 @@ class ProfileSerializer(serializers.ModelSerializer):
 
         instance.save()
         return instance
-        
-    # def update(self, instance, validated_data):
-    #     user_data = validated_data.pop('user')
-    #     user = UserSerializer.update(self,instance,user_data)
-    #
-    #     username = self.data['user']['username']
-    #     user = CustomUser.objects.get(username=username)
-    #     user.first_name = user_data.get('first_name', user_data.first_name)
-    #     user.last_name = user_data.get('last_name', user_data.last_name)
-    #     user.email = user_data.get('email', user_data.email)
-    #     user.save()
-    #     return instance
-
 
 class JobSerializer(serializers.ModelSerializer):
     class Meta:
@@ -108,13 +99,18 @@ class PhotoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Photo
         fields = '__all__'
+        extra_kwargs = {
+            'photo_link':{
+                'validators' : [UniqueValidator(queryset=Photo.objects.all())]
+            }
+        }
 
 
 class AvailTimeSerializer(serializers.ModelSerializer):
     class Meta:
         model = AvailTime
         fields = '__all__'
-
+ 
 
 class StyleSerializer(serializers.ModelSerializer):
     class Meta:
@@ -122,13 +118,18 @@ class StyleSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class EquipmentSerializer(serializers.ModelSerializer):
+class EquipmentSerializer(UniqueFieldsMixin,serializers.ModelSerializer):
     class Meta:
         model = Equipment
         fields = '__all__'
+        extra_kwargs = {
+            'equipment_name': {
+                'validators': [UniqueValidator(queryset=Equipment.objects.all())]
+            },
+        }
 
 
-class PhotographerSerializer(serializers.ModelSerializer):
+class PhotographerSerializer(WritableNestedModelSerializer):
     profile = ProfileSerializer(required=True, partial=True)
     photographer_photos = PhotoSerializer(many=True, required=False, allow_null=True)
     photographer_equipment = EquipmentSerializer(many=True, required=False, allow_null=True)
@@ -137,29 +138,48 @@ class PhotographerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Photographer
         fields = '__all__'
-        extra_kwargs = {
-            'username': {
-                'validators': [UnicodeUsernameValidator()],
-            }
-        }
 
     # Override default create method to auto create nested profile from photographer
     def create(self, validated_data):
         profile_data = validated_data.pop('profile')
-        # photographer_photos_data=validated_data.pop('photographer_photos')
-        # photographer_equipments_data=validated_data.pop('photographer_equipment')
+        photographer_last_online_time_data = validated_data.pop('photographer_last_online_time')
+        photographer_avail_time_data = validated_data.pop('photographer_avail_time')
+
         profile = ProfileSerializer.create(ProfileSerializer(), validated_data=profile_data)
         photographer = Photographer.objects.create(profile=profile
-                                                   #photographer_last_online_time=profile_data.get('photographer_last_online_time', ""),
+                                                #    photographer_last_online_time=profile_data.get('photographer_last_online_time', ""),
                                                    )
-        # for photographer_photo_data in photographer_photos_data:
-        #     Photo.objects.create(photographer=photographer, **photographer_photo_data)
-        #
-        # for photographer_equipment_data in photographer_equipments_data:
-        #     Equipment.objects.create(photographer=photographer, **photographer_equipment_data)
+
+        # create photo instance then add to photographer_photos field
+        # (photo_links are always unique)
+        for photo_data in validated_data.pop('photographer_photos'):
+            photo_data = dict(photo_data)
+            photo_instance = Photo.objects.create(photo_link=photo_data['photo_link'])
+            photographer.photographer_photos.add(photo_instance)
+            
+        # create equipment instance then add to photographer_equipments field
+        for equipment_data in validated_data.pop('photographer_equipment'):
+            equipment_data = dict(equipment_data)
+            try :
+                equipment_instance = Equipment.objects.get(equipment_name=equipment_data['equipment_name'])
+            except :
+                equipment_instance = Equipment.objects.create(equipment_name=equipment_data['equipment_name'])
+            photographer.photographer_equipment.add(equipment_instance)
+        
+        # add selected style to photographer_style
+        for style_data in validated_data.pop('photographer_style'):
+            print(style_data)
+            style_instance = Style.objects.get(style_name=style_data)
+            photographer.photographer_style.add(style_instance)
 
         profile.save()
+        photographer.save()
         return photographer
+        # return validated_data
+    
+    # def update(self, instance, validated_data):
+    #     print(validated_data)
+    #     return instance
 
     # def update(self, instance, validated_data):
     #     # update user information except username and password
