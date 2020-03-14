@@ -5,11 +5,13 @@ const PhotographerCard = (props) => {
     return (
         <Card
             hoverable
-            style={{ flexBasis: '80%' }}
+            style={{ flexBasis: '40%' }}
             cover={<img alt="cover" src={props.img} />}
+            className="ma-2"
         >
-            <h1 className="mb-1">{props.name}</h1>
+            <h1 className="mb-0">{props.name}</h1>
             <span className="d-block mb-1">{props.username}</span>
+            <div className="pb-2"/>
             <Tag color="volcano" className="mb-2">
                 FASHION
             </Tag>
