@@ -54,7 +54,7 @@ class ProfileSerializer(serializers.ModelSerializer):
         user_data = validated_data.pop('user')
         user = UserSerializer.create(UserSerializer(), validated_data=user_data)
         validated_data['user'] = user
-        profile = CustomprofileUserProfile.objects.create(**validated_data)
+        profile = CustomUserProfile.objects.create(**validated_data)
         
         return profile
 
