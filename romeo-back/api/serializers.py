@@ -48,11 +48,6 @@ class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUserProfile
         fields = '__all__'
-        extra_kwargs = {
-            'username': {
-                'validators': [UnicodeUsernameValidator()],
-            }
-        }
 
     # Override default create method to auto create nested user from profile
     def create(self, validated_data):
@@ -61,12 +56,6 @@ class ProfileSerializer(serializers.ModelSerializer):
         validated_data['user'] = user
         profile = CustomprofileUserProfile.objects.create(**validated_data)
         
-            bank_account_number=validated_data.pop('bank_account_number', ''),
-            bank_name=validated_data.pop('bank_name', ''),
-            bank_account_name=validated_data.pop('bank_account_name', ''),
-            phone=validated_data.pop('phone', '')
-        )
-        profile.save()
         return profile
 
     def update (self, instance, validated_data):
@@ -219,10 +208,6 @@ class CustomerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Customer
         fields = '__all__'
-        extra_kwargs = {
-            'username': {
-                'validators': [UnicodeUsernameValidator()]},
-        }
 
         # Override default create method to auto create user from customer
     def create(self, validated_data):
