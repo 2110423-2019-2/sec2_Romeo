@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     'reviews.apps.ReviewsConfig',
     'api.apps.ApiConfig',
     'users.apps.UsersConfig',
+    'notification.apps.NotificationConfig',
 ]
 
 MIDDLEWARE = [

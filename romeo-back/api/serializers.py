@@ -1,17 +1,24 @@
-from rest_framework import fields, serializers
+from rest_framework import fields, serializers, status
+from rest_framework.response import Response
+from django.contrib.auth.validators import UnicodeUsernameValidator
 from djoser.serializers import UserCreateSerializer as BaseUserRegistrationSerializer
 # Import App Models
 from photographers.models import Photographer, Photo, AvailTime, Equipment, Style
 from customers.models import Customer
 from jobs.models import JobInfo
 from users.models import CustomUser, CustomUserProfile
+from notification.models import Notification
 import datetime
-
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = '__all__'
+        extra_kwargs = {
+            'username': {
+                'validators': [UnicodeUsernameValidator()],
+            }
+        }
 
     def create(self, validated_data):
         user = CustomUser.objects.create_user(username=validated_data['username'],
@@ -22,7 +29,7 @@ class UserSerializer(serializers.ModelSerializer):
                                               last_name=validated_data['last_name']
                                               )
         return user
-
+    
     # def update(self, instance, validated_data):
     #     username = self.data['username']
     #     user = CustomUser.objects.get(username=username)
@@ -47,17 +54,29 @@ class ProfileSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         user_data = validated_data.pop('user')
         user = UserSerializer.create(UserSerializer(), validated_data=user_data)
-        profile = CustomUserProfile.objects.create(
-            user=user,
-            ssn=validated_data.pop('ssn', ''),
-            bank_account_number=validated_data.pop('bank_account_number', ''),
-            bank_name=validated_data.pop('bank_name', ''),
-            bank_account_name=validated_data.pop('bank_account_name', ''),
-            phone=validated_data.pop('phone', '')
-        )
-        profile.save()
+        validated_data['user'] = user
+        profile = CustomUserProfile.objects.create(**validated_data)
+        
         return profile
 
+    def update (self, instance, validated_data):
+        # update user instance before updating profile 
+        user_data = dict(validated_data.pop('user'))
+        user_username = user_data['username']
+        user = CustomUser.objects.get(username = user_username)
+        user = UserSerializer.update(UserSerializer(),instance=user,validated_data=user_data)
+
+        # update profile instance
+        instance.user = user
+        instance.ssn = validated_data.pop('ssn')
+        instance.bank_account_number = validated_data.pop('bank_account_number')
+        instance.bank_name = validated_data.pop('bank_name')
+        instance.bank_account_name = validated_data.pop('bank_account_name')
+        instance.phone = validated_data.pop('phone')
+
+        instance.save()
+        return instance
+        
     # def update(self, instance, validated_data):
     #     user_data = validated_data.pop('user')
     #     user = UserSerializer.update(self,instance,user_data)
@@ -75,6 +94,14 @@ class JobSerializer(serializers.ModelSerializer):
     class Meta:
         model = JobInfo
         fields = '__all__'
+    
+    # Override default create method to auto create nested profile from photographer
+    def create(self, validated_data):
+        #Check valid start&end date
+        if validated_data["job_end_date"] < validated_data["job_start_date"]:
+            raise serializers.ValidationError('End date should not be less than start date.')
+        jobInfo = JobInfo.objects.create(**validated_data)
+        return jobInfo
 
 
 class PhotoSerializer(serializers.ModelSerializer):
@@ -110,6 +137,11 @@ class PhotographerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Photographer
         fields = '__all__'
+        extra_kwargs = {
+            'username': {
+                'validators': [UnicodeUsernameValidator()],
+            }
+        }
 
     # Override default create method to auto create nested profile from photographer
     def create(self, validated_data):
@@ -210,4 +242,7 @@ class CustomerSerializer(serializers.ModelSerializer):
     #     jobs_by_customer.JobStatus = jobs_by_customer_data.get('JobStatus', jobs_by_customer.JobStatus)
     #     jobs_by_customer_data.save()
 
-
+class NotificationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Notification
+        fields = '__all__'

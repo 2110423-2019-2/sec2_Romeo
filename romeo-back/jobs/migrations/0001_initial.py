@@ -14,10 +14,10 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='JobInfo',
             fields=[
-                ('JobID', models.AutoField(default=1, primary_key=True, serialize=False)),
-                ('JobStatus', models.CharField(choices=[('PENDING', 'Pending'), ('MATCHED', 'Matched'), ('DECLINED', 'Declined'), ('PAID', 'Paid'), ('CANCELLED', 'Cancelled'), ('PROCESSING', 'Processing Photos'), ('DONE', 'DONE'), ('COMPLETED', 'Completed'), ('CLOSED', 'Closed')], max_length=10)),
-                ('JobStartDate', models.DateField()),
-                ('JobEndDate', models.DateField()),
+                ('job_id', models.AutoField(default=1, primary_key=True, serialize=False)),
+                ('job_status', models.CharField(choices=[('PENDING', 'Pending'), ('MATCHED', 'Matched'), ('DECLINED', 'Declined'), ('PAID', 'Paid'), ('CANCELLED', 'Cancelled'), ('PROCESSING', 'Processing Photos'), ('DONE', 'DONE'), ('COMPLETED', 'Completed'), ('CLOSED', 'Closed')], max_length=10)),
+                ('job_start_date', models.DateField()),
+                ('job_end_date', models.DateField()),
             ],
         ),
     ]
