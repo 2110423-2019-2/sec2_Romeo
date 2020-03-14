@@ -1,4 +1,5 @@
 from rest_framework import fields, serializers
+from django.contrib.auth.validators import UnicodeUsernameValidator
 from djoser.serializers import UserCreateSerializer as BaseUserRegistrationSerializer
 # Import App Models
 from photographers.models import Photographer, Photo, AvailTime, Equipment, Style
@@ -12,6 +13,11 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = '__all__'
+        extra_kwargs = {
+            'username': {
+                'validators': [UnicodeUsernameValidator()],
+            }
+        }
 
     def create(self, validated_data):
         user = CustomUser.objects.create_user(username=validated_data['username'],
@@ -22,7 +28,7 @@ class UserSerializer(serializers.ModelSerializer):
                                               last_name=validated_data['last_name']
                                               )
         return user
-
+    
     # def update(self, instance, validated_data):
     #     username = self.data['username']
     #     user = CustomUser.objects.get(username=username)
@@ -42,14 +48,19 @@ class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUserProfile
         fields = '__all__'
+        extra_kwargs = {
+            'username': {
+                'validators': [UnicodeUsernameValidator()],
+            }
+        }
 
     # Override default create method to auto create nested user from profile
     def create(self, validated_data):
         user_data = validated_data.pop('user')
         user = UserSerializer.create(UserSerializer(), validated_data=user_data)
-        profile = CustomUserProfile.objects.create(
-            user=user,
-            ssn=validated_data.pop('ssn', ''),
+        validated_data['user'] = user
+        profile = CustomprofileUserProfile.objects.create(**validated_data)
+        
             bank_account_number=validated_data.pop('bank_account_number', ''),
             bank_name=validated_data.pop('bank_name', ''),
             bank_account_name=validated_data.pop('bank_account_name', ''),
@@ -58,6 +69,24 @@ class ProfileSerializer(serializers.ModelSerializer):
         profile.save()
         return profile
 
+    def update (self, instance, validated_data):
+        # update user instance before updating profile 
+        user_data = dict(validated_data.pop('user'))
+        user_username = user_data['username']
+        user = CustomUser.objects.get(username = user_username)
+        user = UserSerializer.update(UserSerializer(),instance=user,validated_data=user_data)
+
+        # update profile instance
+        instance.user = user
+        instance.ssn = validated_data.pop('ssn')
+        instance.bank_account_number = validated_data.pop('bank_account_number')
+        instance.bank_name = validated_data.pop('bank_name')
+        instance.bank_account_name = validated_data.pop('bank_account_name')
+        instance.phone = validated_data.pop('phone')
+
+        instance.save()
+        return instance
+        
     # def update(self, instance, validated_data):
     #     user_data = validated_data.pop('user')
     #     user = UserSerializer.update(self,instance,user_data)
@@ -119,6 +148,11 @@ class PhotographerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Photographer
         fields = '__all__'
+        extra_kwargs = {
+            'username': {
+                'validators': [UnicodeUsernameValidator()],
+            }
+        }
 
     # Override default create method to auto create nested profile from photographer
     def create(self, validated_data):
@@ -185,6 +219,10 @@ class CustomerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Customer
         fields = '__all__'
+        extra_kwargs = {
+            'username': {
+                'validators': [UnicodeUsernameValidator()]},
+        }
 
         # Override default create method to auto create user from customer
     def create(self, validated_data):
