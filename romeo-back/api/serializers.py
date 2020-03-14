@@ -195,7 +195,7 @@ class PhotographerSerializer(WritableNestedModelSerializer):
                 
         # photographer_equipment
         if 'photographer_equipment' in validated_data:
-            instance.photographer_photos.clear()
+            instance.photographer_equipment.clear()
             for equipment_data in validated_data.pop('photographer_equipment'):
                 equipment_data = dict(equipment_data)
                 try :
@@ -209,7 +209,7 @@ class PhotographerSerializer(WritableNestedModelSerializer):
 
         # photographer_style
         if 'photographer_style' in validated_data:
-            instance.photographer_photos.clear()
+            instance.photographer_style.clear()
             for style_data in validated_data.pop('photographer_style'):
                 style_instance = Style.objects.get(style_name=style_data)
                 instance.photographer_style.add(style_instance)
