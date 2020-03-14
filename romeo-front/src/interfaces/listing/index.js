@@ -10,13 +10,14 @@ class Listing extends React.Component {
         photographers: []
     }
 
-    componentDidMount() {
-        Axios.get("/api/photographers").then(res => {
-            console.log(res);
-            this.setState({
-                photographers: res.data
-            })
-        }).catch(err => console.log(err))
+    componentDidMount = async () => {
+        const res =  await Axios.get("/api/photographers/")
+        this.setState({
+            photographers: res.data
+        });
+        // Axios.get("/api/photographers").then(res => {
+        //     this.setState({ photographers: res.data });
+        // })
     }
 
     render() {
@@ -38,7 +39,7 @@ class Listing extends React.Component {
                     </div>
                 </Parallax>
                 <div className="container mt-4">
-                    <div className="d-flex flex-wrap justify-space-between">
+                    <div className="d-flex flex-wrap justify-center">
                         { photographers.map((e,i) => (
                             <Card 
                                 name={`${e.profile.user.first_name} ${e.profile.user.last_name}`}
