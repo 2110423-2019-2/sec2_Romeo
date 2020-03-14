@@ -1,0 +1,12 @@
+{
+    "compilerOptions": {
+      "baseUrl": "src",
+      "paths": {
+        "modules": ["/modules"],
+        "router": ["/router"],
+        "common": ["/common"],
+        "assets": ["/assets"],
+        "logic": ["/logic"]
+      }
+    }
+  }

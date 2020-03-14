@@ -1,0 +1,40 @@
+nav.main-nav {
+    .pos-fixed();
+    .el-5();
+    .bg-white();
+    .full-width();
+    height: 64px;
+    top: 0;
+    z-index: 999;
+
+    .container {
+        height: 64px;
+    }
+    .logo img {
+        padding: 2px;
+        width: 72px;
+        height: auto;
+    }
+}
+.ant-dropdown {
+    z-index: 9999;
+}
+
+// Menu modifications
+.ant-menu-inline .ant-menu-item {
+    margin: 0 !important;
+}
+@media screen and (max-width: 599px) {
+    .ant-menu-inline {
+        display: none !important;
+    }
+}
+
+nav.main-nav.transparent {
+    background-color: transparent !important;
+    box-shadow: none !important;
+    .logo {
+        background-color: white;
+        border-radius: 4px;
+    }
+}
