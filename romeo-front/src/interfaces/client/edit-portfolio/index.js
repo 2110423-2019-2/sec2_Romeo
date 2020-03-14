@@ -12,19 +12,21 @@ class EditPortfolio extends React.Component {
         this.uploadRef = React.createRef();
     }
     state = {
-        photos: [],
         hilights: [],
         errors: [],
         warnings: [],
-        success: false
+        success: false,
+        currentClient: null,
+        currentPortfolio: null
     }
     componentDidMount() {
-        const currentPortfolio = getPortfolio();
-        const { photos, hilights } = currentPortfolio
+        const currentClient = await getCurrentClientInfo();
+        const currentPortfolio = getPortfolio(currentClient);
+        console.log(currentClient);
         this.setState({
-            photos,
-            hilights
-        })
+            currentClient,
+            currentPortfolio
+        });
     }
     handleImageChange = async (e) => {
         const { errors, warnings } = await uploadPhotos(e);
@@ -36,7 +38,6 @@ class EditPortfolio extends React.Component {
 
     deletePhoto = async (key) => {
         await removePhoto(key);
-        this.setState({ photos: getPortfolio().photos })
     }
 
     render() {
@@ -44,8 +45,8 @@ class EditPortfolio extends React.Component {
         const currentPortfolio = getPortfolio();
         const { photos } = currentPortfolio;
         const { errors, success, warnings } = this.state;
-        console.log(photos);
-        if (currentClient.type !== 'PHOTOGRAPHER') {
+
+        if (currentClient && currentClient.profile.user.user_type !== 1) {
             return <Redirect to="/"/>
         }
         return (
