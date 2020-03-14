@@ -8,6 +8,7 @@ pip install djoser
 pip install djangorestframework-simplejwt
 pip install django-filter
 pip install django-cors-headers
+pip install drf-writable-nested
 
 ## Prerequisites for mysqlclient
 You may need to install the Python and MySQL development headers and libraries like so:
