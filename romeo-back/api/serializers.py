@@ -1,4 +1,5 @@
-from rest_framework import fields, serializers
+from rest_framework import fields, serializers, status
+from rest_framework.response import Response
 from django.contrib.auth.validators import UnicodeUsernameValidator
 from djoser.serializers import UserCreateSerializer as BaseUserRegistrationSerializer
 # Import App Models
@@ -6,8 +7,8 @@ from photographers.models import Photographer, Photo, AvailTime, Equipment, Styl
 from customers.models import Customer
 from jobs.models import JobInfo
 from users.models import CustomUser, CustomUserProfile
-import datetime
 from notification.models import Notification
+import datetime
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -96,10 +97,9 @@ class JobSerializer(serializers.ModelSerializer):
     
     # Override default create method to auto create nested profile from photographer
     def create(self, validated_data):
+        #Check valid start&end date
         if validated_data["job_end_date"] < validated_data["job_start_date"]:
-            validated_data["job_end_date"] = validated_data["job_start_date"]
-            # raise jobs.ValidationError("End date should be greater than start date.")
-            # print(validated_data["job_end_date"])
+            raise serializers.ValidationError('End date should not be less than start date.')
         jobInfo = JobInfo.objects.create(**validated_data)
         return jobInfo
 
