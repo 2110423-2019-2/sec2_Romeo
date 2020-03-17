@@ -143,12 +143,9 @@ class PhotographerSerializer(WritableNestedModelSerializer):
     # Override default create method to auto create nested profile from photographer
     def create(self, validated_data):
         profile_data = validated_data.pop('profile')
-        photographer_last_online_time_data = validated_data.pop('photographer_last_online_time')
-        photographer_avail_time_data = validated_data.pop('photographer_avail_time')
-
         profile = ProfileSerializer.create(ProfileSerializer(), validated_data=profile_data)
-        photographer = Photographer.objects.create(profile=profile
-                                                #    photographer_last_online_time=profile_data.get('photographer_last_online_time', ""),
+        photographer = Photographer.objects.create(profile=profile,
+                                                   photographer_last_online_time=validated_data.pop('photographer_last_online_time'),
                                                    )
 
         # create photo instance then add to photographer_photos field
@@ -216,16 +213,6 @@ class PhotographerSerializer(WritableNestedModelSerializer):
                     equipment_instance = Equipment.objects.create(equipment_name=equipment_data['equipment_name'])
                 instance.photographer_equipment.add(equipment_instance)
 
-        # TODO    
-        # photographer_last_online_time
-
-        # photographer_style
-        if 'photographer_style' in validated_data:
-            instance.photographer_style.clear()
-            for style_data in validated_data.pop('photographer_style'):
-                style_instance = Style.objects.get(style_name=style_data)
-                instance.photographer_style.add(style_instance)
-
         # photographer_avail_time
         if 'photographer_avail_time' in validated_data:
             instance.photographer_avail_time.clear()
@@ -238,7 +225,18 @@ class PhotographerSerializer(WritableNestedModelSerializer):
                 except :
                     avail_time_instance = AvailTime.objects.create(**avail_time_data)
                 instance.photographer_avail_time.add(avail_time_instance)
-        
+
+        # photographer_last_online_time   
+        if 'photographer_last_online_time' in validated_data:
+            instance.photographer_last_online_time = validated_data.pop('photographer_last_online_time')
+
+        # photographer_style
+        if 'photographer_style' in validated_data:
+            instance.photographer_style.clear()
+            for style_data in validated_data.pop('photographer_style'):
+                style_instance = Style.objects.get(style_name=style_data)
+                instance.photographer_style.add(style_instance)
+                
         instance.save()
         return instance
 
