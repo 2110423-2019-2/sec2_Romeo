@@ -6,7 +6,6 @@ import { connect } from "react-redux";
 import { signOut } from "common/actions/auth";
 import history from "common/router/history";
 import SignInRegModal from "interfaces/signinreg/modal";
-import MenuItem from "antd/lib/menu/MenuItem";
 
 class Nav extends React.Component {
     state = {

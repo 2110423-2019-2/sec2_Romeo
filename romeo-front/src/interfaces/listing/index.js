@@ -3,25 +3,27 @@ import { connect } from "react-redux";
 import { Parallax } from 'react-parallax';
 import Card from "./Card";
 import Axios from "axios";
+import { getCurrentClientInfo } from "common/auth";
 
 class Listing extends React.Component {
 
     state = {
-        photographers: []
+        photographers: [],
+        currentClient: null
     }
 
     componentDidMount = async () => {
         const res =  await Axios.get("/api/photographers/")
+        const currentClient = await getCurrentClientInfo();
         this.setState({
-            photographers: res.data
+            photographers: res.data,
+            currentClient
         });
-        // Axios.get("/api/photographers").then(res => {
-        //     this.setState({ photographers: res.data });
-        // })
     }
 
     render() {
-        const {photographers} = this.state;
+        const {photographers, currentClient} = this.state;
+        const { isAuth } = this.props;
         return (
             <div style={{ marginTop: -64 }}>
                 <Parallax
@@ -45,6 +47,9 @@ class Listing extends React.Component {
                                 user={e}
                                 img="https://photobro.sgp1.digitaloceanspaces.com/prawsang1581927571694-0.jpg"
                                 key={i+e.profile.user.username}
+                                displayFavButton={
+                                    !isAuth || (currentClient && currentClient.profile.user.user_type !== 1)
+                                }
                             />
                         ))
                     }

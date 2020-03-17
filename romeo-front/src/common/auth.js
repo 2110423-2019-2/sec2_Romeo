@@ -26,8 +26,12 @@ export const getCurrentClientInfo = async () => {
 			const info = await Axios.get(`/api/photographers/${currentClient.username}`);
 			return info.data;
 		} else {
-			const info = await Axios.get(`/api/customers/${currentClient.username}`);
-			return info.data;
+			const info = await Axios.get(`/api/users/${currentClient.username}`);
+			return {
+				profile: {
+					user: info.data
+				}
+			};
 		}
 	} else {
 		return null

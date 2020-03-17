@@ -36,8 +36,8 @@ const PhotographerCard = (props) => {
         >
             <div className="d-flex justify-space-between">
                 <h1 className="mb-0">{props.user.profile.user.first_name} {props.user.profile.user.last_name}</h1>
-                { props.user.profile.user.user_type !== 1 && (
-                    <Button type="default" size="large" shape="circle" type="danger" ghost>
+                { props.displayFavButton && (
+                    <Button type="danger" size="large" shape="circle" ghost>
                         <Icon type="heart" theme='outlined' />
                     </Button>
                 )}
