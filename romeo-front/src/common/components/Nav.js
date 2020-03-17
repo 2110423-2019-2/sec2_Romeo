@@ -6,6 +6,7 @@ import { connect } from "react-redux";
 import { signOut } from "common/actions/auth";
 import history from "common/router/history";
 import SignInRegModal from "interfaces/signinreg/modal";
+import MenuItem from "antd/lib/menu/MenuItem";
 
 class Nav extends React.Component {
     state = {
@@ -26,6 +27,31 @@ class Nav extends React.Component {
                         </div>
                     </Link>
                     { isAuth && currentClient ? (
+                        <div className="d-flex">
+                        <div>
+                        <Dropdown overlay={() => (
+                            <Menu>
+                                <Menu.Item>
+                                    <Link to={"/profile/" + currentClient.username}>
+                                        <Icon type="bell" className="mr-2"/><b>See All Notification</b>
+                                    </Link>
+                                </Menu.Item>
+                                <Menu.Divider/>
+                                <Menu.Item>
+                                    <Link to="#">1st Notification</Link>
+                                </Menu.Item>
+                                <Menu.Item>
+                                    <Link to="#">2nd Notification</Link>
+                                </Menu.Item>
+                                <Menu.Item>
+                                    <Link to="#">3rd Notification</Link>
+                                </Menu.Item>
+                            </Menu>
+                        )} trigger={['click']}>
+                            <Button type="default" shape="circle" icon="bell" size="large"/>
+                        </Dropdown>
+                        </div>
+                        <div>
                         <Dropdown overlay={() => (
                             currentClient.type === 1 ? (
                                 <Menu>
@@ -68,6 +94,8 @@ class Nav extends React.Component {
                         )} trigger={['click']}>
                             <Button type="primary" shape="circle" icon="user" size="large"/>
                         </Dropdown>
+                        </div>
+                        </div>
                     ) : (
                         <div>
                             <Button 
