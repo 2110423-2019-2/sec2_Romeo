@@ -36,6 +36,9 @@ function getListData(value) {
         };
         case 6: return {
             content: timeLabels[availTimes[5].time]
+        };
+        default: return {
+            content: ""
         }
     }
 }

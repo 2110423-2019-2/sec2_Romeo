@@ -1,6 +1,6 @@
 import React from "react";
 import { connect } from "react-redux"; 
-import { Parallax, Background } from 'react-parallax';
+import { Parallax } from 'react-parallax';
 import Card from "./Card";
 import Axios from "axios";
 
@@ -42,8 +42,7 @@ class Listing extends React.Component {
                     <div className="d-flex flex-wrap justify-center">
                         { photographers.map((e,i) => (
                             <Card 
-                                name={`${e.profile.user.first_name} ${e.profile.user.last_name}`}
-                                username={e.profile.user.username}
+                                user={e}
                                 img="https://photobro.sgp1.digitaloceanspaces.com/prawsang1581927571694-0.jpg"
                                 key={i+e.profile.user.username}
                             />
