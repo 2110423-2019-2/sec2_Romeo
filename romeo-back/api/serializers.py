@@ -134,6 +134,7 @@ class PhotographerSerializer(WritableNestedModelSerializer):
     photographer_photos = PhotoSerializer(many=True, required=False, allow_null=True)
     photographer_equipment = EquipmentSerializer(many=True, required=False, allow_null=True)
     photographer_styles = StyleSerializer(many=True, required=False)
+    photographer_avail_time = AvailTimeSerializer(many=True, required=False)
 
     class Meta:
         model = Photographer
@@ -170,6 +171,17 @@ class PhotographerSerializer(WritableNestedModelSerializer):
         for style_data in validated_data.pop('photographer_style'):
             style_instance = Style.objects.get(style_name=style_data)
             photographer.photographer_style.add(style_instance)
+        
+        # add avail time
+        for avail_time_data in validated_data.pop('photographer_avail_time'):
+            avail_time_data = dict(avail_time_data)
+            try :
+                avail_time_instance = AvailTime.objects.get(avail_date=avail_time_data['avail_date'],
+                                                            avail_time=avail_time_data['avail_time'],
+                                                            photographer_price=avail_time_data['photographer_price'])
+            except :
+                avail_time_instance = AvailTime.objects.create(**avail_time_data)
+            photographer.photographer_avail_time.add(avail_time_instance)
 
         profile.save()
         photographer.save()
@@ -214,8 +226,18 @@ class PhotographerSerializer(WritableNestedModelSerializer):
                 style_instance = Style.objects.get(style_name=style_data)
                 instance.photographer_style.add(style_instance)
 
-        # TODO
         # photographer_avail_time
+        if 'photographer_avail_time' in validated_data:
+            instance.photographer_avail_time.clear()
+            for avail_time_data in validated_data.pop('photographer_avail_time'):
+                avail_time_data = dict(avail_time_data)
+                try :
+                    avail_time_instance = AvailTime.objects.get(avail_date=avail_time_data['avail_date'],
+                                                                avail_time=avail_time_data['avail_time'],
+                                                                photographer_price=avail_time_data['photographer_price'])
+                except :
+                    avail_time_instance = AvailTime.objects.create(**avail_time_data)
+                instance.photographer_avail_time.add(avail_time_instance)
         
         instance.save()
         return instance
