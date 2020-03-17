@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, Redirect } from "react-router-dom";
-import { Button, Tag } from "antd";
+import { Button, Tag, Icon } from "antd";
 import { getPortfolio } from "logic/Portfolio";
 import { connect } from "react-redux"
 import { formatDate } from "common/date";
@@ -49,6 +49,9 @@ class Profile extends React.Component {
                             <h1 className="mb-1">
                                 {currentClient.profile.user.first_name} {currentClient.profile.user.last_name}
                             </h1>
+                            <Button type="default" size="large" shape="circle">
+                                <Icon type="heart" style={{color:'red'}} theme='outlined' />
+                            </Button>
                             <h3 className="mb-2">{username}</h3>
                             <span className="t-color-light d-block mb-4">Last Online Time: {formatDate(moment(new Date()))}</span>
                             <div className="mb-3">

@@ -1,5 +1,5 @@
 import React from "react";
-import { Card, Tag, Icon } from "antd"
+import { Card, Tag, Button, Icon } from "antd"
 import history from "common/router/history";
 import { styleColors } from "common/style-colors";
 
@@ -34,7 +34,14 @@ const PhotographerCard = (props) => {
             }
             onClick={() => history.push("/profile/" + props.user.profile.user.username)}
         >
-            <h1 className="mb-0">{props.user.profile.user.first_name} {props.user.profile.user.last_name}</h1>
+            <div className="d-flex justify-space-between">
+                <h1 className="mb-0">{props.user.profile.user.first_name} {props.user.profile.user.last_name}</h1>
+                { props.user.profile.user.user_type !== 1 && (
+                    <Button type="default" size="large" shape="circle" type="danger" ghost>
+                        <Icon type="heart" theme='outlined' />
+                    </Button>
+                )}
+            </div>
             <span className="d-block mb-1">{props.user.profile.user.username}</span>
             <div className="pb-2"/>
             { props.user.photographer_style.length > 0 && (

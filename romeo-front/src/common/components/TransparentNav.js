@@ -27,73 +27,71 @@ class TransparentNav extends React.Component {
                     </Link>
                     { isAuth && currentClient ? (
                         <div className="d-flex">
-                        <div>
-                        <Dropdown overlay={() => (
-                            <Menu>
-                                <Menu.Item>
-                                    <Link to={"/profile/" + currentClient.username}>
-                                        <Icon type="bell" className="mr-2"/><b>See All Notification</b>
-                                    </Link>
-                                </Menu.Item>
-                                <Menu.Divider/>
-                                <Menu.Item>
-                                    <Link to="#">1st Notification</Link>
-                                </Menu.Item>
-                                <Menu.Item>
-                                    <Link to="#">2nd Notification</Link>
-                                </Menu.Item>
-                                <Menu.Item>
-                                    <Link to="#">3rd Notification</Link>
-                                </Menu.Item>
-                            </Menu>
-                        )} trigger={['click']}>
-                            <Button type="default" shape="circle" icon="bell" size="large"/>
-                        </Dropdown>
-                        </div>
-                        <div>
-                        <Dropdown overlay={() => (
-                            currentClient.type === 1 ? (
-                                <Menu>
-                                    <Menu.Item key="0">
-                                        <Link to={"/profile/" + currentClient.username}>
-                                            <Icon type="user" className="mr-2"/><b>{currentClient.username}</b>
-                                        </Link>
-                                    </Menu.Item>
-                                    <Menu.Divider />
-                                    <Menu.Item key="2">
-                                        <Link to="/client/edit-portfolio">Edit Portfolio</Link>
-                                    </Menu.Item>
-                                    <Menu.Item key="2">
-                                        <Link to="/client/edit-profile">Edit Profile</Link>
-                                    </Menu.Item>
-                                    <Menu.Item key="1">
-                                        <Link to="/client/edit">Personal Information</Link>
-                                    </Menu.Item>
-                                    <Menu.Item key="3" onClick={() => signOut(history)}>
-                                        <span className="t-color-error">Sign Out</span>
-                                    </Menu.Item>
-                                </Menu>
-                            ) : (
-                                <Menu>
-                                    <Menu.Item key="0" style={{ pointerEvents: 'none' }}>
-                                        <Icon type="user" className="mr-2"/><b>{currentClient.username}</b>
-                                    </Menu.Item>
-                                    <Menu.Divider />
-                                    <Menu.Item key="2">
-                                        <Link to="/client/reservations">My Reservations</Link>
-                                    </Menu.Item>
-                                    <Menu.Item key="1">
-                                        <Link to="/client/edit">Personal Information</Link>
-                                    </Menu.Item>
-                                    <Menu.Item key="3" onClick={() => signOut(history)}>
-                                        <span className="t-color-error">Sign Out</span>
-                                    </Menu.Item>
-                                </Menu>
-                            )
-                        )} trigger={['click']}>
-                            <Button type="primary" shape="circle" icon="user" size="large" />
-                        </Dropdown>
-                        </div>
+                            <div>
+                                <Dropdown overlay={() => (
+                                    <Menu>
+                                        <Menu.Item>
+                                            <Icon type="bell" className="mr-2"/><b>Notifications</b>
+                                        </Menu.Item>
+                                        <Menu.Divider/>
+                                        <Menu.Item>
+                                            <Link to="#">1st Notification</Link>
+                                        </Menu.Item>
+                                        <Menu.Item>
+                                            <Link to="#">2nd Notification</Link>
+                                        </Menu.Item>
+                                        <Menu.Item>
+                                            <Link to="#">3rd Notification</Link>
+                                        </Menu.Item>
+                                    </Menu>
+                                )} trigger={['click']}>
+                                    <Button type="default" shape="circle" icon="bell" size="large" className="mr-3"/>
+                                </Dropdown>
+                            </div>
+                            <div>
+                                <Dropdown overlay={() => (
+                                    currentClient.type === 1 ? (
+                                        <Menu>
+                                            <Menu.Item key="0">
+                                                <Link to={"/profile/" + currentClient.username}>
+                                                    <Icon type="user" className="mr-2"/><b>{currentClient.username}</b>
+                                                </Link>
+                                            </Menu.Item>
+                                            <Menu.Divider />
+                                            <Menu.Item key="2">
+                                                <Link to="/client/edit-portfolio">Edit Portfolio</Link>
+                                            </Menu.Item>
+                                            <Menu.Item key="2">
+                                                <Link to="/client/edit-profile">Edit Profile</Link>
+                                            </Menu.Item>
+                                            <Menu.Item key="1">
+                                                <Link to="/client/edit">Personal Information</Link>
+                                            </Menu.Item>
+                                            <Menu.Item key="3" onClick={() => signOut(history)}>
+                                                <span className="t-color-error">Sign Out</span>
+                                            </Menu.Item>
+                                        </Menu>
+                                    ) : (
+                                        <Menu>
+                                            <Menu.Item key="0" style={{ pointerEvents: 'none' }}>
+                                                <Icon type="user" className="mr-2"/><b>{currentClient.username}</b>
+                                            </Menu.Item>
+                                            <Menu.Divider />
+                                            <Menu.Item key="2">
+                                                <Link to="/client/reservations">My Reservations</Link>
+                                            </Menu.Item>
+                                            <Menu.Item key="1">
+                                                <Link to="/client/edit">Personal Information</Link>
+                                            </Menu.Item>
+                                            <Menu.Item key="3" onClick={() => signOut(history)}>
+                                                <span className="t-color-error">Sign Out</span>
+                                            </Menu.Item>
+                                        </Menu>
+                                    )
+                                )} trigger={['click']}>
+                                    <Button type="primary" shape="circle" icon="user" size="large" />
+                                </Dropdown>
+                            </div>
                         </div>
                     ) : (
                         <div>
