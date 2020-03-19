@@ -76,6 +76,6 @@ class Photographer(models.Model):
     photographer_photos = models.ManyToManyField(Photo, related_name='photographer_photos', null=True, blank=True)
 
     def __str__(self):
-        return self.profile.user.first_name
+        return self.profile.user.username
 
 

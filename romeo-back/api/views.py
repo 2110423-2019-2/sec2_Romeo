@@ -62,6 +62,7 @@ class CustomerViewSet(viewsets.ModelViewSet):
     queryset = Customer.objects.filter()
     serializer_class = CustomerSerializer
     permission_classes = [AllowAny]
+    lookup_field = 'profile__user__username'
 
 
 class JobsViewSet(viewsets.ModelViewSet):

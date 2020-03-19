@@ -311,6 +311,14 @@ class CustomerSerializer(serializers.ModelSerializer):
         profile.save()
         return customer
 
+    def update (self, instance, validated_data):
+        # update profile 
+        profile_data = dict(validated_data['profile'])
+        username = dict(profile_data['user'])['username']
+        profile_instance = CustomUserProfile.objects.get(user__username=username)
+        profile_instance = ProfileSerializer.update(ProfileSerializer, instance=profile_instance, validated_data=profile_data)
+        instance.save()
+        return instance
     # def create(self, validated_data):
     #     jobs_by_customer_data = validated_data.pop('jobs_by_customer')
     #     customer = Customer.objects.create(**validated_data)
