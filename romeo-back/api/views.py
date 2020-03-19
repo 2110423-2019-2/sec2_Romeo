@@ -22,7 +22,7 @@ class PhotographerViewSet(viewsets.ModelViewSet):
     permission_classes = [AllowAny]
     lookup_field = 'profile__user__username'
     filter_backends = [filters.SearchFilter]
-    search_fields = ['profile__user__username']
+    search_fields = ['profile__user__username',"profile__user__first_name","profile__user__last_name"]
 
     # # custom action routing for photographers to update photos
     # @action(detail=True, methods=['get', 'post', 'delete'], url_path='update_photos')
