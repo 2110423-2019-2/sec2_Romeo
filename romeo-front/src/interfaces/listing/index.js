@@ -3,8 +3,9 @@ import { connect } from "react-redux";
 import { Parallax } from 'react-parallax';
 import Card from "./Card";
 import Axios from "axios";
-import { Input, Skeleton, Card as AntCard, Avatar, Icon } from "antd";
+import { Input, Skeleton, Card as AntCard, Avatar, Icon, Dropdown, Form, Checkbox, Button } from "antd";
 import { getCurrentClientInfo } from "common/auth";
+import { availableStyles } from "logic/availableStyles"
 
 class Listing extends React.Component {
 
@@ -17,11 +18,13 @@ class Listing extends React.Component {
     }
 
     componentDidMount = async () => {
+        this.setState({ loading: true })
         const res =  await Axios.get("/api/photographers/")
         const currentClient = await getCurrentClientInfo();
         this.setState({
             photographers: res.data,
-            currentClient
+            currentClient,
+            loading: false
         });
     }
 
@@ -49,6 +52,10 @@ class Listing extends React.Component {
         });
     }
 
+    onStyleChange(checkedValues) {
+        console.log('checked = ', checkedValues);
+    }
+
     render() {
         const {photographers, currentClient, search, loading, typing} = this.state;
         const { isAuth } = this.props;
@@ -69,16 +76,34 @@ class Listing extends React.Component {
                         </div>
                     </div>
                 </Parallax>
-                <div className="container mt-4 mb-5">
-                    <div className="d-flex align-center" style={{ maxWidth: 500, margin: 'auto' }}>
+                <div className="container mt-5 mb-5">
+                    <div className="secondary-label mb-3 pl-0 t-color-default" style={{ textAlign: 'center' }}>
+                        Search by Name or Filter by Style
+                    </div>
+                    <div className="d-flex align-center mb-4" style={{ maxWidth: 500, margin: 'auto' }}>
                         <Input.Search 
                             value={search} 
                             placeholder="Search" 
                             onChange={e => this.searchPhotographers(e.target.value)} 
                             size="large"
+                            className="ma-1"
                         />
+                        <Dropdown overlay={() => (
+                            <Form className="pa-3">
+                                <Checkbox.Group 
+                                    options={availableStyles} 
+                                    onChange={this.onStyleChange} 
+                                    className="vertical"
+                                />
+                            </Form>
+                        )} trigger={['click']}>
+                            <Button type="primary" size="large" className="ma-1">
+                                <span>Styles</span>
+                                <Icon type="down" />
+                            </Button>
+                        </Dropdown>
                     </div>
-                    <div className="d-flex flex-wrap justify-center">
+                    <div className="d-flex flex-wrap justify-center align-center pl-2 pr-2">
                         { (!loading) ? 
                             (photographers.length > 0 ? photographers.map((e,i) => (
                                 <Card 

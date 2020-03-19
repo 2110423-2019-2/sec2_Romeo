@@ -53,7 +53,7 @@ class EditProfile extends React.Component {
             photographer_avail_time: out
         }
 
-        Axios.put("/api/photographers/" + this.state.currentClient.profile.user.username + "/",request)
+        Axios.patch("/api/photographers/" + this.state.currentClient.profile.user.username + "/",request)
         .then(res => {
             this.setState({ success: true })
             this.setState({ error: false })

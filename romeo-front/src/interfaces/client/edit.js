@@ -41,7 +41,7 @@ class Edit extends React.Component {
                 } = values;
 
                 const url = user_type === 1 ? "/api/photographers" : "/api/customers"
-                Axios.put(`${url}/${username}/`, {
+                Axios.patch(`${url}/${username}/`, {
                     profile: {
                         user: {
                             first_name: firstName,

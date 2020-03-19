@@ -30,17 +30,15 @@ class EditPortfolio extends React.Component {
         const { currentClient } = this.state;
         const { errors } = await uploadPhotos(e, currentClient.profile.user.username, currentClient.photographer_photos);
         this.setState({ errors });
-        if (errors.length <= 0) {
-            this.setState({ success: true });
-        }
     };
 
     deletePhoto = async (key) => {
-        await removePhoto(key);
+        const { currentClient, currentPortfolio } = this.state;
+        await removePhoto(key, currentPortfolio , currentClient.profile.user.username);
     }
 
     render() {
-        const { errors, success, currentClient, currentPortfolio } = this.state;
+        const { errors, currentClient, currentPortfolio } = this.state;
 
         if (currentClient && currentClient.profile.user.user_type !== 1) {
             return <Redirect to="/"/>
@@ -53,11 +51,6 @@ class EditPortfolio extends React.Component {
                         Upload and remove photos from your portfolio. <br/>
                         <small className="t-color-light">Maximum file size: 2MB</small>
                     </p>
-                    { success && (
-                        <div className="success-banner">
-                            <span>You photos have been successfully uploaded. Please refresh the page to see your new photos.</span>
-                        </div>
-                    )}
                     { errors && errors.length > 0 ? (
                         errors.map((e,i) => (
                             <div key={"error" + i} className="error-banner">{e.msg ? e.msg : "An error occured."}</div>

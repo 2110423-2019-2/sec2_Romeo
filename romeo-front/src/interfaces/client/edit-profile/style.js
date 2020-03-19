@@ -2,7 +2,7 @@ import React from "react";
 import { Checkbox, Form } from "antd";
 import { connect } from "react-redux";
 import { setCurrentStyles } from "./actions";
-import { availableStyles } from "./availableStyles";
+import { availableStyles } from "../../../logic/availableStyles";
 
 class Style extends React.Component {
    

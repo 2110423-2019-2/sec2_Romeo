@@ -28,14 +28,14 @@ export const uploadPhotos = (event, username, currentPortfolio) => {
                 } else {
                     // If there is no error updating the editor with the imageUrl
                     const imageUrl = `${Config.digitalOceanSpaces}` + fileName
-                    Axios.put("/api/photographers/" + username + '/', {
+                    Axios.patch("/api/photographers/" + username + '/', {
                         photographer_photos: [
                             ...currentPortfolio,
                             {
                                 photo_link: imageUrl
                             }
                         ]
-                    })
+                    }).then(res => window.location.reload())
                 }
             })
         }
@@ -45,7 +45,7 @@ export const uploadPhotos = (event, username, currentPortfolio) => {
     }
 }
 
-export const removePhoto = async (key, currentPortfolio) => {
+export const removePhoto = async (key, currentPortfolio, username) => {
     // Remove from spaces
     const f = currentPortfolio[key].photo_link.split("/");
     const fileName = f[f.length-1];
@@ -56,13 +56,12 @@ export const removePhoto = async (key, currentPortfolio) => {
         if (err) {
             console.log(err);
         }
-        localStorage.setItem("portfolio", JSON.stringify({
-            ...currentPortfolio,
-            photos: [
-                ...currentPortfolio.photos.slice(0,key),
-                ...currentPortfolio.photos.slice(key+1, currentPortfolio.photos.length)
+        Axios.patch("/api/photographers/" + username + '/', {
+            photographer_photos: [
+                ...currentPortfolio.slice(0,key),
+                ...currentPortfolio.slice(key+1)
             ]
-        }));
+        })
         window.location.reload();
     })
 }

@@ -13,7 +13,7 @@ const mapEquipments = (equipment) => {
 
 const getCover = (user) => {
     const { photographer_photos } = user;
-    if (photographer_photos > 0) {
+    if (photographer_photos.length > 0) {
         return photographer_photos[photographer_photos.length-1].photo_link
     } else {
         return null

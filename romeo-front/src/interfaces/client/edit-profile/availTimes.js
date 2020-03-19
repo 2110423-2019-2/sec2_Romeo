@@ -79,7 +79,7 @@ class AvailTimes extends React.Component {
 
     componentDidMount() {
         const { currentClient } = this.props;
-        let availTimes = currentClient.photographer_avail_times;
+        let availTimes = currentClient.photographer_avail_time;
         if (!availTimes) availTimes = [];
         // Fill In Empty Times
         let out = defaultDays;

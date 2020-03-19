@@ -2,6 +2,8 @@ import React from 'react';
 import history from "../../common/router/history";
 import { getCurrentClientInfo } from "common/auth";
 import { Button, Form, Input } from "antd";
+import { animateScroll as scroll } from 'react-scroll'
+import Axios from 'axios';
 
 function hasErrors(fieldsError) {
     return Object.keys(fieldsError).some(field => fieldsError[field]);
@@ -16,19 +18,8 @@ class Edit extends React.Component {
     handleSubmit = async (e) => {
         e.preventDefault();
         const currentClient = await getCurrentClientInfo();
-        const { password } = currentClient
 
         this.props.form.validateFields((err, values) => {
-            if ( values.oldPassword !== password) {
-                this.setState({
-                    wrongPassword: true
-                })
-                return;
-            } else {
-                this.setState({
-                    wrongPassword: false
-                })
-            }
             if ( values.newPassword !== values.confirmPassword) {
                 this.setState({
                     passwordsDoNotMatch: true
@@ -40,13 +31,21 @@ class Edit extends React.Component {
                 })
             }
             if (!err) {
-                localStorage.setItem("currentClient", JSON.stringify({
-                    ...currentClient,
-                    password: values.newPassword
-                }));
-                this.setState({
-                    success: true
-                })
+                const { user_type, username } = currentClient.profile.user
+                const url = user_type === 1 ? "/api/photographers" : "/api/customers"
+                Axios.patch(`${url}/${username}/`, {
+                    profile: {
+                        user: {
+                            password: values.newPassword
+                        }
+                    },
+                }).then(res => {
+                    scroll.scrollToTop();
+                    this.setState({ success: true })
+                }).catch(res => {
+                    scroll.scrollToTop();
+                    this.setState({ wrongPassword: true })
+                });
             }
         });
     };
