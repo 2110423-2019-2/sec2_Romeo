@@ -4,7 +4,7 @@ import Edit from "./edit";
 import Password from "./password"
 import Reservations from "./reservations";
 // import EditPortfolio from "./edit-portfolio/"
-// import EditProfile from "./edit-profile/"
+import EditProfile from "./edit-profile/"
 import { getCurrentClient } from "common/auth";
 
 import { Menu } from 'antd';
@@ -66,7 +66,7 @@ class ClientLanding extends React.Component {
                     <Route path="/client/edit" component={Edit} />
                     <Route path="/client/reservations" exact component={Reservations} />
                     {/* <Route path="/client/edit-portfolio" exact component={EditPortfolio} /> */}
-                    {/* <Route path="/client/edit-profile" exact component={EditProfile} /> */}
+                    <Route path="/client/edit-profile" exact component={EditProfile} />
                     <Route path="/client" exact component={RedirectToEdit} />
                 </Switch>
             </div>

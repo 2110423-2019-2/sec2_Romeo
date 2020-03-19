@@ -133,9 +133,6 @@ class AvailTimes extends React.Component {
 
     render() {
         const { currentAvailTimes } = this.props;
-        const { currentClient } = this.props;
-        
-        console.log(currentAvailTimes);
 
         return (
             <React.Fragment>

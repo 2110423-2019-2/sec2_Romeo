@@ -7,11 +7,18 @@ class Equipment extends React.Component {
     state = {
         equipmentName: ""
     }
+    componentDidMount() {
+        const { currentClient } = this.props;
+        const equipment = currentClient.photographer_equipment;
+        this.props.setCurrentEquipment(equipment);
+    }
     addEquipment = () => {
         const { equipmentName } = this.state;
         const { currentEquipment, setCurrentEquipment } = this.props;
         if (equipmentName.length > 0) {
-            setCurrentEquipment([...currentEquipment, equipmentName])
+            setCurrentEquipment([...currentEquipment, {
+                equipment_name: equipmentName
+            }])
         }
     }
     deleteEquipment = key => {
@@ -53,7 +60,7 @@ class Equipment extends React.Component {
                             className="snippet"
                             key={"equip" + i}
                         >
-                            <b>{e}</b>
+                            <b>{e.equipment_name}</b>
                             <Button type="danger" onClick={() => this.deleteEquipment(i)}>
                                 <Icon type="delete"/>
                             </Button>

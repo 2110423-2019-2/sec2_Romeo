@@ -10,9 +10,14 @@ class Style extends React.Component {
         this.props.setCurrentStyles(checkedValues);
     }
     
+    componentDidMount() {
+        const { currentClient } = this.props;
+        const styles = currentClient.photographer_style;
+        this.props.setCurrentStyles(styles);
+    }
+
     render() {
         const { currentStyles } = this.props;
-        console.log(currentStyles);
 
         return (
             <React.Fragment>
