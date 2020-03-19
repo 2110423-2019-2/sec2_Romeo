@@ -23,7 +23,6 @@ class UserSerializer(serializers.ModelSerializer):
             }
         }
 
-
     def create(self, validated_data):
         user = CustomUser.objects.create_user(username=validated_data['username'],
                                               password=validated_data['password'],
@@ -65,18 +64,19 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     def update (self, instance, validated_data):
         # update user instance before updating profile 
-        user_data = dict(validated_data.pop('user'))
-        user_username = user_data['username']
-        user = CustomUser.objects.get(username = user_username)
-        user = UserSerializer.update(UserSerializer(),instance=user,validated_data=user_data)
+        if 'user' in validated_data:
+            user_data = dict(validated_data.pop('user'))
+            user_username = user_data['username']
+            user = CustomUser.objects.get(username = user_username)
+            user = UserSerializer.update(UserSerializer(required=False),instance=user,validated_data=user_data)
 
         # update profile instance
         instance.user = user
-        instance.ssn = validated_data.pop('ssn')
-        instance.bank_account_number = validated_data.pop('bank_account_number')
-        instance.bank_name = validated_data.pop('bank_name')
-        instance.bank_account_name = validated_data.pop('bank_account_name')
-        instance.phone = validated_data.pop('phone')
+        instance.ssn = validated_data.get('ssn',instance.ssn)
+        instance.bank_account_number = validated_data.get('bank_account_number',instance.bank_account_number)
+        instance.bank_name = validated_data.get('bank_name',instance.bank_name)
+        instance.bank_account_name = validated_data.get('bank_account_name',instance.bank_account_name)
+        instance.phone = validated_data.get('phone',instance.phone)
 
         instance.save()
         return instance
@@ -183,10 +183,10 @@ class EquipmentSerializer(UniqueFieldsMixin,NestedUpdateMixin,serializers.ModelS
 
 class PhotographerSerializer(WritableNestedModelSerializer):
     profile = ProfileSerializer(required=True, partial=True)
-    photographer_photos = PhotoSerializer(many=True, required=False, allow_null=True)
-    photographer_equipment = EquipmentSerializer(many=True, required=False, allow_null=True)
-    photographer_styles = StyleSerializer(many=True, required=False)
-    photographer_avail_time = AvailTimeSerializer(many=True, required=False)
+    photographer_photos = PhotoSerializer(many=True, required=False, allow_null=True, partial=True)
+    photographer_equipment = EquipmentSerializer(many=True, required=False, allow_null=True, partial=True)
+    photographer_styles = StyleSerializer(many=True, required=False, partial=True)
+    photographer_avail_time = AvailTimeSerializer(many=True, required=False, partial=True)
 
     class Meta:
         model = Photographer
@@ -238,10 +238,14 @@ class PhotographerSerializer(WritableNestedModelSerializer):
     
     def update (self, instance, validated_data):
         # update profile 
-        profile_data = dict(validated_data['profile'])
-        username = dict(profile_data['user'])['username']
-        profile_instance = CustomUserProfile.objects.get(user__username=username)
-        profile_instance = ProfileSerializer.update(ProfileSerializer, instance=profile_instance, validated_data=profile_data)
+        if 'profile' in validated_data:
+            profile_data = dict(validated_data['profile'])
+            if 'user' in profile_data:
+                profile_data_dict = dict(profile_data['user'])
+                if 'username' in profile_data_dict:
+                    username = profile_data_dict['username']
+                    profile_instance = CustomUserProfile.objects.get(user__username=username)
+                    profile_instance = ProfileSerializer.update(ProfileSerializer(required=False), instance=profile_instance, validated_data=profile_data)
 
         # update photographer_photos 
         if 'photographer_photos' in validated_data:
@@ -314,9 +318,10 @@ class CustomerSerializer(serializers.ModelSerializer):
     def update (self, instance, validated_data):
         # update profile 
         profile_data = dict(validated_data['profile'])
-        username = dict(profile_data['user'])['username']
-        profile_instance = CustomUserProfile.objects.get(user__username=username)
-        profile_instance = ProfileSerializer.update(ProfileSerializer, instance=profile_instance, validated_data=profile_data)
+        if 'user' in profile_data:
+            username = dict(profile_data['user'])['username']
+            profile_instance = CustomUserProfile.objects.get(user__username=username)
+            profile_instance = ProfileSerializer.update(ProfileSerializer, instance=profile_instance, validated_data=profile_data)
         instance.save()
         return instance
     # def create(self, validated_data):
