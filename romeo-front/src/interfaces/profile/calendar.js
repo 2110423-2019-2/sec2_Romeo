@@ -27,8 +27,8 @@ class JobCalendar extends React.Component {
         );
     }
     getListData = (value) => {
-        const { currentClient } = this.props;
-        const { photographer_avail_time } = currentClient;
+        const { currentPhotographer } = this.props;
+        const { photographer_avail_time } = currentPhotographer;
         // Fill In 
         let out = defaultDays;
         photographer_avail_time.forEach((e,i) => {

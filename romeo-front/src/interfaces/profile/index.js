@@ -25,7 +25,7 @@ class Profile extends React.Component {
         this.setState({
             photographer
         });
-        const currentPortfolio = currentClient.photographer_photos;
+        const currentPortfolio = photographer.photographer_photos;
         this.setState({
             currentPhotographer: photographer,
             currentPortfolio,
@@ -130,7 +130,7 @@ class Profile extends React.Component {
                             </div>
                         ) : (
                             <div className="pa-4">
-                                <JobCalendar currentClient={currentClient}/>
+                                <JobCalendar currentPhotographer={currentPhotographer}/>
                             </div>
                         ) }
                         </div>
