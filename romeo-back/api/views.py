@@ -3,6 +3,8 @@ from rest_framework import status, viewsets, filters
 from rest_framework.response import Response
 from .permissions import IsUser
 from rest_framework.permissions import AllowAny, SAFE_METHODS
+from django.shortcuts import get_object_or_404
+from rest_framework.response import Response 
 
 # Import Serializers of apps
 from .serializers import PhotographerSerializer, CustomerSerializer, JobSerializer, JobReservationSerializer, UserSerializer, \
@@ -66,6 +68,8 @@ class CustomerViewSet(viewsets.ModelViewSet):
     serializer_class = CustomerSerializer
     permission_classes = [AllowAny]
     lookup_field = 'profile__user__username'
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['profile__user__username']
 
 
 class JobsViewSet(viewsets.ModelViewSet):
@@ -105,3 +109,15 @@ class ProfileViewSet(viewsets.ModelViewSet):
 class NotificationViewSet(viewsets.ModelViewSet):
     serializer_class = NotificationSerializer
     queryset = Notification.objects.all()
+
+class FavPhotographersViewSet(viewsets.ModelViewSet):
+    serializer_class = PhotographerSerializer
+    queryset = Photographer.objects.all()
+    permission_classes = [AllowAny]
+    lookup_field = 'profile__user__username'
+
+    def retrieve(self, request, pk=None):
+        queryset = User.objects.filter(username=pk)
+        contact = get_object_or_404(queryset, pk=1)
+        serializer = ContactSerializer(contact)
+        return Response(serializer.data)
