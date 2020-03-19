@@ -37,7 +37,10 @@ class UserSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         # special case to hash password
         if 'password' in validated_data :
-            instance.set_password(validated_data.pop('password'))
+            raw_password = validated_data.pop('password')
+            if not instance.check_password(raw_password):
+                instance.set_password(raw_password)
+            
         instance.username = validated_data.get('username', instance.username)
         instance.first_name = validated_data.get('first_name', instance.first_name)
         instance.last_name = validated_data.get('last_name', instance.last_name)
