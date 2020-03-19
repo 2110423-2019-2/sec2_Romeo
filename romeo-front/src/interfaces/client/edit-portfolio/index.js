@@ -1,7 +1,7 @@
 import React from "react"
 import { Redirect } from "react-router-dom";
-import { getCurrentClient } from "logic/Client";
-import { getPortfolio, uploadPhotos, removePhoto } from "logic/Portfolio";
+import { getCurrentClientInfo } from "common/auth";
+import { uploadPhotos, removePhoto } from "logic/Portfolio";
 import { Button, Icon } from "antd";
 import Photo from "./Photo"
 
@@ -14,24 +14,23 @@ class EditPortfolio extends React.Component {
     state = {
         hilights: [],
         errors: [],
-        warnings: [],
         success: false,
         currentClient: null,
         currentPortfolio: null
     }
-    componentDidMount() {
+    componentDidMount = async () => {
         const currentClient = await getCurrentClientInfo();
-        const currentPortfolio = getPortfolio(currentClient);
-        console.log(currentClient);
+        const currentPortfolio = currentClient.photographer_photos
         this.setState({
             currentClient,
             currentPortfolio
         });
     }
     handleImageChange = async (e) => {
-        const { errors, warnings } = await uploadPhotos(e);
-        this.setState({ errors, warnings });
-        if (errors.length <= 0 && warnings.length <= 0) {
+        const { currentClient } = this.state;
+        const { errors } = await uploadPhotos(e, currentClient.profile.user.username, currentClient.photographer_photos);
+        this.setState({ errors });
+        if (errors.length <= 0) {
             this.setState({ success: true });
         }
     };
@@ -41,10 +40,7 @@ class EditPortfolio extends React.Component {
     }
 
     render() {
-        const currentClient = getCurrentClient();
-        const currentPortfolio = getPortfolio();
-        const { photos } = currentPortfolio;
-        const { errors, success, warnings } = this.state;
+        const { errors, success, currentClient, currentPortfolio } = this.state;
 
         if (currentClient && currentClient.profile.user.user_type !== 1) {
             return <Redirect to="/"/>
@@ -67,12 +63,7 @@ class EditPortfolio extends React.Component {
                             <div key={"error" + i} className="error-banner">{e.msg ? e.msg : "An error occured."}</div>
                         ))
                     ) : <span/>}
-                    { warnings && warnings.length > 0 ? (
-                        warnings.map((e,i) => (
-                            <div key={"warning" + i} className="warning-banner">{e.msg ? e.msg : "An error occured."}</div>
-                        ))
-                    ) : <span/>}
-                    <input type="file" id="inputfile" accept="image/*" multiple
+                    <input type="file" id="inputfile" accept="image/*"
                         onChange={this.handleImageChange} hidden ref={this.uploadRef}/>
                     <Button 
                         type="primary" 
@@ -93,12 +84,12 @@ class EditPortfolio extends React.Component {
                 </div>
                 <div className="container with-sidebar full-width-xs portfolio-container">
                     <div className="photo-grid">
-                        { photos.map((e,i) => (
+                        { currentPortfolio && currentPortfolio.map((e,i) => (
                             <Photo 
-                                src={e} 
-                                key={e} 
+                                src={e.photo_link} 
+                                key={e.photo_link} 
                                 index={i}
-                                onDelete={() => this.deletePhoto(i)}
+                                onDelete={() => this.deletePhoto(i, currentPortfolio)}
                             />
                         ))}
                     </div>

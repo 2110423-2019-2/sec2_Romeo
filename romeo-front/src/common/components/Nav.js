@@ -45,7 +45,7 @@ class Nav extends React.Component {
                                         </Menu.Item>
                                     </Menu>
                                 )} trigger={['click']}>
-                                    <Button type="default" shape="circle" icon="bell" size="large" className="mr-3"/>
+                                    <Button type="default" shape="circle" icon="bell" size="large" className="mr-2"/>
                                 </Dropdown>
                             </div>
                             <div>

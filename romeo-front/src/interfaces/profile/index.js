@@ -26,7 +26,7 @@ class Profile extends React.Component {
         this.setState({
             photographer
         });
-        const currentPortfolio = getPortfolio(photographer);
+        const currentPortfolio = currentClient.photographer_photos;
         this.setState({
             currentPhotographer: photographer,
             currentPortfolio,
