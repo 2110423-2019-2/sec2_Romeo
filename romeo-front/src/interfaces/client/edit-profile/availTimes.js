@@ -1,5 +1,5 @@
 import React from "react";
-import { Radio, Form, Tag } from "antd";
+import { Radio, Form, Tag, Input } from "antd";
 import { connect } from "react-redux";
 import { setCurrentAvailTimes } from "./actions";
 
@@ -11,6 +11,46 @@ const options = [
     { label: 'Full-Day and Night', value: "FULL_DAY_NIGHT"},
     { label: 'Not Available', value: "NOT_AVAILABLE"}
   ];
+
+const defaultDays = [{
+    avail_date: "MONDAY",
+    avail_time: "NOT_AVAILABLE",
+    photographer_price: 0
+},{
+    avail_date: "TUESDAY",
+    avail_time: "NOT_AVAILABLE",
+    photographer_price: 0
+},{
+    avail_date: "WEDNESDAY",
+    avail_time: "NOT_AVAILABLE",
+    photographer_price: 0
+},{
+    avail_date: "THURSDAY",
+    avail_time: "NOT_AVAILABLE",
+    photographer_price: 0
+},{
+    avail_date: "FRIDAY",
+    avail_time: "NOT_AVAILABLE",
+    photographer_price: 0
+},{
+    avail_date: "SATURDAY",
+    avail_time: "NOT_AVAILABLE",
+    photographer_price: 0
+},{
+    avail_date: "SUNDAY",
+    avail_time: "NOT_AVAILABLE",
+    photographer_price: 0
+}];
+
+const dayIndex = {
+    MONDAY: 0,
+    TUESDAY: 1,
+    WEDNESDAY: 2,
+    THURSDAY: 3,
+    FRIDAY: 4,
+    SATURDAY: 5,
+    SUNDAY: 6
+}
 
 const days = [{
     label: "Monday",
@@ -56,46 +96,80 @@ class AvailTimes extends React.Component {
         setCurrentAvailTimes([
             ...currentAvailTimes.slice(0,day.index),
             {
-                day: day.value,
-                time: e.target.value
+                ...currentAvailTimes[day.index],
+                avail_date: day.value,
+                avail_time: e.target.value
             },
             ...currentAvailTimes.slice(day.index+1,7)
         ]);
     }
+
+    onPriceUpdate = (e, day) => {
+        const { currentAvailTimes, setCurrentAvailTimes } = this.props;
+        setCurrentAvailTimes([
+            ...currentAvailTimes.slice(0,day.index),
+            {
+                ...currentAvailTimes[day.index],
+                photographer_price: e.target.value,
+            },
+            ...currentAvailTimes.slice(day.index+1,7)
+        ]);
+    }
+
+    componentDidMount() {
+        const { currentClient } = this.props;
+        let availTimes = currentClient.photographer_avail_times;
+        if (!availTimes) availTimes = [];
+        const def = defaultDays;
+        // Fill In Empty Times
+        let out = defaultDays;
+        availTimes.forEach((e,i) => {
+            out.splice(dayIndex[e.avail_date],1)
+            out.splice(dayIndex[e.avail_date],0,e)
+        })
+        const { setCurrentAvailTimes } = this.props;
+        setCurrentAvailTimes(out);
+    }
+
     render() {
         const { currentAvailTimes } = this.props;
-        const { getFieldDecorator, getFieldsError, getFieldError, isFieldTouched } = this.props.form;
-        const priceError = isFieldTouched('price') && getFieldError('price');
+        const { currentClient } = this.props;
         
+        console.log(currentAvailTimes);
+
         return (
             <React.Fragment>
                 <h3>Available Times</h3>
                 <Form>
                     { days.map((e,i) => (
-                        <div className="snippet secondary">
+                        <div className="snippet secondary" key={i+e.value}>
                             <Tag color={e.color}>{e.label}</Tag>
                             <Radio.Group 
                                 options={options} 
-                                value={currentAvailTimes[e.index].time} 
+                                value={currentAvailTimes[e.index].avail_time} 
                                 onChange={(ev) => this.onChange(ev, e)} 
                             />
-                            <label>Price</label>
-                            <Form.Item 
-                                validateStatus={priceError ? 'error' : ''} 
-                                help={priceError || ''}
-                            >
-                                {getFieldDecorator('price', {
-                                    rules: [
-                                        { required: true,message: 'This field is required.' },
-                                    ],
-                                    initialValue: currentClient.price
-                                })(
-                                    <Form.Input
-                                        placeholder="Full-day Price"
-                                        type="price"
-                                    />,
-                                )}
-                            </Form.Item>
+                            <div>
+                                <b>Price</b>
+                                <div className="ant-row ant-form-item mb-0">
+                                    <div className="ant-col ant-form-item-control-wrapper">
+                                        <div className="ant-form-item-control has-success">
+                                            <span className="ant-form-item-children">
+                                                <input 
+                                                    placeholder="Price" 
+                                                    type="number" 
+                                                    className="ant-input"
+                                                    onChange={(ev) => this.onPriceUpdate(ev, e)} 
+                                                    value={currentAvailTimes[e.index].photographer_price !== undefined ? 
+                                                        currentAvailTimes[e.index].photographer_price
+                                                    : "0" }
+                                                    disabled={currentAvailTimes[e.index].avail_time === "NOT_AVAILABLE"}
+                                                />
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     ))}
                 </Form>
