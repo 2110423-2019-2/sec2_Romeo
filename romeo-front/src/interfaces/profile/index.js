@@ -1,7 +1,6 @@
 import React from "react";
 import { Link, Redirect } from "react-router-dom";
 import { Button, Tag, Icon, Divider } from "antd";
-import { getPortfolio } from "logic/Portfolio";
 import { connect } from "react-redux"
 import { getCurrentClientInfo } from "common/auth";
 import { formatDate } from "common/date";
@@ -131,7 +130,7 @@ class Profile extends React.Component {
                             </div>
                         ) : (
                             <div className="pa-4">
-                                <JobCalendar/>
+                                <JobCalendar currentClient={currentClient}/>
                             </div>
                         ) }
                         </div>

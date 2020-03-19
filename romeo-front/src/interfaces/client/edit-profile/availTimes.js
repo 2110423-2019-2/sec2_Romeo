@@ -1,7 +1,8 @@
 import React from "react";
-import { Radio, Form, Tag, Input } from "antd";
+import { Radio, Form, Tag } from "antd";
 import { connect } from "react-redux";
 import { setCurrentAvailTimes } from "./actions";
+import { defaultDays, dayIndex } from "logic/Calendar";
 
 const options = [
     { label: 'Half-Day (Morning-Noon)', value: 'HALF_DAY_MORNING' },
@@ -11,46 +12,6 @@ const options = [
     { label: 'Full-Day and Night', value: "FULL_DAY_NIGHT"},
     { label: 'Not Available', value: "NOT_AVAILABLE"}
   ];
-
-const defaultDays = [{
-    avail_date: "MONDAY",
-    avail_time: "NOT_AVAILABLE",
-    photographer_price: 0
-},{
-    avail_date: "TUESDAY",
-    avail_time: "NOT_AVAILABLE",
-    photographer_price: 0
-},{
-    avail_date: "WEDNESDAY",
-    avail_time: "NOT_AVAILABLE",
-    photographer_price: 0
-},{
-    avail_date: "THURSDAY",
-    avail_time: "NOT_AVAILABLE",
-    photographer_price: 0
-},{
-    avail_date: "FRIDAY",
-    avail_time: "NOT_AVAILABLE",
-    photographer_price: 0
-},{
-    avail_date: "SATURDAY",
-    avail_time: "NOT_AVAILABLE",
-    photographer_price: 0
-},{
-    avail_date: "SUNDAY",
-    avail_time: "NOT_AVAILABLE",
-    photographer_price: 0
-}];
-
-const dayIndex = {
-    MONDAY: 0,
-    TUESDAY: 1,
-    WEDNESDAY: 2,
-    THURSDAY: 3,
-    FRIDAY: 4,
-    SATURDAY: 5,
-    SUNDAY: 6
-}
 
 const days = [{
     label: "Monday",
@@ -120,7 +81,6 @@ class AvailTimes extends React.Component {
         const { currentClient } = this.props;
         let availTimes = currentClient.photographer_avail_times;
         if (!availTimes) availTimes = [];
-        const def = defaultDays;
         // Fill In Empty Times
         let out = defaultDays;
         availTimes.forEach((e,i) => {
