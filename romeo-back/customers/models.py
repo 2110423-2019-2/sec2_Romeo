@@ -9,5 +9,5 @@ class Customer(models.Model):
     profile = models.OneToOneField(CustomUserProfile, on_delete=models.CASCADE, primary_key=True)
     fav_photographers = models.ManyToManyField(Photographer,related_name="fav_photographers",null=True, blank=True)
     def __str__(self):
-        return self.profile.user.first_name
+        return self.profile.user.username
 

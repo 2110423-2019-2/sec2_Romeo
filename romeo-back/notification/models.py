@@ -1,23 +1,33 @@
 from django.db import models
+from django.conf import settings
 # from django.db.models.signals import post_save,post_delete
 # from django.dispatch import receiver
 # from jobs.models import JobInfo
-# from photographers.models import Photographer
 
 # from payments.models import Payment
 
-NOTI_CHOICES = [('CREATE', 'Create'),
-               ('DELETE', 'Delete'),
-               ('UPDATE', 'Update')]
+# to whom you want to send the notification
+NOTIFICATION_TARGET = [(0, 'admin'),
+                        (1, 'photographer'),
+                        (2, 'customer')]
 
 class Notification(models.Model):
     notification_id = models.AutoField(primary_key=True)
-    notification_type = models.CharField(max_length=20, choices=NOTI_CHOICES)
-    # photographer = models.ForeignKey(Photographer, on_delete=models.CASCADE)
-    #timestamp, flag, details(allow null)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='notification')
+    actor = models.CharField(max_length=50)
+    verb = models.CharField(max_length=50)
+    action = models.CharField(max_length=50, blank=True, null=True)
+    # target = models.IntegerField(max_length=1, choices=NOTIFICATION_TARGET)
+    description = models.TextField(blank=True, null=True)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    #flag
+    # owner = models.ForeignKey(User)
+    # datetime = models.DateTimeField(auto_now_add=True)
+    # resources = models.ManyToManyField(Resource, related_name='notifications', blank=True)
+    # recipients = models.ManyToManyField(User, related_name='notifications', blank=True)
 
     def __str__(self):
-        return self.notification_id
+        return f"{self.actor} {self.verb} {self.action} {self.target} at {self.timestamp}"
 
 #create/update job - move to job serializer
 # @receiver(post_save, sender=Photographer)

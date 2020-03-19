@@ -5,13 +5,13 @@ from .permissions import IsUser
 from rest_framework.permissions import AllowAny, SAFE_METHODS
 
 # Import Serializers of apps
-from .serializers import PhotographerSerializer, CustomerSerializer, JobSerializer, UserSerializer, \
+from .serializers import PhotographerSerializer, CustomerSerializer, JobSerializer, JobReservationSerializer, UserSerializer, \
     PhotoSerializer, AvailTimeSerializer, EquipmentSerializer, ProfileSerializer, StyleSerializer, NotificationSerializer
 
 # Import models of apps for queryset
 from photographers.models import Photographer, Photo, AvailTime, Equipment, Style
 from customers.models import Customer
-from jobs.models import JobInfo
+from jobs.models import JobInfo, JobReservation
 from users.models import CustomUser, CustomUserProfile
 from notification.models import Notification
 
@@ -62,6 +62,7 @@ class CustomerViewSet(viewsets.ModelViewSet):
     queryset = Customer.objects.filter()
     serializer_class = CustomerSerializer
     permission_classes = [AllowAny]
+    lookup_field = 'profile__user__username'
 
 
 class JobsViewSet(viewsets.ModelViewSet):
@@ -76,6 +77,10 @@ class JobsViewSet(viewsets.ModelViewSet):
     #         self.permission_classes = [IsUser]
     #     return super(self.__class__, self).get_permissions()
 
+class JobReservationViewSet(viewsets.ModelViewSet):
+    queryset = JobReservation.objects.all()
+    serializer_class = JobReservationSerializer
+    # permission_classes = [AllowAny]
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = CustomUser.objects.all()

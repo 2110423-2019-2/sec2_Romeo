@@ -8,7 +8,7 @@ from drf_writable_nested.mixins import UniqueFieldsMixin, NestedUpdateMixin
 # Import App Models
 from photographers.models import Photographer, Photo, AvailTime, Equipment, Style
 from customers.models import Customer
-from jobs.models import JobInfo
+from jobs.models import JobInfo, JobReservation
 from users.models import CustomUser, CustomUserProfile
 from notification.models import Notification
 import datetime
@@ -81,19 +81,71 @@ class ProfileSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
+class JobReservationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = JobReservation
+        fields = '__all__'
+
+    # Override default create method to auto create nested profile from photographer
+    def create(self, validated_data):
+        if validated_data['photoshoot_date'].get_weekday() not in validated_data['job_reservation.avail_date']:
+            raise serializers.ValidationError('The photographer is not available at the selected date.')
+        reservation = JobReservation.objects.create(**validated_data)
+        return reservation
+
 class JobSerializer(serializers.ModelSerializer):
+    # Reservation=True
+    reservation = JobReservationSerializer(many=True, required=False)
     class Meta:
         model = JobInfo
         fields = '__all__'
     
     # Override default create method to auto create nested profile from photographer
     def create(self, validated_data):
-        #Check valid start&end date
+        # Check if start date is valid
+        if validated_data["job_start_date"] < datetime.date.today():
+            raise serializers.ValidationError('The selected date should not be before today.')
+        # Check valid start&end date
         if validated_data["job_end_date"] < validated_data["job_start_date"]:
-            raise serializers.ValidationError('End date should not be less than start date.')
-        jobInfo = JobInfo.objects.create(**validated_data)
-        return jobInfo
+            raise serializers.ValidationError('End date should not be before start date.')
+        
+        job_info = JobInfo.objects.create(job_title=validated_data.pop('job_title'), job_description=validated_data.pop('job_description'), \
+         job_customer=validated_data.pop('job_customer'), job_photographer=validated_data.pop('job_photographer'), \
+         job_status=validated_data.pop('job_status'), job_start_date=validated_data.pop('job_start_date'), \
+         job_end_date=validated_data.pop('job_end_date'), job_total_price=validated_data.pop('job_total_price'))
+        
+        # create job reservation instance then add to job_reservation field
+        for reservation_data in validated_data.pop('job_reservation'):
+            reservation_data = dict(reservation_data)
+            try :
+                reservation_instance = JobReservation.objects.get(photoshoot_date=reservation_data['photoshoot_date'], \
+                job_reservation=reservation_data['job_reservation'])
+            except :
+                reservation_instance = JobReservation.objects.create(photoshoot_date=reservation_data['photoshoot_date'], \
+                job_reservation=reservation_data['job_reservation'])
+            job_info.reservation.add(reservation_instance)
+        job_info.save()
+        return job_info
 
+    def update(self, instance, validated_data):
+        # job_reservation
+        if 'job_reservation' in validated_data:
+            instance.job_reservation.clear()
+            for reservation_data in validated_data.pop('job_reservation'):
+                reservation_data = dict(reservation_data)
+                try :
+                    reservation_instance = JobReservation.objects.get(photoshoot_date=reservation_data['photoshoot_date'],
+                                                                job_reservation=reservation_data['job_reservation'])
+                except :
+                    reservation_instance = JobReservation.objects.create(**reservation_data)
+                instance.job_reservation.add(reservation_instance)
+
+        # job_status 
+        if 'job_status' in validated_data:
+            instance.job_status = validated_data.pop('job_status')
+
+        instance.save()
+        return instance
 
 class PhotoSerializer(UniqueFieldsMixin, serializers.ModelSerializer):
     class Meta:
@@ -259,6 +311,14 @@ class CustomerSerializer(serializers.ModelSerializer):
         profile.save()
         return customer
 
+    def update (self, instance, validated_data):
+        # update profile 
+        profile_data = dict(validated_data['profile'])
+        username = dict(profile_data['user'])['username']
+        profile_instance = CustomUserProfile.objects.get(user__username=username)
+        profile_instance = ProfileSerializer.update(ProfileSerializer, instance=profile_instance, validated_data=profile_data)
+        instance.save()
+        return instance
     # def create(self, validated_data):
     #     jobs_by_customer_data = validated_data.pop('jobs_by_customer')
     #     customer = Customer.objects.create(**validated_data)
@@ -285,3 +345,6 @@ class NotificationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Notification
         fields = '__all__'
+    
+    # noti = Notificaiton.objects.create(user = settings.AUTH_USER_MODEL, actor = validated_data['customer'],\
+    # verb = validated_data['job_status'])
