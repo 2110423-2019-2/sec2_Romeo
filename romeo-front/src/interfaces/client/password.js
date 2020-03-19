@@ -1,5 +1,6 @@
 import React from 'react';
 import history from "../../common/router/history";
+import { getCurrentClientInfo } from "common/auth";
 import { Button, Form, Input } from "antd";
 
 function hasErrors(fieldsError) {
@@ -12,9 +13,9 @@ class Edit extends React.Component {
         this.props.form.validateFields();
     }
 
-    handleSubmit = e => {
+    handleSubmit = async (e) => {
         e.preventDefault();
-        const currentClient = JSON.parse(localStorage.getItem("currentClient"));
+        const currentClient = await getCurrentClientInfo();
         const { password } = currentClient
 
         this.props.form.validateFields((err, values) => {
@@ -39,9 +40,6 @@ class Edit extends React.Component {
                 })
             }
             if (!err) {
-                console.log('Received values of form: ', values);
-                
-                // TODO: connect to backend
                 localStorage.setItem("currentClient", JSON.stringify({
                     ...currentClient,
                     password: values.newPassword

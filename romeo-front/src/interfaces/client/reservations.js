@@ -1,8 +1,8 @@
 import React from "react"
 import { Redirect } from "react-router-dom";
-import { getAllReservations } from "logic/Reservations";
 import { Table, Button } from "antd";
 import { formatDateTime } from "common/date";
+import { getCurrentClient } from "common/auth";
 
 const columns = [{
     title: 'Description',
@@ -35,15 +35,11 @@ const columns = [{
 class Reservations extends React.Component {
 
     state = {
-        reservations: []
-    }
-
-    componentDidMount() {
-        this.setState({ reservations: getAllReservations() });
+        reservations: [],
     }
     render() {
-        const currentClient = JSON.parse(localStorage.getItem("currentClient"));
-        if (currentClient.type !== 'CUSTOMER') {
+        const currentClient = getCurrentClient();
+        if (currentClient.type !== 2) {
             return <Redirect to="/"/>
         }
 

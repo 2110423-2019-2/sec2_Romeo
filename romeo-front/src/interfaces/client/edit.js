@@ -26,7 +26,7 @@ class Edit extends React.Component {
     handleSubmit = e => {
         e.preventDefault();
         const { currentClient } = this.state;
-        const { id, user_type } = currentClient.profile.user;
+        const { username, user_type } = currentClient.profile.user;
         this.props.form.validateFields((err, values) => {
             if (!err) {
                 const {
@@ -41,21 +41,28 @@ class Edit extends React.Component {
                 } = values;
 
                 const url = user_type === 1 ? "/api/photographers" : "/api/customers"
-                Axios.put(`${url}/${id}`, {
+                Axios.put(`${url}/${username}/`, {
                     profile: {
-                        firstName,
-                        lastName,
-                        email,
+                        user: {
+                            first_name: firstName,
+                            last_name: lastName,
+                            email,
+                        },
+                        ssn,
+                        bank_account_number: bankAccountNumber,
+                        bank_name: bankName,
+                        bank_account_name: bankAccountName,
+                        phone
                     },
-                    ssn,
-                    bankAccountNumber,
-                    bankName,
-                    bankAccountName,
-                    phone
+                }).then(res => {
+                    scroll.scrollToTop();
+                    this.setState({ success: true })
+                    this.setState({ error: false })
+                }).catch(res => {
+                    scroll.scrollToTop();
+                    this.setState({ error: true })
+                    this.setState({ success: false })
                 });
-                scroll.scrollToTop();
-                this.setState({ success: true })
-                this.setState({ error: false })
             } else {
                 scroll.scrollToTop();
                 this.setState({ error: true })
