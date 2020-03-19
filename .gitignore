@@ -8,11 +8,3 @@ public
 
 romeo-back/.vscode/settings.json
 .DS_Store
-
-romeo-back/jobs/migrations/
-
-romeo-back/customers/migrations/
-
-romeo-back/users/migrations/
-
-romeo-back/photographers/migrations/

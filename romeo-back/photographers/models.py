@@ -39,7 +39,7 @@ class AvailTime(models.Model):
     avail_time = models.CharField(max_length=16, choices=TIME_CHOICES)
     photographer_price = models.FloatField()
 
-    def __str__(self):
+    def __str__(self):     
         return self.avail_date + " " + self.avail_time
 
 
@@ -57,7 +57,6 @@ class Style(models.Model):
         return self.style_name
 
 
-# TODO Rename common fields
 class Photographer(models.Model):
     profile = models.OneToOneField(CustomUserProfile, on_delete=models.CASCADE, primary_key=True)
     # # Common fields
