@@ -16,3 +16,5 @@ romeo-back/customers/migrations/
 romeo-back/users/migrations/
 
 romeo-back/photographers/migrations/
+
+romeo-back/notification/migrations/
