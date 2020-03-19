@@ -57,7 +57,6 @@ class Style(models.Model):
         return self.style_name
 
 
-# TODO Rename common fields
 class Photographer(models.Model):
     profile = models.OneToOneField(CustomUserProfile, on_delete=models.CASCADE, primary_key=True)
     # # Common fields
