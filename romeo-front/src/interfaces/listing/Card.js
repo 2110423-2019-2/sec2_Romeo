@@ -24,7 +24,7 @@ const PhotographerCard = (props) => {
     return (
         <Card
             hoverable
-            style={{ flexBasis: '40%', margin: '2%' }}
+            className="photographer-card"
             cover={
                 props.user.photographer_photos.length > 0 ? 
                 <img src={getCover(props.user)} alt="cover"/> :

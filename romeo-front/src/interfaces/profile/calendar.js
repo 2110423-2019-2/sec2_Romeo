@@ -65,7 +65,11 @@ class JobCalendar extends React.Component {
     }
     render() {
         return (
-            <Calendar onPanelChange={this.onPanelChange} dateCellRender={this.dateCellRender}/>
+            <div className="calendar-wrapper">
+                <div className="calendar-container">
+                    <Calendar onPanelChange={this.onPanelChange} dateCellRender={this.dateCellRender}/>
+                </div>
+            </div>
         )
     }
 }

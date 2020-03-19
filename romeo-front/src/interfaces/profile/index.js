@@ -62,20 +62,6 @@ class Profile extends React.Component {
                             <Divider/>
                             <div className="mb-3">
                                 <div className="secondary-label mb-2">
-                                    Equipment
-                                </div>
-                                { currentPhotographer.photographer_equipment.length > 0 ? (
-                                    currentPhotographer.photographer_equipment.map((e,i) => (
-                                        <div className="snippet secondary" key={i + e.equipment_name}>
-                                            {e.equipment_name}
-                                        </div>
-                                    ))
-                                ) : (
-                                    <span className="t-color-light">There is no equipment.</span>
-                                )}
-                            </div>
-                            <div className="mb-4">
-                                <div className="secondary-label mb-2">
                                     Styles
                                 </div>
                                 { currentPhotographer.photographer_style.length > 0 ? (
@@ -88,7 +74,20 @@ class Profile extends React.Component {
                                     <span className="t-color-light">There are no styles.</span>
                                 )}
                             </div>
-                            
+                            <div className="mb-4">
+                                <div className="secondary-label mb-2">
+                                    Equipment
+                                </div>
+                                { currentPhotographer.photographer_equipment.length > 0 ? (
+                                    currentPhotographer.photographer_equipment.map((e,i) => (
+                                        <div className="snippet secondary" key={i + e.equipment_name}>
+                                            {e.equipment_name}
+                                        </div>
+                                    ))
+                                ) : (
+                                    <span className="t-color-light">There is no equipment.</span>
+                                )}
+                            </div>
                             { isAuth && currentClient.profile.user.username === username && (
                                 <React.Fragment>
                                     <Link to="/client/edit-profile">
