@@ -1,7 +1,7 @@
 from django.db import models
 from users.models import CustomUserProfile
 from photographers.models import Photographer
-from favPhotographers.models import FavPhotographer
+from favPhotographers.models import FavPhotographers
 # Create your models here.
 
 # class FavPhotographer(models.Model): 

@@ -6,7 +6,7 @@ from rest_framework.validators import UniqueValidator
 from drf_writable_nested.serializers import WritableNestedModelSerializer
 from drf_writable_nested.mixins import UniqueFieldsMixin, NestedUpdateMixin
 # Import App Models
-from favPhotographers.models import FavPhotographer
+from favPhotographers.models import FavPhotographers
 from photographers.models import Photographer, Photo, AvailTime, Equipment, Style
 from customers.models import Customer
 from jobs.models import JobInfo, JobReservation
@@ -115,9 +115,15 @@ class JobSerializer(serializers.ModelSerializer):
         if validated_data["job_end_date"] < validated_data["job_start_date"]:
             raise serializers.ValidationError('End date should not be before start date.')
 
-        job_info = JobInfo.objects.create(job_title=validated_data.pop('job_title'), job_description=validated_data.pop('job_description'), \
-         job_customer=validated_data.pop('job_customer'), job_photographer=validated_data.pop('job_photographer'), \
-         job_status=validated_data.pop('job_status'), job_start_date=validated_data.pop('job_start_date'), \
+        job_title=validated_data.pop('job_title')
+        job_description=validated_data.pop('job_description')
+        job_customer=validated_data.pop('job_customer')
+        job_photographer=validated_data.pop('job_photographer')
+        job_status='PENDING'
+
+        job_info = JobInfo.objects.create(job_title=job_title, job_description=job_description, \
+         job_customer=job_customer, job_photographer=job_photographer, \
+         job_status=job_status, job_start_date=validated_data.pop('job_start_date'), \
          job_end_date=validated_data.pop('job_end_date'), job_total_price=validated_data.pop('job_total_price'))
 
         # create job reservation instance then add to job_reservation field
@@ -131,6 +137,11 @@ class JobSerializer(serializers.ModelSerializer):
                 job_reservation=reservation_data['job_reservation'])
             job_info.reservation.add(reservation_instance)
         job_info.save()
+
+        # Create a notification
+        notification=NotificationSerializer.create(self,validated_data={'noti_field':'JOB', 'noti_receiver':job_photographer.profile, \
+        'noti_actor':job_customer.profile, 'noti_action':'CREATE', 'noti_status':job_status})
+
         return job_info
 
     def update(self, instance, validated_data):
@@ -149,6 +160,9 @@ class JobSerializer(serializers.ModelSerializer):
         # job_status
         if 'job_status' in validated_data:
             instance.job_status = validated_data.pop('job_status')
+            # Create a notification
+            notification=NotificationSerializer.create(self,validated_data={'noti_field':'JOB', 'noti_receiver':instance.job_customer.profile, \
+            'noti_actor':instance.job_photographer.profile, 'noti_action':'UPDATE', 'noti_status':instance.job_status})
 
         instance.save()
         return instance
@@ -373,9 +387,12 @@ class NotificationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Notification
         fields = '__all__'
-
-    # noti = Notificaiton.objects.create(user = settings.AUTH_USER_MODEL, actor = validated_data['customer'],\
-    # verb = validated_data['job_status'])
+        ordering = ('-timestamp')
+    
+    def create(self, validated_data):
+        notification = Notification.objects.create(**validated_data)
+        notification.save()
+        return notification
 
 # class EquipmentSerializer(UniqueFieldsMixin,NestedUpdateMixin,serializers.ModelSerializer):
 #     class Meta:
