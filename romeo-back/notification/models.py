@@ -1,47 +1,39 @@
 from django.db import models
-from django.conf import settings
-# from django.db.models.signals import post_save,post_delete
-# from django.dispatch import receiver
-# from jobs.models import JobInfo
+from django.utils import timezone
+from users.models import CustomUserProfile
 
-# from payments.models import Payment
+NOTI_FIELD_CHOICES = [('PAYMENT', 'Payment'),
+                      ('JOB', 'Job')]
 
-# to whom you want to send the notification
-NOTIFICATION_TARGET = [(0, 'admin'),
-                        (1, 'photographer'),
-                        (2, 'customer')]
+NOTI_ACTION_CHOICES = [('CREATE', 'Create'),
+                      ('UPDATE', 'Update')]
 
-class Notification(models.Model):
-    notification_id = models.AutoField(primary_key=True)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='notification')
-    actor = models.CharField(max_length=50)
-    verb = models.CharField(max_length=50)
-    action = models.CharField(max_length=50, blank=True, null=True)
-    # target = models.IntegerField(max_length=1, choices=NOTIFICATION_TARGET)
-    description = models.TextField(blank=True, null=True)
-    timestamp = models.DateTimeField(auto_now_add=True)
-    #flag
-    # owner = models.ForeignKey(User)
-    # datetime = models.DateTimeField(auto_now_add=True)
-    # resources = models.ManyToManyField(Resource, related_name='notifications', blank=True)
-    # recipients = models.ManyToManyField(User, related_name='notifications', blank=True)
+NOTI_STATUS_CHOICES = [('PENDING', 'Pending'),
+                      ('DECLINED', 'Declined'),
+                      ('MATCHED', 'Matched'),
+                      ('PAID', 'Paid'),
+                      ('CANCELLED', 'Cancelled'),
+                      ('PROCESSING', 'Processing Photos'),
+                      ('DONE', 'Done'),
+                      ('COMPLETED', 'Completed'),
+                      ('CLOSED', 'Closed')]
+
+class Notification(models.Model): 
+    noti_id = models.AutoField(primary_key=True)
+    noti_field = models.CharField(choices=NOTI_FIELD_CHOICES, max_length=10)
+    noti_receiver = models.ForeignKey(CustomUserProfile,blank=False,related_name='noti_recipient',on_delete=models.CASCADE)
+    noti_actor = models.ForeignKey(CustomUserProfile,blank=False,related_name='noti_actor',on_delete=models.CASCADE)
+    noti_action = models.CharField(max_length=100)
+    noti_status = models.CharField(choices=NOTI_STATUS_CHOICES, max_length=10)
+    noti_description = models.TextField(blank=True, null=True,max_length=250)
+    noti_timestamp = models.DateTimeField(default=timezone.now, db_index=True)
+
+    # NOTI_TYPE_CHOICES = [('success', 'info', 'warning', 'error')]
+    # noti_type = models.CharField(choices=NOTI_TYPE_CHOICES, default='Info', max_length=10)
+    # unread = models.BooleanField(default=True, blank=False, db_index=True)
+    # public = models.BooleanField(default=False, db_index=True)
+
 
     def __str__(self):
-        return f"{self.actor} {self.verb} {self.action} {self.target} at {self.timestamp}"
-
-#create/update job - move to job serializer
-# @receiver(post_save, sender=Photographer)
-# def save_job(sender, instance, created, **kwargs):
-#     if created:
-#         print('A new job was created.')
-#     elif not created:
-#         # User object updated
-#         print('The job was updated.')
-#         jobs_obj = instance
-#         pass
-
-
-# @receiver([post_save, post_delete], sender=User)
-# def create_payment(sender, instance, created, **kwargs):
-#     if created:
-#         JobInfo.objects.create(job=instance)
+        return self.noti_actor.user.username + ' -> ' + self.noti_recipient.user.username \
+        + ': ' + self.noti_action
