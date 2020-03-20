@@ -69,9 +69,7 @@ class ProfileSerializer(serializers.ModelSerializer):
         # update user instance before updating profile
         if 'user' in validated_data:
             user_data = dict(validated_data.pop('user'))
-            user_username = user_data['username']
-            user = CustomUser.objects.get(username = user_username)
-            user = UserSerializer.update(UserSerializer(required=False),instance=user,validated_data=user_data)
+            user = UserSerializer.update(UserSerializer(required=False),instance=instance.user,validated_data=user_data)
 
         # update profile instance
         instance.user = user
@@ -249,10 +247,7 @@ class PhotographerSerializer(WritableNestedModelSerializer):
             profile_data = dict(validated_data['profile'])
             if 'user' in profile_data:
                 profile_data_dict = dict(profile_data['user'])
-                if 'username' in profile_data_dict:
-                    username = profile_data_dict['username']
-                    profile_instance = CustomUserProfile.objects.get(user__username=username)
-                    profile_instance = ProfileSerializer.update(ProfileSerializer(required=False), instance=profile_instance, validated_data=profile_data)
+                profile_instance = ProfileSerializer.update(ProfileSerializer(required=False), instance=instance.profile, validated_data=profile_data)
 
         # update photographer_photos
         if 'photographer_photos' in validated_data:
