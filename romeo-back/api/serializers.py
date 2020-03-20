@@ -42,6 +42,9 @@ class UserSerializer(serializers.ModelSerializer):
             if not instance.check_password(raw_password):
                 instance.set_password(raw_password)
             
+||||||| merged common ancestors
+        if 'password' in validated_data :
+            instance.set_password(validated_data.pop('password'))
         instance.username = validated_data.get('username', instance.username)
         instance.first_name = validated_data.get('first_name', instance.first_name)
         instance.last_name = validated_data.get('last_name', instance.last_name)
