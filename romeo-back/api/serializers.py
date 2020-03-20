@@ -12,6 +12,7 @@ from customers.models import Customer
 from jobs.models import JobInfo, JobReservation
 from users.models import CustomUser, CustomUserProfile
 from notification.models import Notification
+from favPhotographers.models import FavPhotographers
 import datetime
 
 
@@ -67,11 +68,10 @@ class ProfileSerializer(serializers.ModelSerializer):
         return profile
 
     def update (self, instance, validated_data):
-        # update user instance before updating profile 
-        user_data = dict(validated_data.pop('user'))
-        user_username = user_data['username']
-        user = CustomUser.objects.get(username = user_username)
-        user = UserSerializer.update(UserSerializer(),instance=user,validated_data=user_data)
+        # update user instance before updating profile
+        if 'user' in validated_data:
+            user_data = dict(validated_data.pop('user'))
+            user = UserSerializer.update(UserSerializer(required=False),instance=instance.user,validated_data=user_data)
 
         # update profile instance
         instance.user = user
@@ -244,11 +244,12 @@ class PhotographerSerializer(WritableNestedModelSerializer):
         return photographer
 
     def update (self, instance, validated_data):
-        # update profile 
-        profile_data = dict(validated_data['profile'])
-        username = dict(profile_data['user'])['username']
-        profile_instance = CustomUserProfile.objects.get(user__username=username)
-        profile_instance = ProfileSerializer.update(ProfileSerializer, instance=profile_instance, validated_data=profile_data)
+        # update profile
+        if 'profile' in validated_data:
+            profile_data = dict(validated_data['profile'])
+            if 'user' in profile_data:
+                profile_data_dict = dict(profile_data['user'])
+                profile_instance = ProfileSerializer.update(ProfileSerializer(required=False), instance=instance.profile, validated_data=profile_data)
 
         # update photographer_photos
         if 'photographer_photos' in validated_data:
@@ -314,21 +315,12 @@ class CustomerSerializer(serializers.ModelSerializer):
         customer = Customer.objects.create(profile=profile)
         # customer.fav_photographers.set(validated_data.pop('fav_photographers'))
 
-         # create equipment instance then add to photographer_equipments field
-        # for equipment_data in validated_data.pop('photographer_equipment'):
-        #     equipment_data = dict(equipment_data)
-        #     try :
-        #         equipment_instance = Equipment.objects.get(equipment_name=equipment_data['equipment_name'])
-        #     except :
-        #         equipment_instance = Equipment.objects.create(equipment_name=equipment_data['equipment_name'])
-        #     photographer.photographer_equipment.add(equipment_instance)
-
         for favphotographers_data in validated_data.pop('fav_photographers'):
             favphotographers_data = dict(favphotographers_data)
             try :
-                favphotographers_instance = FavPhotographer.objects.get(fav_photographers_name=favphotographers_data['fav_photographers_name'])
+                favphotographers_instance = FavPhotographers.objects.get(fav_photographers_name=favphotographers_data['fav_photographers_name'])
             except :
-                favphotographers_instance = FavPhotographer.objects.create(fav_photographers_name=favphotographers_data['fav_photographers_name'])
+                favphotographers_instance = FavPhotographers.objects.create(fav_photographers_name=favphotographers_data['fav_photographers_name'])
             customer.fav_photographers.add(favphotographers_instance)
 
         customer.save()
@@ -338,31 +330,21 @@ class CustomerSerializer(serializers.ModelSerializer):
     def update (self, instance, validated_data):
         # update profile
         profile_data = dict(validated_data['profile'])
-        username = dict(profile_data['user'])['username']
-        profile_instance = CustomUserProfile.objects.get(user__username=username)
-        profile_instance = ProfileSerializer.update(ProfileSerializer, instance=profile_instance, validated_data=profile_data)
+        if 'user' in profile_data:
+            username = dict(profile_data['user'])['username']
+            profile_instance = CustomUserProfile.objects.get(user__username=username)
+            profile_instance = ProfileSerializer.update(ProfileSerializer, instance=profile_instance, validated_data=profile_data)
 
-         # photographer_equipment
-        # if 'photographer_equipment' in validated_data:
-        #     instance.photographer_equipment.clear()
-        #     for equipment_data in validated_data.pop('photographer_equipment'):
-        #         equipment_data = dict(equipment_data)
-        #         try :
-        #             equipment_instance = Equipment.objects.get(equipment_name=equipment_data['equipment_name'])
-        #         except :
-        #             equipment_instance = Equipment.objects.create(equipment_name=equipment_data['equipment_name'])
-        #         instance.photographer_equipment.add(equipment_instance)
-
-         # photographer_equipment
-        if 'fav_photographers' in validated_data:
-            instance.fav_photographers.clear()
-            for favphotographers_data in validated_data.pop('fav_photographers'):
-                favphotographers_data = dict(favphotographers_data)
+            if 'fav_photographers' in validated_data:
+                instance.fav_photographers.clear()
+                for favphotographers_data in validated_data.pop('fav_photographers'):
+                    favphotographers_data = dict(favphotographers_data)
                 try :
-                    favphotographers_instance = FavPhotographer.objects.get(fav_photographers_name=favphotographers_data['fav_photographers_name'])
+                    favphotographers_instance = FavPhotographers.objects.get(fav_photographers_name=favphotographers_data['fav_photographers_name'])
                 except :
-                    favphotographers_instance = FavPhotographer.objects.create(fav_photographers_name=favphotographers_data['fav_photographers_name'])
+                    favphotographers_instance = FavPhotographers.objects.create(fav_photographers_name=favphotographers_data['fav_photographers_name'])
                 instance.fav_photographers.add(favphotographers_instance)
+
         instance.save()
         return instance
     # def create(self, validated_data):
@@ -395,7 +377,22 @@ class NotificationSerializer(serializers.ModelSerializer):
     # noti = Notificaiton.objects.create(user = settings.AUTH_USER_MODEL, actor = validated_data['customer'],\
     # verb = validated_data['job_status'])
 
-class FavPhotographerSerializer(serializers.ModelSerializer):
+# class EquipmentSerializer(UniqueFieldsMixin,NestedUpdateMixin,serializers.ModelSerializer):
+#     class Meta:
+#         model = Equipment
+#         fields = '__all__'
+#         extra_kwargs = {
+#             'equipment_name': {
+#                 'validators': [UniqueValidator(queryset=Equipment.objects.all())]
+#             },
+#         }
+
+class FavPhotographersSerializer(UniqueFieldsMixin,NestedUpdateMixin,serializers.ModelSerializer):
     class Meta:
-        model = FavPhotographer
+        model = FavPhotographers
         fields = '__all__'
+        extra_kwargs = {
+            'fav_photographers_name': {
+                'validators': [UniqueValidator(queryset=FavPhotographers.objects.all())]
+            },
+        }

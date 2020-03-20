@@ -8,7 +8,7 @@ from rest_framework.response import Response
 
 # Import Serializers of apps
 from .serializers import PhotographerSerializer, CustomerSerializer, JobSerializer, JobReservationSerializer, UserSerializer, \
-    PhotoSerializer, AvailTimeSerializer, EquipmentSerializer, ProfileSerializer, StyleSerializer, NotificationSerializer
+    PhotoSerializer, AvailTimeSerializer, EquipmentSerializer, ProfileSerializer, StyleSerializer, NotificationSerializer,FavPhotographersSerializer
 
 # Import models of apps for queryset
 from photographers.models import Photographer, Photo, AvailTime, Equipment, Style
@@ -16,6 +16,7 @@ from customers.models import Customer
 from jobs.models import JobInfo, JobReservation
 from users.models import CustomUser, CustomUserProfile
 from notification.models import Notification
+from favPhotographers.models import FavPhotographers
 
 
 class PhotographerViewSet(viewsets.ModelViewSet):
@@ -111,13 +112,5 @@ class NotificationViewSet(viewsets.ModelViewSet):
     queryset = Notification.objects.all()
 
 class FavPhotographersViewSet(viewsets.ModelViewSet):
-    serializer_class = PhotographerSerializer
-    queryset = Photographer.objects.all()
-    permission_classes = [AllowAny]
-    lookup_field = 'profile__user__username'
-
-    def retrieve(self, request, pk=None):
-        queryset = User.objects.filter(username=pk)
-        contact = get_object_or_404(queryset, pk=1)
-        serializer = ContactSerializer(contact)
-        return Response(serializer.data)
+    serializer_class = FavPhotographersSerializer
+    queryset = FavPhotographers.objects.all()
