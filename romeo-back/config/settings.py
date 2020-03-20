@@ -58,6 +58,7 @@ INSTALLED_APPS = [
     'api.apps.ApiConfig',
     'users.apps.UsersConfig',
     'notification.apps.NotificationConfig',
+    'favPhotographers.apps.FavphotographersConfig'
 ]
 
 MIDDLEWARE = [
@@ -110,7 +111,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'romeo-database',
         'USER': 'root',
-        'PASSWORD': 'P@ssw0rd',
+        'PASSWORD': '1834',
         'HOST': 'localhost',
         'PORT': '3306',
     }

@@ -6,12 +6,15 @@ from rest_framework.validators import UniqueValidator
 from drf_writable_nested.serializers import WritableNestedModelSerializer
 from drf_writable_nested.mixins import UniqueFieldsMixin, NestedUpdateMixin
 # Import App Models
+from favPhotographers.models import FavPhotographer
 from photographers.models import Photographer, Photo, AvailTime, Equipment, Style
 from customers.models import Customer
-from jobs.models import JobInfo
+from jobs.models import JobInfo, JobReservation
 from users.models import CustomUser, CustomUserProfile
 from notification.models import Notification
+from favPhotographers.models import FavPhotographers
 import datetime
+
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -33,18 +36,20 @@ class UserSerializer(serializers.ModelSerializer):
                                               last_name=validated_data['last_name']
                                               )
         return user
-    
-    # def update(self, instance, validated_data):
-    #     username = self.data['username']
-    #     user = CustomUser.objects.get(username=username)
-    #     print(user)
-    #     user.username = validated_data.pop('username', user.username)
-    #     user.password = validated_data.pop('password', user.password)
-    #     user.email = validated_data.pop('email', user.email)
-    #     user.first_name = validated_data.pop('first_name', user.first_name)
-    #     user.last_name = validated_data.pop('last_name', user.last_name)
-    #     instance.save()
-    #     return instance
+
+    def update(self, instance, validated_data):
+        # special case to hash password
+        if 'password' in validated_data :
+            raw_password = validated_data.pop('password')
+            if not instance.check_password(raw_password):
+                instance.set_password(raw_password)
+            
+        instance.username = validated_data.get('username', instance.username)
+        instance.first_name = validated_data.get('first_name', instance.first_name)
+        instance.last_name = validated_data.get('last_name', instance.last_name)
+        instance.email = validated_data.get('email', instance.email)
+        instance.save()
+        return instance
 
 
 class ProfileSerializer(serializers.ModelSerializer):
@@ -60,15 +65,13 @@ class ProfileSerializer(serializers.ModelSerializer):
         user = UserSerializer.create(UserSerializer(), validated_data=user_data)
         validated_data['user'] = user
         profile = CustomUserProfile.objects.create(**validated_data)
-        
         return profile
 
     def update (self, instance, validated_data):
-        # update user instance before updating profile 
-        user_data = dict(validated_data.pop('user'))
-        user_username = user_data['username']
-        user = CustomUser.objects.get(username = user_username)
-        user = UserSerializer.update(UserSerializer(),instance=user,validated_data=user_data)
+        # update user instance before updating profile
+        if 'user' in validated_data:
+            user_data = dict(validated_data.pop('user'))
+            user = UserSerializer.update(UserSerializer(required=False),instance=instance.user,validated_data=user_data)
 
         # update profile instance
         instance.user = user
@@ -81,21 +84,77 @@ class ProfileSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
+
+class JobReservationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = JobReservation
+        fields = '__all__'
+
+    # Override default create method to auto create nested profile from photographer
+    def create(self, validated_data):
+        if validated_data['photoshoot_date'].get_weekday() not in validated_data['job_reservation.avail_date']:
+            raise serializers.ValidationError('The photographer is not available at the selected date.')
+        reservation = JobReservation.objects.create(**validated_data)
+        return reservation
+
+
 class JobSerializer(serializers.ModelSerializer):
+    # Reservation=True
+    reservation = JobReservationSerializer(many=True, required=False)
+
     class Meta:
         model = JobInfo
         fields = '__all__'
-    
+
     # Override default create method to auto create nested profile from photographer
     def create(self, validated_data):
-        #Check valid start&end date
+        # Check if start date is valid
+        if validated_data["job_start_date"] < datetime.date.today():
+            raise serializers.ValidationError('The selected date should not be before today.')
+        # Check valid start&end date
         if validated_data["job_end_date"] < validated_data["job_start_date"]:
-            raise serializers.ValidationError('End date should not be less than start date.')
-        jobInfo = JobInfo.objects.create(**validated_data)
-        return jobInfo
+            raise serializers.ValidationError('End date should not be before start date.')
+
+        job_info = JobInfo.objects.create(job_title=validated_data.pop('job_title'), job_description=validated_data.pop('job_description'), \
+         job_customer=validated_data.pop('job_customer'), job_photographer=validated_data.pop('job_photographer'), \
+         job_status=validated_data.pop('job_status'), job_start_date=validated_data.pop('job_start_date'), \
+         job_end_date=validated_data.pop('job_end_date'), job_total_price=validated_data.pop('job_total_price'))
+
+        # create job reservation instance then add to job_reservation field
+        for reservation_data in validated_data.pop('job_reservation'):
+            reservation_data = dict(reservation_data)
+            try :
+                reservation_instance = JobReservation.objects.get(photoshoot_date=reservation_data['photoshoot_date'], \
+                job_reservation=reservation_data['job_reservation'])
+            except :
+                reservation_instance = JobReservation.objects.create(photoshoot_date=reservation_data['photoshoot_date'], \
+                job_reservation=reservation_data['job_reservation'])
+            job_info.reservation.add(reservation_instance)
+        job_info.save()
+        return job_info
+
+    def update(self, instance, validated_data):
+        # job_reservation
+        if 'job_reservation' in validated_data:
+            instance.job_reservation.clear()
+            for reservation_data in validated_data.pop('job_reservation'):
+                reservation_data = dict(reservation_data)
+                try :
+                    reservation_instance = JobReservation.objects.get(photoshoot_date=reservation_data['photoshoot_date'],
+                                                                job_reservation=reservation_data['job_reservation'])
+                except :
+                    reservation_instance = JobReservation.objects.create(**reservation_data)
+                instance.job_reservation.add(reservation_instance)
+
+        # job_status
+        if 'job_status' in validated_data:
+            instance.job_status = validated_data.pop('job_status')
+
+        instance.save()
+        return instance
 
 
-class PhotoSerializer(serializers.ModelSerializer):
+class PhotoSerializer(UniqueFieldsMixin, serializers.ModelSerializer):
     class Meta:
         model = Photo
         fields = '__all__'
@@ -110,7 +169,7 @@ class AvailTimeSerializer(serializers.ModelSerializer):
     class Meta:
         model = AvailTime
         fields = '__all__'
- 
+
 
 class StyleSerializer(serializers.ModelSerializer):
     class Meta:
@@ -118,7 +177,7 @@ class StyleSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class EquipmentSerializer(UniqueFieldsMixin,serializers.ModelSerializer):
+class EquipmentSerializer(UniqueFieldsMixin,NestedUpdateMixin,serializers.ModelSerializer):
     class Meta:
         model = Equipment
         fields = '__all__'
@@ -134,6 +193,7 @@ class PhotographerSerializer(WritableNestedModelSerializer):
     photographer_photos = PhotoSerializer(many=True, required=False, allow_null=True)
     photographer_equipment = EquipmentSerializer(many=True, required=False, allow_null=True)
     photographer_styles = StyleSerializer(many=True, required=False)
+    photographer_avail_time = AvailTimeSerializer(many=True, required=False)
 
     class Meta:
         model = Photographer
@@ -142,12 +202,9 @@ class PhotographerSerializer(WritableNestedModelSerializer):
     # Override default create method to auto create nested profile from photographer
     def create(self, validated_data):
         profile_data = validated_data.pop('profile')
-        photographer_last_online_time_data = validated_data.pop('photographer_last_online_time')
-        photographer_avail_time_data = validated_data.pop('photographer_avail_time')
-
         profile = ProfileSerializer.create(ProfileSerializer(), validated_data=profile_data)
-        photographer = Photographer.objects.create(profile=profile
-                                                #    photographer_last_online_time=profile_data.get('photographer_last_online_time', ""),
+        photographer = Photographer.objects.create(profile=profile,
+                                                   photographer_last_online_time=validated_data.pop('photographer_last_online_time'),
                                                    )
 
         # create photo instance then add to photographer_photos field
@@ -156,7 +213,7 @@ class PhotographerSerializer(WritableNestedModelSerializer):
             photo_data = dict(photo_data)
             photo_instance = Photo.objects.create(photo_link=photo_data['photo_link'])
             photographer.photographer_photos.add(photo_instance)
-            
+
         # create equipment instance then add to photographer_equipments field
         for equipment_data in validated_data.pop('photographer_equipment'):
             equipment_data = dict(equipment_data)
@@ -165,61 +222,83 @@ class PhotographerSerializer(WritableNestedModelSerializer):
             except :
                 equipment_instance = Equipment.objects.create(equipment_name=equipment_data['equipment_name'])
             photographer.photographer_equipment.add(equipment_instance)
-        
+
         # add selected style to photographer_style
         for style_data in validated_data.pop('photographer_style'):
-            print(style_data)
             style_instance = Style.objects.get(style_name=style_data)
             photographer.photographer_style.add(style_instance)
+
+        # add avail time
+        for avail_time_data in validated_data.pop('photographer_avail_time'):
+            avail_time_data = dict(avail_time_data)
+            try :
+                avail_time_instance = AvailTime.objects.get(avail_date=avail_time_data['avail_date'],
+                                                            avail_time=avail_time_data['avail_time'],
+                                                            photographer_price=avail_time_data['photographer_price'])
+            except :
+                avail_time_instance = AvailTime.objects.create(**avail_time_data)
+            photographer.photographer_avail_time.add(avail_time_instance)
 
         profile.save()
         photographer.save()
         return photographer
-        # return validated_data
-    
-    # def update(self, instance, validated_data):
-    #     print(validated_data)
-    #     return instance
 
-    # def update(self, instance, validated_data):
-    #     # update user information except username and password
-    #     profile_data = validated_data.pop('profile')
-    #     profile = instance.profile
-    #     profile.ssn = profile_data.get('ssn', profile.ssn)
-    #     profile.back_account_number = profile_data.get('bank_account_number', profile.back_account_number)
-    #     profile.bank_name = profile_data.get('bank_name', profile.bank_name)
-    #     profile.phone = profile_data.get('phone', profile.phone)
-    #     profile.save()
-    #
-    #     # update photographer's photos
-    #     photos_data = validated_data.pop('photographer_photo')
-    #     photos = (instance.photos).all()
-    #     photos = list(photos)
-    #     for photo_data in photos_data:
-    #         photo = photos.pop(0)
-    #         photo.photo_link = photo_data.get('photo_link', photo.photo_link)
-    #         photo.save()
-    #
-    #     # update photographer's equipments
-    #     equipments_data = validated_data.pop('photographer_equipments')
-    #     equipments = (instance.equipments).all()
-    #     equipments = list(equipments)
-    #     for equipment_data in equipments_data:
-    #         equipment = equipments.pop(0)
-    #         equipment.equipment_name = equipment_data.get('equipment_name', equipment.equipment_name)
-    #         equipment.save()
-    #
-    #     # update photographer's style
-    #     styles_data = validated_data.pop('photographer_styles')
-    #     styles = (instance.styles).all()
-    #     styles = list(styles)
-    #     for style_data in styles_data:
-    #         style = styles.pop(0)
-    #         style.style_name = style_data.get('style_name', style.style_name)
-    #         style.save()
-    #
-    #     return instance
+    def update (self, instance, validated_data):
+        # update profile
+        if 'profile' in validated_data:
+            profile_data = dict(validated_data['profile'])
+            if 'user' in profile_data:
+                profile_data_dict = dict(profile_data['user'])
+                profile_instance = ProfileSerializer.update(ProfileSerializer(required=False), instance=instance.profile, validated_data=profile_data)
 
+        # update photographer_photos
+        if 'photographer_photos' in validated_data:
+            instance.photographer_photos.clear()
+            for photo_data in validated_data.pop('photographer_photos'):
+                photo_data = dict(photo_data)
+                try:
+                    photo_instance = Photo.objects.get(photo_link=photo_data['photo_link'])
+                except:
+                    photo_instance = Photo.objects.create(photo_link=photo_data['photo_link'])
+                instance.photographer_photos.add(photo_instance)
+
+        # photographer_equipment
+        if 'photographer_equipment' in validated_data:
+            instance.photographer_equipment.clear()
+            for equipment_data in validated_data.pop('photographer_equipment'):
+                equipment_data = dict(equipment_data)
+                try :
+                    equipment_instance = Equipment.objects.get(equipment_name=equipment_data['equipment_name'])
+                except :
+                    equipment_instance = Equipment.objects.create(equipment_name=equipment_data['equipment_name'])
+                instance.photographer_equipment.add(equipment_instance)
+
+        # photographer_avail_time
+        if 'photographer_avail_time' in validated_data:
+            instance.photographer_avail_time.clear()
+            for avail_time_data in validated_data.pop('photographer_avail_time'):
+                avail_time_data = dict(avail_time_data)
+                try :
+                    avail_time_instance = AvailTime.objects.get(avail_date=avail_time_data['avail_date'],
+                                                                avail_time=avail_time_data['avail_time'],
+                                                                photographer_price=avail_time_data['photographer_price'])
+                except :
+                    avail_time_instance = AvailTime.objects.create(**avail_time_data)
+                instance.photographer_avail_time.add(avail_time_instance)
+
+        # photographer_last_online_time
+        if 'photographer_last_online_time' in validated_data:
+            instance.photographer_last_online_time = validated_data.pop('photographer_last_online_time')
+
+        # photographer_style
+        if 'photographer_style' in validated_data:
+            instance.photographer_style.clear()
+            for style_data in validated_data.pop('photographer_style'):
+                style_instance = Style.objects.get(style_name=style_data)
+                instance.photographer_style.add(style_instance)
+
+        instance.save()
+        return instance
 
 class CustomerSerializer(serializers.ModelSerializer):
     profile = ProfileSerializer(required=True, partial=True)
@@ -234,12 +313,40 @@ class CustomerSerializer(serializers.ModelSerializer):
         profile_data = validated_data.pop('profile')
         profile = ProfileSerializer.create(ProfileSerializer(), validated_data=profile_data)
         customer = Customer.objects.create(profile=profile)
-        customer.fav_photographers.set(validated_data.pop('fav_photographers'))
+        # customer.fav_photographers.set(validated_data.pop('fav_photographers'))
+
+        for favphotographers_data in validated_data.pop('fav_photographers'):
+            favphotographers_data = dict(favphotographers_data)
+            try :
+                favphotographers_instance = FavPhotographers.objects.get(fav_photographers_name=favphotographers_data['fav_photographers_name'])
+            except :
+                favphotographers_instance = FavPhotographers.objects.create(fav_photographers_name=favphotographers_data['fav_photographers_name'])
+            customer.fav_photographers.add(favphotographers_instance)
 
         customer.save()
         profile.save()
         return customer
 
+    def update (self, instance, validated_data):
+        # update profile
+        profile_data = dict(validated_data['profile'])
+        if 'user' in profile_data:
+            username = dict(profile_data['user'])['username']
+            profile_instance = CustomUserProfile.objects.get(user__username=username)
+            profile_instance = ProfileSerializer.update(ProfileSerializer, instance=profile_instance, validated_data=profile_data)
+
+            if 'fav_photographers' in validated_data:
+                instance.fav_photographers.clear()
+                for favphotographers_data in validated_data.pop('fav_photographers'):
+                    favphotographers_data = dict(favphotographers_data)
+                try :
+                    favphotographers_instance = FavPhotographers.objects.get(fav_photographers_name=favphotographers_data['fav_photographers_name'])
+                except :
+                    favphotographers_instance = FavPhotographers.objects.create(fav_photographers_name=favphotographers_data['fav_photographers_name'])
+                instance.fav_photographers.add(favphotographers_instance)
+
+        instance.save()
+        return instance
     # def create(self, validated_data):
     #     jobs_by_customer_data = validated_data.pop('jobs_by_customer')
     #     customer = Customer.objects.create(**validated_data)
@@ -266,3 +373,26 @@ class NotificationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Notification
         fields = '__all__'
+
+    # noti = Notificaiton.objects.create(user = settings.AUTH_USER_MODEL, actor = validated_data['customer'],\
+    # verb = validated_data['job_status'])
+
+# class EquipmentSerializer(UniqueFieldsMixin,NestedUpdateMixin,serializers.ModelSerializer):
+#     class Meta:
+#         model = Equipment
+#         fields = '__all__'
+#         extra_kwargs = {
+#             'equipment_name': {
+#                 'validators': [UniqueValidator(queryset=Equipment.objects.all())]
+#             },
+#         }
+
+class FavPhotographersSerializer(UniqueFieldsMixin,NestedUpdateMixin,serializers.ModelSerializer):
+    class Meta:
+        model = FavPhotographers
+        fields = '__all__'
+        extra_kwargs = {
+            'fav_photographers_name': {
+                'validators': [UniqueValidator(queryset=FavPhotographers.objects.all())]
+            },
+        }

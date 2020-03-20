@@ -2,6 +2,7 @@ import React from "react";
 import { Radio, Form, Tag } from "antd";
 import { connect } from "react-redux";
 import { setCurrentAvailTimes } from "./actions";
+import { defaultDays, dayIndex } from "logic/Calendar";
 
 const options = [
     { label: 'Half-Day (Morning-Noon)', value: 'HALF_DAY_MORNING' },
@@ -56,46 +57,76 @@ class AvailTimes extends React.Component {
         setCurrentAvailTimes([
             ...currentAvailTimes.slice(0,day.index),
             {
-                day: day.value,
-                time: e.target.value
+                ...currentAvailTimes[day.index],
+                avail_date: day.value,
+                avail_time: e.target.value
             },
             ...currentAvailTimes.slice(day.index+1,7)
         ]);
     }
+
+    onPriceUpdate = (e, day) => {
+        const { currentAvailTimes, setCurrentAvailTimes } = this.props;
+        setCurrentAvailTimes([
+            ...currentAvailTimes.slice(0,day.index),
+            {
+                ...currentAvailTimes[day.index],
+                photographer_price: e.target.value,
+            },
+            ...currentAvailTimes.slice(day.index+1,7)
+        ]);
+    }
+
+    componentDidMount() {
+        const { currentClient } = this.props;
+        let availTimes = currentClient.photographer_avail_time;
+        if (!availTimes) availTimes = [];
+        // Fill In Empty Times
+        let out = defaultDays;
+        availTimes.forEach((e,i) => {
+            out.splice(dayIndex[e.avail_date],1)
+            out.splice(dayIndex[e.avail_date],0,e)
+        })
+        const { setCurrentAvailTimes } = this.props;
+        setCurrentAvailTimes(out);
+    }
+
     render() {
         const { currentAvailTimes } = this.props;
-        const { getFieldDecorator, getFieldsError, getFieldError, isFieldTouched } = this.props.form;
-        const priceError = isFieldTouched('price') && getFieldError('price');
-        
+
         return (
             <React.Fragment>
                 <h3>Available Times</h3>
                 <Form>
                     { days.map((e,i) => (
-                        <div className="snippet secondary">
+                        <div className="snippet secondary" key={i+e.value}>
                             <Tag color={e.color}>{e.label}</Tag>
                             <Radio.Group 
                                 options={options} 
-                                value={currentAvailTimes[e.index].time} 
+                                value={currentAvailTimes[e.index].avail_time} 
                                 onChange={(ev) => this.onChange(ev, e)} 
                             />
-                            <label>Price</label>
-                            <Form.Item 
-                                validateStatus={priceError ? 'error' : ''} 
-                                help={priceError || ''}
-                            >
-                                {getFieldDecorator('price', {
-                                    rules: [
-                                        { required: true,message: 'This field is required.' },
-                                    ],
-                                    initialValue: currentClient.price
-                                })(
-                                    <Form.Input
-                                        placeholder="Full-day Price"
-                                        type="price"
-                                    />,
-                                )}
-                            </Form.Item>
+                            <div>
+                                <b>Price</b>
+                                <div className="ant-row ant-form-item mb-0">
+                                    <div className="ant-col ant-form-item-control-wrapper">
+                                        <div className="ant-form-item-control has-success">
+                                            <span className="ant-form-item-children">
+                                                <input 
+                                                    placeholder="Price" 
+                                                    type="number" 
+                                                    className="ant-input"
+                                                    onChange={(ev) => this.onPriceUpdate(ev, e)} 
+                                                    value={currentAvailTimes[e.index].photographer_price !== undefined ? 
+                                                        currentAvailTimes[e.index].photographer_price
+                                                    : "0" }
+                                                    disabled={currentAvailTimes[e.index].avail_time === "NOT_AVAILABLE"}
+                                                />
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     ))}
                 </Form>

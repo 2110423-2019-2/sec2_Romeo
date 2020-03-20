@@ -74,13 +74,24 @@ main.main-content {
     width: 256px; 
     height: 100%;
     position: fixed;
+    overflow-y: scroll;
+    max-height: calc(100vh - 64px);
+    padding-bottom: 64px !important;
     @media screen and (max-width: 599px) {
         & {
             position: relative;
             width: 100%;
             height: auto;
             text-align: center;
+            padding-bottom: 16px !important;
         }
+    }
+}
+.calendar-wrapper {
+    max-width: 100%;
+    overflow-x: scroll;
+    .calendar-container {
+        min-width: 600px;
     }
 }
 

@@ -2,7 +2,7 @@ import React from "react";
 import { Checkbox, Form } from "antd";
 import { connect } from "react-redux";
 import { setCurrentStyles } from "./actions";
-import { availableStyles } from "./availableStyles";
+import { availableStyles } from "../../../logic/availableStyles";
 
 class Style extends React.Component {
    
@@ -10,9 +10,14 @@ class Style extends React.Component {
         this.props.setCurrentStyles(checkedValues);
     }
     
+    componentDidMount() {
+        const { currentClient } = this.props;
+        const styles = currentClient.photographer_style;
+        this.props.setCurrentStyles(styles);
+    }
+
     render() {
         const { currentStyles } = this.props;
-        console.log(currentStyles);
 
         return (
             <React.Fragment>

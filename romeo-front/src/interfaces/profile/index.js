@@ -1,76 +1,71 @@
 import React from "react";
 import { Link, Redirect } from "react-router-dom";
-import { Button, Tag } from "antd";
-import { getPortfolio } from "logic/Portfolio";
+import { Button, Tag, Icon, Divider } from "antd";
 import { connect } from "react-redux"
+import { getCurrentClientInfo } from "common/auth";
 import { formatDate } from "common/date";
 import moment from "moment";
 import JobCalendar from "./calendar";
 import { styleColors } from "../../common/style-colors";
-import { getCurrentClientInfo } from "../../common/auth";
+import Axios from "axios"
 
 class Profile extends React.Component {
     state = {
         display: 0,
-        currentClient: null,
-        currentPortfolio: null
+        currentPhotographer: null,
+        currentPortfolio: null,
+        currentClient: null
     }
 
     componentDidMount = async () => {
         const currentClient = await getCurrentClientInfo();
-        const currentPortfolio = getPortfolio(currentClient);
-        console.log(currentClient);
+        const { username } = this.props.match.params;
+        const res =  await Axios.get("/api/photographers/" + username)
+        const photographer = res.data;
         this.setState({
-            currentClient,
-            currentPortfolio
+            photographer
+        });
+        const currentPortfolio = photographer.photographer_photos;
+        this.setState({
+            currentPhotographer: photographer,
+            currentPortfolio,
+            currentClient
         });
     }
 
     render() {
-        const { currentClient, currentPortfolio, display } = this.state;
+        const { currentPhotographer, currentPortfolio, display, currentClient } = this.state;
         const { username } = this.props.match.params;
-        if (currentClient && (currentClient.profile.username === username && currentClient.profile.user_type !== 1)) {
+        if (currentPhotographer && (currentPhotographer.profile.username === username && currentPhotographer.profile.user_type !== 1)) {
             return <Redirect to="/"/>
         }
         
         const { isAuth } = this.props;
 
-        if (currentClient) {
-            console.log(currentClient.profile.user.first_name);
-        }
-
         return (
             <div className="d-flex-md align-stretch bg-white">
-                { currentClient && (
+                { currentPhotographer && (
                     <React.Fragment>
                         <div
                             className="sidebar-profile pa-3"
                         >
                             <h1 className="mb-1">
-                                {currentClient.profile.user.first_name} {currentClient.profile.user.last_name}
+                                {currentPhotographer.profile.user.first_name} {currentPhotographer.profile.user.last_name}
                             </h1>
                             <h3 className="mb-2">{username}</h3>
-                            <span className="t-color-light d-block mb-4">Last Online Time: {formatDate(moment(new Date()))}</span>
+                            <span className="t-color-light d-block">Last Online Time: {formatDate(moment(new Date()))}</span>
+                            { (!isAuth || (currentClient && currentClient.profile.user.user_type !== 1)) && (
+                                <Button type="danger" size="large" shape="round" ghost className="mt-2">
+                                    Favorite <Icon type="heart" theme='outlined' />
+                                </Button>
+                            )} 
+                            <Divider/>
                             <div className="mb-3">
-                                <div className="secondary-label mb-2">
-                                    Equipment
-                                </div>
-                                { currentClient.photographer_equipment.length > 0 ? (
-                                    currentClient.photographer_equipment.map((e,i) => (
-                                        <div className="snippet secondary" key={i + e.equipment_name}>
-                                            {e.equipment_name}
-                                        </div>
-                                    ))
-                                ) : (
-                                    <span className="t-color-light">There is no equipment.</span>
-                                )}
-                            </div>
-                            <div className="mb-4">
                                 <div className="secondary-label mb-2">
                                     Styles
                                 </div>
-                                { currentClient.photographer_style.length > 0 ? (
-                                    currentClient.photographer_style.map((e,i) => (
+                                { currentPhotographer.photographer_style.length > 0 ? (
+                                    currentPhotographer.photographer_style.map((e,i) => (
                                         <Tag color={styleColors[e]} key={i + e} className="mb-2">
                                             {e}
                                         </Tag>
@@ -79,7 +74,20 @@ class Profile extends React.Component {
                                     <span className="t-color-light">There are no styles.</span>
                                 )}
                             </div>
-                            
+                            <div className="mb-4">
+                                <div className="secondary-label mb-2">
+                                    Equipment
+                                </div>
+                                { currentPhotographer.photographer_equipment.length > 0 ? (
+                                    currentPhotographer.photographer_equipment.map((e,i) => (
+                                        <div className="snippet secondary" key={i + e.equipment_name}>
+                                            {e.equipment_name}
+                                        </div>
+                                    ))
+                                ) : (
+                                    <span className="t-color-light">There is no equipment.</span>
+                                )}
+                            </div>
                             { isAuth && currentClient.profile.user.username === username && (
                                 <React.Fragment>
                                     <Link to="/client/edit-profile">
@@ -121,7 +129,7 @@ class Profile extends React.Component {
                             </div>
                         ) : (
                             <div className="pa-4">
-                                <JobCalendar/>
+                                <JobCalendar currentPhotographer={currentPhotographer}/>
                             </div>
                         ) }
                         </div>

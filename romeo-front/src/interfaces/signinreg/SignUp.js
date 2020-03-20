@@ -19,10 +19,10 @@ class SignUp extends React.Component {
         this.props.form.validateFields();
     }
 
-    signInUser = () => {
+    signInUser = (username, password) => {
         this.props.signIn({
-            username: this.props.form.getFieldsValue().username,
-            password: this.props.form.getFieldsValue().password,
+            username,
+            password
         }, history);
     }
 
@@ -79,7 +79,7 @@ class SignUp extends React.Component {
                         profile,
                         ...photographerInfo
                     }).then(res => {
-                        this.signInUser();
+                        this.signInUser(username, password);
                     })
                     .catch(err => console.log(err))
                 } else {
@@ -87,7 +87,7 @@ class SignUp extends React.Component {
                         profile
                     })
                     .then(res => {
-                        this.signInUser();
+                        this.signInUser(username, password);
                     })
                     .catch(err => console.log(err))
                 }
@@ -235,7 +235,7 @@ class SignUp extends React.Component {
                                         <Input
                                             placeholder="Social Security Number"
                                             type="text"
-                                            maxLength="13"
+                                            maxLength={13}
                                         />,
                                     )}
                                 </Form.Item>

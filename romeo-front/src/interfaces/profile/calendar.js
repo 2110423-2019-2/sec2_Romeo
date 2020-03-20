@@ -1,7 +1,7 @@
 import React from "react";
 import { Calendar, Tag } from 'antd';
 import moment from "moment";
-import { getCurrentClientInfo } from "common/auth";
+import { defaultDays, dayIndex } from "logic/Calendar";
 
 const timeLabels = {
     HALF_DAY_MORNING: 'Half-Day (Morning-Noon)',
@@ -11,45 +11,6 @@ const timeLabels = {
     FULL_DAY_NIGHT: 'Full-Day and Night',
 }
 
-function getListData(value) {
-    const currentClient = getCurrentClientInfo();
-    const { availTimes } = currentClient;
-
-    switch (value.day()) {
-        case 0: return {
-            content: timeLabels[availTimes[6].time]
-        };
-        case 1: return {
-            content: timeLabels[availTimes[0].time]
-        };
-        case 2: return {
-            content: timeLabels[availTimes[1].time]
-        };
-        case 3: return {
-            content: timeLabels[availTimes[2].time]
-        };
-        case 4: return {
-            content: timeLabels[availTimes[3].time]
-        };
-        case 5: return {
-            content: timeLabels[availTimes[4].time]
-        };
-        case 6: return {
-            content: timeLabels[availTimes[5].time]
-        }
-    }
-}
-
-function dateCellRender(value) {
-    const listData = getListData(value);
-    console.log(listData);
-    return (
-      <div>
-        { listData.content && <Tag color="green" style={{ whiteSpace: 'normal' }}>{listData.content}</Tag>}
-      </div>
-    );
-}
-
 class JobCalendar extends React.Component {
     state = {
         today: moment(new Date())
@@ -57,10 +18,58 @@ class JobCalendar extends React.Component {
     onPanelChange = (value, mode) => {
         console.log(value, mode);
     }
-    render() {
-        const { today } = this.state;
+    dateCellRender = (value) => {
+        const listData = this.getListData(value);
         return (
-            <Calendar onPanelChange={this.onPanelChange} dateCellRender={dateCellRender}/>
+          <div>
+            { listData.content && <Tag color="green" style={{ whiteSpace: 'normal' }}>{listData.content}</Tag>}
+          </div>
+        );
+    }
+    getListData = (value) => {
+        const { currentPhotographer } = this.props;
+        const { photographer_avail_time } = currentPhotographer;
+        // Fill In 
+        let out = defaultDays;
+        photographer_avail_time.forEach((e,i) => {
+            out.splice(dayIndex[e.avail_date],1)
+            out.splice(dayIndex[e.avail_date],0,e)
+        })
+        
+        switch (value.day()) {
+            case 0: return {
+                content: timeLabels[out[6].avail_time]
+            };
+            case 1: return {
+                content: timeLabels[out[0].avail_time]
+            };
+            case 2: return {
+                content: timeLabels[out[1].avail_time]
+            };
+            case 3: return {
+                content: timeLabels[out[2].avail_time]
+            };
+            case 4: return {
+                content: timeLabels[out[3].avail_time]
+            };
+            case 5: return {
+                content: timeLabels[out[4].avail_time]
+            };
+            case 6: return {
+                content: timeLabels[out[5].avail_time]
+            };
+            default: return {
+                content: ""
+            }
+        }
+    }
+    render() {
+        return (
+            <div className="calendar-wrapper">
+                <div className="calendar-container">
+                    <Calendar onPanelChange={this.onPanelChange} dateCellRender={this.dateCellRender}/>
+                </div>
+            </div>
         )
     }
 }

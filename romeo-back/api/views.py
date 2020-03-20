@@ -3,17 +3,20 @@ from rest_framework import status, viewsets, filters
 from rest_framework.response import Response
 from .permissions import IsUser
 from rest_framework.permissions import AllowAny, SAFE_METHODS
+from django.shortcuts import get_object_or_404
+from rest_framework.response import Response 
 
 # Import Serializers of apps
-from .serializers import PhotographerSerializer, CustomerSerializer, JobSerializer, UserSerializer, \
-    PhotoSerializer, AvailTimeSerializer, EquipmentSerializer, ProfileSerializer, StyleSerializer, NotificationSerializer
+from .serializers import PhotographerSerializer, CustomerSerializer, JobSerializer, JobReservationSerializer, UserSerializer, \
+    PhotoSerializer, AvailTimeSerializer, EquipmentSerializer, ProfileSerializer, StyleSerializer, NotificationSerializer,FavPhotographersSerializer
 
 # Import models of apps for queryset
 from photographers.models import Photographer, Photo, AvailTime, Equipment, Style
 from customers.models import Customer
-from jobs.models import JobInfo
+from jobs.models import JobInfo, JobReservation
 from users.models import CustomUser, CustomUserProfile
 from notification.models import Notification
+from favPhotographers.models import FavPhotographers
 
 
 class PhotographerViewSet(viewsets.ModelViewSet):
@@ -22,7 +25,7 @@ class PhotographerViewSet(viewsets.ModelViewSet):
     permission_classes = [AllowAny]
     lookup_field = 'profile__user__username'
     filter_backends = [filters.SearchFilter]
-    search_fields = ['profile__user__username']
+    search_fields = ['profile__user__username',"profile__user__first_name","profile__user__last_name"]
 
     # # custom action routing for photographers to update photos
     # @action(detail=True, methods=['get', 'post', 'delete'], url_path='update_photos')
@@ -49,8 +52,11 @@ class AvailTimeViewSet(viewsets.ModelViewSet):
 
 
 class StyleViewSet(viewsets.ModelViewSet):
-    serializer_class = StyleSerializer
-    queryset = Style.objects.all()
+    serializer_class = PhotographerSerializer
+    queryset = Photographer.objects.all()
+    permission_classes = [AllowAny]
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['photographer_style__style_name']
 
 
 class EquipmentViewSet(viewsets.ModelViewSet):
@@ -62,6 +68,9 @@ class CustomerViewSet(viewsets.ModelViewSet):
     queryset = Customer.objects.filter()
     serializer_class = CustomerSerializer
     permission_classes = [AllowAny]
+    lookup_field = 'profile__user__username'
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['profile__user__username']
 
 
 class JobsViewSet(viewsets.ModelViewSet):
@@ -76,6 +85,10 @@ class JobsViewSet(viewsets.ModelViewSet):
     #         self.permission_classes = [IsUser]
     #     return super(self.__class__, self).get_permissions()
 
+class JobReservationViewSet(viewsets.ModelViewSet):
+    queryset = JobReservation.objects.all()
+    serializer_class = JobReservationSerializer
+    # permission_classes = [AllowAny]
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = CustomUser.objects.all()
@@ -97,3 +110,7 @@ class ProfileViewSet(viewsets.ModelViewSet):
 class NotificationViewSet(viewsets.ModelViewSet):
     serializer_class = NotificationSerializer
     queryset = Notification.objects.all()
+
+class FavPhotographersViewSet(viewsets.ModelViewSet):
+    serializer_class = FavPhotographersSerializer
+    queryset = FavPhotographers.objects.all()
