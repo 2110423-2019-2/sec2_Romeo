@@ -47,8 +47,11 @@ class PhotoViewSet(viewsets.ModelViewSet):
 
 
 class AvailTimeViewSet(viewsets.ModelViewSet):
-    serializer_class = AvailTimeSerializer
-    queryset = AvailTime.objects.all()
+    serializer_class = PhotographerSerializer
+    queryset = Photographer.objects.all()
+    permission_classes = [AllowAny]
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['photographer_avail_time__avail_date','photographer_avail_time__avail_time']
 
 
 class StyleViewSet(viewsets.ModelViewSet):
