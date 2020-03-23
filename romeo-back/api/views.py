@@ -9,7 +9,7 @@ from django.db.models import Q
 
 # Import Serializers of apps
 from .serializers import PhotographerSerializer, CustomerSerializer, JobSerializer, JobReservationSerializer, UserSerializer, \
-    PhotoSerializer, AvailTimeSerializer, EquipmentSerializer, ProfileSerializer, StyleSerializer, NotificationSerializer,FavPhotographersSerializer
+    PhotoSerializer, AvailTimeSerializer, EquipmentSerializer, ProfileSerializer, StyleSerializer, NotificationSerializer
 
 # Import models of apps for queryset
 from photographers.models import Photographer, Photo, AvailTime, Equipment, Style
@@ -17,7 +17,6 @@ from customers.models import Customer
 from jobs.models import JobInfo, JobReservation
 from users.models import CustomUser, CustomUserProfile
 from notification.models import Notification
-from favPhotographers.models import FavPhotographers
 
 
 class PhotographerViewSet(viewsets.ModelViewSet):
@@ -122,7 +121,3 @@ class ProfileViewSet(viewsets.ModelViewSet):
 class NotificationViewSet(viewsets.ModelViewSet):
     serializer_class = NotificationSerializer
     queryset = Notification.objects.all()
-
-class FavPhotographersViewSet(viewsets.ModelViewSet):
-    serializer_class = FavPhotographersSerializer
-    queryset = FavPhotographers.objects.all()

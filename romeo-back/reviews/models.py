@@ -5,6 +5,6 @@ from jobs.models import JobInfo
 
 
 class ReviewInfo(models.Model):
-    ReviewJob = models.OneToOneField(JobInfo, limit_choices_to={'JobStatus': 'Done'}, primary_key=True, on_delete=models.CASCADE)
+    ReviewJob = models.OneToOneField(JobInfo, limit_choices_to={'JobStatus': 'Closed'}, primary_key=True, on_delete=models.CASCADE)
     ReviewDetail = models.TextField()
     # ReviewPhotographer  =
