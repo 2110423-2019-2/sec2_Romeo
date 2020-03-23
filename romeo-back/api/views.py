@@ -5,6 +5,7 @@ from .permissions import IsUser
 from rest_framework.permissions import AllowAny, SAFE_METHODS
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response 
+from django.db.models import Q
 
 # Import Serializers of apps
 from .serializers import PhotographerSerializer, CustomerSerializer, JobSerializer, JobReservationSerializer, UserSerializer, \
@@ -59,14 +60,15 @@ class PhotographerSearchViewSet(viewsets.ModelViewSet) :
     serializer_class = PhotographerSerializer
     def get_queryset(self):
         user = self.request.query_params.get('user')
+        if user is not None :
+            qset = Photographer.objects.filter(Q(profile__user__username__icontains=user)|Q(profile__user__first_name__icontains=user)|Q(profile__user__last_name__icontains=user))
+        else : qset = Photographer.objects.all()
         style = self.request.query_params.get('style')
         date = self.request.query_params.get('date')
         time = self.request.query_params.get('time')
-        first = self.request.query_params.get('first')
-        last = self.request.query_params.get('last')
-        metafil = {'profile__user__username__icontains': user, 'profile__user__first_name__icontains': first, 'profile__user__last_name__icontains': last, 'photographer_style__style_name': style, 'photographer_avail_time__avail_date': date, 'photographer_avail_time__avail_time': time}
+        metafil = {'photographer_style__style_name': style, 'photographer_avail_time__avail_date': date, 'photographer_avail_time__avail_time': time}
         filters = {k: v for k, v in metafil.items() if v is not None}
-        queryset = Photographer.objects.filter(**filters)
+        queryset = qset.filter(**filters)
         return queryset
 
 class EquipmentViewSet(viewsets.ModelViewSet):
