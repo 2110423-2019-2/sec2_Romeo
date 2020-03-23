@@ -1,7 +1,7 @@
 from django.conf.urls import url
 from rest_framework.routers import DefaultRouter
 from .views import PhotographerViewSet, PhotoViewSet, EquipmentViewSet, PhotoViewSet, AvailTimeViewSet, \
-    StyleViewSet, CustomerViewSet, JobsViewSet, JobReservationViewSet, UserViewSet, ProfileViewSet, NotificationViewSet
+    StyleViewSet, CustomerViewSet, JobsViewSet, JobReservationViewSet, UserViewSet, ProfileViewSet, NotificationViewSet, PhotographerSearchViewSet
 
 router = DefaultRouter()
 router.register(r'photographers', PhotographerViewSet, basename='photographers')

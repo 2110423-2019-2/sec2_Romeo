@@ -314,7 +314,6 @@ class PhotographerSerializer(WritableNestedModelSerializer):
 
 class CustomerSerializer(serializers.ModelSerializer):
     profile = ProfileSerializer(required=True, partial=True)
-    # fav_photographers = FavPhotographersSerializer(many=True, required=False, partial=True)
     # jobs_by_customer = JobSerializer(many=True)
 
     class Meta:
@@ -342,8 +341,6 @@ class CustomerSerializer(serializers.ModelSerializer):
 
         if 'fav_photographers' in validated_data:
             instance.fav_photographers.clear()
-            # if favphotographers_data != []:
-            #     print('hello')
             for favphotographers_data in validated_data.pop('fav_photographers'):
                 if favphotographers_data != []:
                     instance.fav_photographers.add(favphotographers_data)
