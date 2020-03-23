@@ -155,8 +155,45 @@
 .photographer-card {
     flex-basis: 40%;
     margin: 2%;
+    max-width: 40% !important;
+    transition: all 0.3s ease-in-out;
     @media screen and (max-width: 599px) {
         flex-basis: 96%;
+        max-width: 96%;
     }
 }
 
+// Carousel
+.carousel {
+    position: relative;
+    .carousel-tabs {
+        display: flex;
+        width: 100%;
+        justify-content: center;
+        position: absolute;
+        bottom: 0;
+        .carousel-tab-wrapper {
+            padding:8px 0;
+            .carousel-tab {
+                background-color: rgba(255,255,255,0.5);
+                height: 3px;
+                border-radius: 1px;
+                width: 16px;
+                &.active {
+                    background-color: white;
+                }
+                margin: 0 3px;
+            }
+        }
+    }
+    .carousel-content {
+        display: none;
+        max-width: 100%;
+        &.active {
+            display: block;
+        }
+        img {
+            max-width: 100%;
+        }
+    }
+}

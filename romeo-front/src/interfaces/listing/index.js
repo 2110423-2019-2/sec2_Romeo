@@ -162,9 +162,6 @@ class Listing extends React.Component {
                                 <Card 
                                     user={e}
                                     key={i+e.profile.user.username}
-                                    displayFavButton={
-                                        !isAuth || (currentClient && currentClient.profile.user.user_type !== 1)
-                                    }
                                 />
                             )) : ( 
                             <div className="d-flex align-center justify-center" style={{ height: 400 }}>

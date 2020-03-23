@@ -119,8 +119,8 @@ class Profile extends React.Component {
                             <div className="photo-grid">
                                 { currentPortfolio && currentPortfolio.length > 0 ? (
                                     currentPortfolio.map((e,i) => (
-                                        <div  className="photo-grid-photo">
-                                            <img src={e.photo_link} key={e.photo_link} alt=""/>
+                                        <div className="photo-grid-photo" key={e.photo_link}>
+                                            <img src={e.photo_link} alt=""/>
                                         </div>
                                     ))
                                 ) : (
