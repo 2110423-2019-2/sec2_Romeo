@@ -1,5 +1,5 @@
 import { SET_AUTH } from "../action-types";
-import { setAuthToken, removeAuthToken, setCurrentClient, removeCurrentClient } from "../auth";
+import { setAuthToken, setRefreshToken, removeAuthToken, setCurrentClient, removeCurrentClient } from "../auth";
 import Axios from "axios";
 
 export const signIn = (credentials, history) => async dispatch => {
@@ -8,9 +8,9 @@ export const signIn = (credentials, history) => async dispatch => {
 		removeCurrentClient();
 		Axios.post("/auth/jwt/create", credentials)
 		.then(res => {
-			const token = res.data.access;
-			setAuthToken(token);
-			console.log(token);
+			const { access, refresh } = res.data;
+			setAuthToken(access);
+			setRefreshToken(refresh);
 			Axios.get("/api/users/" + credentials.username)
 			.then(res1 => {
 				const userType = res1.data.user_type;
