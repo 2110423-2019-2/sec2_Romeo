@@ -5,7 +5,7 @@ from .permissions import IsUser
 from rest_framework.permissions import AllowAny, SAFE_METHODS
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response 
-from django.db.models import Q
+from django.db.models import Q, Avg
 
 # Import Serializers of apps
 from .serializers import PhotographerSerializer, CustomerSerializer, JobSerializer, JobReservationSerializer, UserSerializer, \
@@ -73,6 +73,10 @@ class PhotographerSearchViewSet(viewsets.ModelViewSet) :
             return queryset.order_by("-photographer_last_online_time")
         elif sort == "time_asc" :
             return queryset.order_by("photographer_last_online_time")
+        elif sort == "price_des" :
+            return queryset.annotate(price=Avg('photographer_avail_time__photographer_price')).order_by('-price')
+        elif sort == "price_asc" :
+            return queryset.annotate(price=Avg('photographer_avail_time__photographer_price')).order_by('price')
         return queryset
 
 class EquipmentViewSet(viewsets.ModelViewSet):
