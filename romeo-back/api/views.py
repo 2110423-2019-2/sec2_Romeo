@@ -68,6 +68,11 @@ class PhotographerSearchViewSet(viewsets.ModelViewSet) :
         metafil = {'photographer_style__style_name': style, 'photographer_avail_time__avail_date': date, 'photographer_avail_time__avail_time': time}
         filters = {k: v for k, v in metafil.items() if v is not None}
         queryset = qset.filter(**filters)
+        sort = self.request.query_params.get('sort')
+        if sort == "time_des" :
+            return queryset.order_by("-photographer_last_online_time")
+        elif sort == "time_asc" :
+            return queryset.order_by("photographer_last_online_time")
         return queryset
 
 class EquipmentViewSet(viewsets.ModelViewSet):
