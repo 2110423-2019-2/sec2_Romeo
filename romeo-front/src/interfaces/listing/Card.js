@@ -1,7 +1,7 @@
 import React from "react";
-import { Card, Tag, Button, Icon } from "antd"
+import { Card, Tag, Icon } from "antd"
 import history from "common/router/history";
-import { styleColors, availableStyles } from "common/style-colors";
+import { styleColors } from "common/style-colors";
 
 class PhotographerCard extends React.Component {
     state = {
@@ -18,7 +18,6 @@ class PhotographerCard extends React.Component {
     getCover = (user) => {
         const { photographer_photos } = user;
         if (photographer_photos.length > 0) {
-            console.log(photographer_photos.slice(Math.max(photographer_photos.length - 3, 0)));
             return photographer_photos.slice(Math.max(photographer_photos.length - 3, 0))
         } else {
             return []

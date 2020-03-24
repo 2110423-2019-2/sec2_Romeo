@@ -52,7 +52,6 @@ class Listing extends React.Component {
 
     getParamString = (params) => {
         // Filter out params with empty string or null params
-        console.log(params);
         const keys = Object.keys(params);
         let out = {};
         keys.forEach(e => {
@@ -98,9 +97,7 @@ class Listing extends React.Component {
     }
 
     render() {
-        const {photographers, currentClient, params, loading, typing} = this.state;
-        const { isAuth } = this.props;
-        console.log(loading);
+        const {photographers, params, loading} = this.state;
         return (
             <div style={{ marginTop: -64 }}>
                 <Parallax

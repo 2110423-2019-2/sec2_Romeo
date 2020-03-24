@@ -16,7 +16,6 @@ class TransparentNav extends React.Component {
         const { signOut, isAuth } = this.props;
 
         const currentClient = JSON.parse(localStorage.getItem('currentClient'))
-        console.log(this.state);
         return (
             <nav className="main-nav transparent">
                 <div className="container d-flex align-center justify-space-between">

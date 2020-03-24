@@ -61,7 +61,6 @@ class EditProfile extends React.Component {
         .catch(err => {
             this.setState({ success: false })
             this.setState({ error: true })
-            console.log(err);
         });
         scroll.scrollToTop();
         

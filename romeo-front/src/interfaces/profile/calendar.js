@@ -1,7 +1,7 @@
 import React from "react";
 import { Calendar, Tag } from 'antd';
 import moment from "moment";
-import { defaultDays, dayIndex } from "logic/Calendar";
+import { dayIndex, defaultDays } from "logic/Calendar";
 
 const timeLabels = {
     HALF_DAY_MORNING: 'Morning-Noon',
@@ -13,10 +13,19 @@ const timeLabels = {
 
 class JobCalendar extends React.Component {
     state = {
-        today: moment(new Date())
+        today: moment(new Date()),
+        calOutput: defaultDays
     };
-    onPanelChange = (value, mode) => {
-        console.log(value, mode);
+    componentDidMount() {
+        const { currentPhotographer } = this.props;
+        const { photographer_avail_time } = currentPhotographer;
+        
+        let out = [...this.state.calOutput];
+        photographer_avail_time.forEach((e,i) => {
+            out.splice(dayIndex[e.avail_date],1)
+            out.splice(dayIndex[e.avail_date],0,e)
+        });
+        this.setState({ calOutput: out });
     }
     dateCellRender = (value) => {
         const listData = this.getListData(value);
@@ -35,37 +44,35 @@ class JobCalendar extends React.Component {
         }
         return null;
     }
-    getListData = (value) => {
-        const { currentPhotographer } = this.props;
-        const { photographer_avail_time } = currentPhotographer;
-        // Fill In 
-        let out = defaultDays;
-        photographer_avail_time.forEach((e,i) => {
-            out.splice(dayIndex[e.avail_date],1)
-            out.splice(dayIndex[e.avail_date],0,e)
+    componentWillUnmount() {
+        this.setState({
+            calOutput: defaultDays
         })
-        
+    }
+
+    getListData = (value) => {
+        const { calOutput } = this.state;
         switch (value.day()) {
             case 0: return {
-                content: this.getLabel(out[6])
+                content: this.getLabel(calOutput[6])
             };
             case 1: return {
-                content: this.getLabel(out[0])
+                content: this.getLabel(calOutput[0])
             };
             case 2: return {
-                content: this.getLabel(out[1])
+                content: this.getLabel(calOutput[1])
             };
             case 3: return {
-                content: this.getLabel(out[2])
+                content: this.getLabel(calOutput[2])
             };
             case 4: return {
-                content: this.getLabel(out[3])
+                content: this.getLabel(calOutput[3])
             };
             case 5: return {
-                content: this.getLabel(out[4])
+                content: this.getLabel(calOutput[4])
             };
             case 6: return {
-                content: this.getLabel(out[5])
+                content: this.getLabel(calOutput[5])
             };
             default: return {
                 content: ""
