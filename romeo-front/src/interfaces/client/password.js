@@ -31,14 +31,9 @@ class Edit extends React.Component {
                 })
             }
             if (!err) {
-                const { user_type, username } = currentClient.profile.user
-                const url = user_type === 1 ? "/api/photographers" : "/api/customers"
-                Axios.patch(`${url}/${username}/`, {
-                    profile: {
-                        user: {
-                            password: values.newPassword
-                        }
-                    },
+                const { username } = currentClient.profile.user
+                Axios.patch(`/api/users/${username}/`, {
+                    password: values.newPassword
                 }).then(res => {
                     scroll.scrollToTop();
                     this.setState({ success: true })
