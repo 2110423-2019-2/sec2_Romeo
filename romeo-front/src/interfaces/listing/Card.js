@@ -85,7 +85,7 @@ class PhotographerCard extends React.Component {
                 >
                     <div className="d-flex justify-space-between">
                         <h1 
-                            className="mb-0 t-color-primary-hover t-hover"
+                            className="mb-0"
                         >{user.profile.user.first_name} {user.profile.user.last_name}</h1>
                         {/* { this.props.displayFavButton && (
                             <Button type="danger" size="large" shape="circle" ghost>

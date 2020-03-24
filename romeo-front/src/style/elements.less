@@ -152,14 +152,33 @@
     }
 }
 
+// Photographer Card
 .photographer-card {
-    flex-basis: 40%;
+    flex-basis: 45%;
     margin: 2%;
-    max-width: 40% !important;
+    padding-left: 8px;
+    padding-right: 8px;
+    max-width: 45% !important;
     transition: all 0.3s ease-in-out;
     @media screen and (max-width: 599px) {
-        flex-basis: 96%;
-        max-width: 96%;
+        flex-basis: 100%;
+        max-width: 100% !important;
+        margin-left: 0px;
+        margin-right: 0px;
+        padding-left: 0px;
+        padding-right: 0px;
+    }
+}
+.photographer-card-skeleton {
+    flex-basis: 45%;
+    margin: 2%;
+    height: 400px;
+    @media screen and (max-width:599px) {
+        flex-basis: 100%;
+        margin-left: 0px;
+        margin-right: 0px;
+        padding-left: 0px;
+        padding-right: 0px;
     }
 }
 
@@ -184,6 +203,9 @@
                 }
                 margin: 0 3px;
             }
+            &:only-child {
+                display: none;
+            }
         }
     }
     .carousel-content {
@@ -191,6 +213,11 @@
         max-width: 100%;
         &.active {
             display: block;
+        }
+        @media screen and (min-width: 600px) {
+            & {
+                pointer-events: none;
+            }
         }
         img {
             max-width: 100%;

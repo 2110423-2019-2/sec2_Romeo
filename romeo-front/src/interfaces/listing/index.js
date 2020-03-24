@@ -153,7 +153,7 @@ class Listing extends React.Component {
                             </Button>
                         </Dropdown>
                     </div>
-                    <div className="d-flex flex-wrap justify-center align-center pl-2 pr-2">
+                    <div className="d-flex flex-wrap justify-center align-center">
                         { (!loading) ? 
                             (photographers.length > 0 ? photographers.map((e,i) => (
                                 <Card 
@@ -169,7 +169,7 @@ class Listing extends React.Component {
                             </div> 
                         )) : (
                             <AntCard
-                                style={{ flexBasis: '40%', margin: '2%', height: 400 }}
+                                className="photographer-card-skeleton"
                             >
                                 <Skeleton loading={loading} avatar active>
                                     <Card.Meta

@@ -82,7 +82,7 @@ class AvailTimes extends React.Component {
         let availTimes = currentClient.photographer_avail_time;
         if (!availTimes) availTimes = [];
         // Fill In Empty Times
-        let out = defaultDays;
+        let out = [...defaultDays];
         availTimes.forEach((e,i) => {
             out.splice(dayIndex[e.avail_date],1)
             out.splice(dayIndex[e.avail_date],0,e)
