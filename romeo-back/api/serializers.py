@@ -6,13 +6,11 @@ from rest_framework.validators import UniqueValidator
 from drf_writable_nested.serializers import WritableNestedModelSerializer
 from drf_writable_nested.mixins import UniqueFieldsMixin, NestedUpdateMixin
 # Import App Models
-from favPhotographers.models import FavPhotographers
 from photographers.models import Photographer, Photo, AvailTime, Equipment, Style
 from customers.models import Customer
 from jobs.models import JobInfo, JobReservation
 from users.models import CustomUser, CustomUserProfile
 from notification.models import Notification
-from favPhotographers.models import FavPhotographers
 import datetime
 
 
@@ -83,90 +81,6 @@ class ProfileSerializer(serializers.ModelSerializer):
 
         instance.save()
         return instance
-
-
-class JobReservationSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = JobReservation
-        fields = '__all__'
-
-    # Override default create method to auto create nested profile from photographer
-    def create(self, validated_data):
-        if validated_data['photoshoot_date'].get_weekday() not in validated_data['job_reservation.avail_date']:
-            raise serializers.ValidationError('The photographer is not available at the selected date.')
-        reservation = JobReservation.objects.create(**validated_data)
-        return reservation
-
-
-class JobSerializer(serializers.ModelSerializer):
-    # Reservation=True
-    reservation = JobReservationSerializer(many=True, required=False)
-
-    class Meta:
-        model = JobInfo
-        fields = '__all__'
-
-    # Override default create method to auto create nested profile from photographer
-    def create(self, validated_data):
-        # Check if start date is valid
-        if validated_data["job_start_date"] < datetime.date.today():
-            raise serializers.ValidationError('The selected date should not be before today.')
-        # Check valid start&end date
-        if validated_data["job_end_date"] < validated_data["job_start_date"]:
-            raise serializers.ValidationError('End date should not be before start date.')
-
-        job_title=validated_data.pop('job_title')
-        job_description=validated_data.pop('job_description')
-        job_customer=validated_data.pop('job_customer')
-        job_photographer=validated_data.pop('job_photographer')
-        job_status='PENDING'
-
-        job_info = JobInfo.objects.create(job_title=job_title, job_description=job_description, \
-         job_customer=job_customer, job_photographer=job_photographer, \
-         job_status=job_status, job_start_date=validated_data.pop('job_start_date'), \
-         job_end_date=validated_data.pop('job_end_date'), job_total_price=validated_data.pop('job_total_price'))
-
-        # create job reservation instance then add to job_reservation field
-        for reservation_data in validated_data.pop('job_reservation'):
-            reservation_data = dict(reservation_data)
-            try :
-                reservation_instance = JobReservation.objects.get(photoshoot_date=reservation_data['photoshoot_date'], \
-                job_reservation=reservation_data['job_reservation'])
-            except :
-                reservation_instance = JobReservation.objects.create(photoshoot_date=reservation_data['photoshoot_date'], \
-                job_reservation=reservation_data['job_reservation'])
-            job_info.reservation.add(reservation_instance)
-        job_info.save()
-
-        # Create a notification
-        notification=NotificationSerializer.create(self,validated_data={'noti_field':'JOB', 'noti_receiver':job_photographer.profile, \
-        'noti_actor':job_customer.profile, 'noti_action':'CREATE', 'noti_status':job_status})
-
-        return job_info
-
-    def update(self, instance, validated_data):
-        # job_reservation
-        if 'job_reservation' in validated_data:
-            instance.job_reservation.clear()
-            for reservation_data in validated_data.pop('job_reservation'):
-                reservation_data = dict(reservation_data)
-                try :
-                    reservation_instance = JobReservation.objects.get(photoshoot_date=reservation_data['photoshoot_date'],
-                                                                job_reservation=reservation_data['job_reservation'])
-                except :
-                    reservation_instance = JobReservation.objects.create(**reservation_data)
-                instance.job_reservation.add(reservation_instance)
-
-        # job_status
-        if 'job_status' in validated_data:
-            instance.job_status = validated_data.pop('job_status')
-            # Create a notification
-            notification=NotificationSerializer.create(self,validated_data={'noti_field':'JOB', 'noti_receiver':instance.job_customer.profile, \
-            'noti_actor':instance.job_photographer.profile, 'noti_action':'UPDATE', 'noti_status':instance.job_status})
-
-        instance.save()
-        return instance
-
 
 class PhotoSerializer(UniqueFieldsMixin, serializers.ModelSerializer):
     class Meta:
@@ -327,15 +241,7 @@ class CustomerSerializer(serializers.ModelSerializer):
         profile_data = validated_data.pop('profile')
         profile = ProfileSerializer.create(ProfileSerializer(), validated_data=profile_data)
         customer = Customer.objects.create(profile=profile)
-        # customer.fav_photographers.set(validated_data.pop('fav_photographers'))
-
-        for favphotographers_data in validated_data.pop('fav_photographers'):
-            favphotographers_data = dict(favphotographers_data)
-            try :
-                favphotographers_instance = FavPhotographers.objects.get(fav_photographers_name=favphotographers_data['fav_photographers_name'])
-            except :
-                favphotographers_instance = FavPhotographers.objects.create(fav_photographers_name=favphotographers_data['fav_photographers_name'])
-            customer.fav_photographers.add(favphotographers_instance)
+        customer.fav_photographers.set(validated_data.pop('fav_photographers'))
 
         customer.save()
         profile.save()
@@ -349,15 +255,11 @@ class CustomerSerializer(serializers.ModelSerializer):
             profile_instance = CustomUserProfile.objects.get(user__username=username)
             profile_instance = ProfileSerializer.update(ProfileSerializer, instance=profile_instance, validated_data=profile_data)
 
-            if 'fav_photographers' in validated_data:
-                instance.fav_photographers.clear()
-                for favphotographers_data in validated_data.pop('fav_photographers'):
-                    favphotographers_data = dict(favphotographers_data)
-                try :
-                    favphotographers_instance = FavPhotographers.objects.get(fav_photographers_name=favphotographers_data['fav_photographers_name'])
-                except :
-                    favphotographers_instance = FavPhotographers.objects.create(fav_photographers_name=favphotographers_data['fav_photographers_name'])
-                instance.fav_photographers.add(favphotographers_instance)
+        if 'fav_photographers' in validated_data:
+            instance.fav_photographers.clear()
+            for favphotographers_data in validated_data.pop('fav_photographers'):
+                if favphotographers_data != []:
+                    instance.fav_photographers.add(favphotographers_data)
 
         instance.save()
         return instance
@@ -404,12 +306,95 @@ class NotificationSerializer(serializers.ModelSerializer):
 #             },
 #         }
 
-class FavPhotographersSerializer(UniqueFieldsMixin,NestedUpdateMixin,serializers.ModelSerializer):
+class JobReservationSerializer(serializers.ModelSerializer):
+    job_reservation = AvailTimeSerializer(partial=True)
     class Meta:
-        model = FavPhotographers
+        model = JobReservation
         fields = '__all__'
-        extra_kwargs = {
-            'fav_photographers_name': {
-                'validators': [UniqueValidator(queryset=FavPhotographers.objects.all())]
-            },
-        }
+
+    # Override default create method to auto create nested profile from photographer
+    def create(self, validated_data):
+        if validated_data['photoshoot_date'].get_weekday() not in validated_data['job_reservation.avail_date']:
+            raise serializers.ValidationError('The photographer is not available at the selected date.')
+        reservation = JobReservation.objects.create(**validated_data)
+        return reservation
+
+class JobSerializer(serializers.ModelSerializer):
+    # Reservation=True
+    job_customer = serializers.CharField(source='job_customer.profile.user.username')
+    job_photographer =serializers.CharField(source='job_photographer.profile.user.username')
+    job_reservation = JobReservationSerializer(many=True, required=False, partial=True)
+
+    class Meta:
+        model = JobInfo
+        fields = '__all__'
+
+    # Override default create method to auto create nested profile from photographer
+    def create(self, validated_data):
+        # Check if start date is valid
+        if validated_data["job_start_date"] < datetime.date.today():
+            raise serializers.ValidationError('The selected date should not be before today.')
+        # Check valid start&end date
+        if validated_data["job_end_date"] < validated_data["job_start_date"]:
+            raise serializers.ValidationError('End date should not be before start date.')
+
+        job_customer=validated_data.pop('job_customer')
+        job_customer=Customer.objects.get(profile__user__username=job_customer['profile']['user']['username'])
+        
+        job_photographer=validated_data.pop('job_photographer')
+        job_photographer=Photographer.objects.get(profile__user__username=job_photographer['profile']['user']['username'])
+
+        job_status = "PENDING"
+        
+        job_info = JobInfo.objects.create(job_title=validated_data.pop('job_title'), 
+                                        job_description=validated_data.pop('job_description'), 
+                                        job_customer=job_customer, 
+                                        job_photographer=job_photographer, 
+                                        job_status='PENDING', 
+                                        job_start_date=validated_data.pop('job_start_date'), 
+                                        job_end_date=validated_data.pop('job_end_date'), 
+                                        job_total_price=validated_data.pop('job_total_price'))
+
+        # create job reservation instance then add to job_reservation field
+        for reservation_data in validated_data.pop('job_reservation'):
+            reservation_data = dict(reservation_data)
+            job_reservation_data = dict(reservation_data['job_reservation'])
+            photoshoot_date = reservation_data['photoshoot_date']
+            # check if reservation date and time is valid
+            is_vaild = False
+            for avail_time_instance in job_photographer.photographer_avail_time.all():
+                if avail_time_instance.avail_date == job_reservation_data['avail_date'] and avail_time_instance.avail_time == job_reservation_data['avail_time']:
+                    is_vaild = True
+            if not is_vaild:
+                job_info.delete()
+                raise serializers.ValidationError('''Your selected date or time for reservation is invalid for the photographer, please check photographer's available time''')
+            
+            try :
+                reservation_instance = JobReservation.objects.get(photoshoot_date=photoshoot_date,
+                                                                job_reservation__avail_date=job_reservation_data['avail_date'],
+                                                                job_reservation__avail_time=job_reservation_data['avail_time'],
+                                                                job_reservation__photographer_price=job_reservation_data['photographer_price'])
+            except :
+                reservation_instance = JobReservation.objects.create(photoshoot_date=photoshoot_date,
+                                                                    job_reservation__avail_date=job_reservation_data['avail_date'],
+                                                                    job_reservation__avail_time=job_reservation_data['avail_time'],
+                                                                    job_reservation__photographer_price=job_reservation_data['photographer_price'])
+            job_info.job_reservation.add(reservation_instance)
+        job_info.save()
+
+        # Create a notification
+        notification=NotificationSerializer.create(self,validated_data={'noti_field':'JOB', 'noti_receiver':job_photographer.profile, \
+        'noti_actor':job_customer.profile, 'noti_action':'CREATE', 'noti_status':job_status})
+
+        return job_info
+
+    def update(self, instance, validated_data):
+        # job_status
+        if 'job_status' in validated_data:
+            instance.job_status = validated_data.pop('job_status')
+            # Create a notification
+            notification=NotificationSerializer.create(self,validated_data={'noti_field':'JOB', 'noti_receiver':instance.job_customer.profile, \
+            'noti_actor':instance.job_photographer.profile, 'noti_action':'UPDATE', 'noti_status':instance.job_status})
+
+        instance.save()
+        return instance
