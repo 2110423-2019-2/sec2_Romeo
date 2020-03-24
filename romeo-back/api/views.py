@@ -108,7 +108,7 @@ class JobsViewSet(viewsets.ModelViewSet):
 class JobReservationViewSet(viewsets.ModelViewSet):
     queryset = JobReservation.objects.all()
     serializer_class = JobReservationSerializer
-    # permission_classes = [AllowAny]
+    permission_classes = [AllowAny]
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = CustomUser.objects.all()
