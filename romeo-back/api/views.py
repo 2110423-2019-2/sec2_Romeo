@@ -5,10 +5,11 @@ from .permissions import IsUser
 from rest_framework.permissions import AllowAny, SAFE_METHODS
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response 
+from django.db.models import Q, Avg
 
 # Import Serializers of apps
 from .serializers import PhotographerSerializer, CustomerSerializer, JobSerializer, JobReservationSerializer, UserSerializer, \
-    PhotoSerializer, AvailTimeSerializer, EquipmentSerializer, ProfileSerializer, StyleSerializer, NotificationSerializer,FavPhotographersSerializer
+    PhotoSerializer, AvailTimeSerializer, EquipmentSerializer, ProfileSerializer, StyleSerializer, NotificationSerializer
 
 # Import models of apps for queryset
 from photographers.models import Photographer, Photo, AvailTime, Equipment, Style
@@ -16,7 +17,6 @@ from customers.models import Customer
 from jobs.models import JobInfo, JobReservation
 from users.models import CustomUser, CustomUserProfile
 from notification.models import Notification
-from favPhotographers.models import FavPhotographers
 
 
 class PhotographerViewSet(viewsets.ModelViewSet):
@@ -52,12 +52,32 @@ class AvailTimeViewSet(viewsets.ModelViewSet):
 
 
 class StyleViewSet(viewsets.ModelViewSet):
-    serializer_class = PhotographerSerializer
-    queryset = Photographer.objects.all()
-    permission_classes = [AllowAny]
-    filter_backends = [filters.SearchFilter]
-    search_fields = ['photographer_style__style_name']
+    serializer_class = StyleSerializer
+    queryset = Style.objects.all()
 
+class PhotographerSearchViewSet(viewsets.ModelViewSet) :
+    serializer_class = PhotographerSerializer
+    def get_queryset(self):
+        user = self.request.query_params.get('user')
+        if user is not None :
+            qset = Photographer.objects.filter(Q(profile__user__username__icontains=user)|Q(profile__user__first_name__icontains=user)|Q(profile__user__last_name__icontains=user))
+        else : qset = Photographer.objects.all()
+        style = self.request.query_params.get('style')
+        date = self.request.query_params.get('date')
+        time = self.request.query_params.get('time')
+        metafil = {'photographer_style__style_name': style, 'photographer_avail_time__avail_date': date, 'photographer_avail_time__avail_time': time}
+        filters = {k: v for k, v in metafil.items() if v is not None}
+        queryset = qset.filter(**filters)
+        sort = self.request.query_params.get('sort')
+        if sort == "time_des" :
+            return queryset.order_by("-photographer_last_online_time")
+        elif sort == "time_asc" :
+            return queryset.order_by("photographer_last_online_time")
+        elif sort == "price_des" :
+            return queryset.annotate(price=Avg('photographer_avail_time__photographer_price')).order_by('-price')
+        elif sort == "price_asc" :
+            return queryset.annotate(price=Avg('photographer_avail_time__photographer_price')).order_by('price')
+        return queryset
 
 class EquipmentViewSet(viewsets.ModelViewSet):
     serializer_class = EquipmentSerializer
@@ -88,7 +108,7 @@ class JobsViewSet(viewsets.ModelViewSet):
 class JobReservationViewSet(viewsets.ModelViewSet):
     queryset = JobReservation.objects.all()
     serializer_class = JobReservationSerializer
-    # permission_classes = [AllowAny]
+    permission_classes = [AllowAny]
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = CustomUser.objects.all()
@@ -110,7 +130,3 @@ class ProfileViewSet(viewsets.ModelViewSet):
 class NotificationViewSet(viewsets.ModelViewSet):
     serializer_class = NotificationSerializer
     queryset = Notification.objects.all()
-
-class FavPhotographersViewSet(viewsets.ModelViewSet):
-    serializer_class = FavPhotographersSerializer
-    queryset = FavPhotographers.objects.all()

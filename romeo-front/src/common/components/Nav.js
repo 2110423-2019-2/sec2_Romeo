@@ -16,7 +16,6 @@ class Nav extends React.Component {
         const { signOut, isAuth } = this.props;
 
         const currentClient = JSON.parse(localStorage.getItem('currentClient'))
-        console.log(this.state);
         return (
             <nav className="main-nav">
                 <div className="container d-flex align-center justify-space-between">
@@ -34,13 +33,13 @@ class Nav extends React.Component {
                                             <Icon type="bell" className="mr-2"/><b>Notifications</b>
                                         </Menu.Item>
                                         <Menu.Divider/>
-                                        <Menu.Item>
+                                        <Menu.Item key="noti0">
                                             <Link to="#">1st Notification</Link>
                                         </Menu.Item>
-                                        <Menu.Item>
+                                        <Menu.Item key="noti1">
                                             <Link to="#">2nd Notification</Link>
                                         </Menu.Item>
-                                        <Menu.Item>
+                                        <Menu.Item key="noti2">
                                             <Link to="#">3rd Notification</Link>
                                         </Menu.Item>
                                     </Menu>
@@ -58,16 +57,16 @@ class Nav extends React.Component {
                                                 </Link>
                                             </Menu.Item>
                                             <Menu.Divider />
-                                            <Menu.Item key="2">
+                                            <Menu.Item key="1">
                                                 <Link to="/client/edit-portfolio">Edit Portfolio</Link>
                                             </Menu.Item>
                                             <Menu.Item key="2">
                                                 <Link to="/client/edit-profile">Edit Profile</Link>
                                             </Menu.Item>
-                                            <Menu.Item key="1">
+                                            <Menu.Item key="3">
                                                 <Link to="/client/edit">Personal Information</Link>
                                             </Menu.Item>
-                                            <Menu.Item key="3" onClick={() => signOut(history)}>
+                                            <Menu.Item key="4" onClick={() => signOut(history)}>
                                                 <span className="t-color-error">Sign Out</span>
                                             </Menu.Item>
                                         </Menu>

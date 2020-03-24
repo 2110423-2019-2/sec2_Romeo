@@ -5,13 +5,17 @@ export const setAuthToken = token => {
 	localStorage.setItem("token", token);
 };
 
+export const setRefreshToken = token => {
+	localStorage.setItem("refresh", token);
+};
+
 export const removeAuthToken = () => {
 	delete Axios.defaults.headers.common["Authorization"];
 	localStorage.removeItem("token");
+	localStorage.removeItem("refresh");
 };
 
 export const setCurrentClient = (username, type) => {
-	console.log(username);
 	localStorage.setItem("currentClient", JSON.stringify({username, type }));
 };
 

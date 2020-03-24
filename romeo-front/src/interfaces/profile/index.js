@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, Redirect } from "react-router-dom";
-import { Button, Tag, Icon, Divider } from "antd";
+import { Modal, Button, Tag, Icon, Divider } from "antd";
 import { connect } from "react-redux"
 import { getCurrentClientInfo } from "common/auth";
 import { formatDate } from "common/date";
@@ -8,13 +8,15 @@ import moment from "moment";
 import JobCalendar from "./calendar";
 import { styleColors } from "../../common/style-colors";
 import Axios from "axios"
+import ReserveModal from "./ReserveModal";
 
 class Profile extends React.Component {
     state = {
         display: 0,
         currentPhotographer: null,
         currentPortfolio: null,
-        currentClient: null
+        currentClient: null,
+        showReserveModal: false
     }
 
     componentDidMount = async () => {
@@ -33,8 +35,12 @@ class Profile extends React.Component {
         });
     }
 
+    handleReserve = () => {
+        console.log("reserve");
+    }
+
     render() {
-        const { currentPhotographer, currentPortfolio, display, currentClient } = this.state;
+        const { currentPhotographer, currentPortfolio, display, currentClient, showReserveModal } = this.state;
         const { username } = this.props.match.params;
         if (currentPhotographer && (currentPhotographer.profile.username === username && currentPhotographer.profile.user_type !== 1)) {
             return <Redirect to="/"/>
@@ -119,8 +125,8 @@ class Profile extends React.Component {
                             <div className="photo-grid">
                                 { currentPortfolio && currentPortfolio.length > 0 ? (
                                     currentPortfolio.map((e,i) => (
-                                        <div  className="photo-grid-photo">
-                                            <img src={e.photo_link} key={e.photo_link} alt=""/>
+                                        <div className="photo-grid-photo" key={e.photo_link}>
+                                            <img src={e.photo_link} alt=""/>
                                         </div>
                                     ))
                                 ) : (
@@ -133,6 +139,31 @@ class Profile extends React.Component {
                             </div>
                         ) }
                         </div>
+                        { currentClient.profile.user.user_type !== 1 && (
+                            <Button 
+                                type="primary" 
+                                onClick={() => this.setState({ showReserveModal: true })}
+                                className="el-4 pos-fixed"
+                                size="large"
+                                shape="round"
+                                style={{
+                                    right: 36,
+                                    bottom: 24,
+                                    transform: 'scale(1.2)',
+                                    zIndex: 999
+                                }}
+                            >
+                                <Icon type="book" /> Reserve
+                            </Button>
+                        )}
+                        <Modal
+                            title="Reserve"
+                            visible={showReserveModal}
+                            onOk={this.handleReserve}
+                            onCancel={() => this.setState({ showReserveModal: false })}
+                        >
+                            <ReserveModal/>
+                        </Modal>
                     </React.Fragment>
                 )}
             </div>
