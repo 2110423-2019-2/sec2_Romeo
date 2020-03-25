@@ -1,16 +1,14 @@
 from rest_framework.decorators import action
-from rest_framework import status, viewsets, filters 
+from rest_framework import status, viewsets, filters, mixins
 from rest_framework.response import Response
 from .permissions import IsUser
-from rest_framework.permissions import AllowAny, SAFE_METHODS
+from rest_framework.permissions import AllowAny
 from django.shortcuts import get_object_or_404
-from rest_framework.response import Response 
 from django.db.models import Q, Avg
 
 # Import Serializers of apps
 from .serializers import PhotographerSerializer, CustomerSerializer, JobSerializer, JobReservationSerializer, UserSerializer, \
-    PhotoSerializer, AvailTimeSerializer, EquipmentSerializer, ProfileSerializer, StyleSerializer, NotificationSerializer
-
+    PhotoSerializer, AvailTimeSerializer, EquipmentSerializer, ProfileSerializer, StyleSerializer, NotificationSerializer, ChangePasswordSerializer
 # Import models of apps for queryset
 from photographers.models import Photographer, Photo, AvailTime, Equipment, Style
 from customers.models import Customer
@@ -97,6 +95,8 @@ class JobsViewSet(viewsets.ModelViewSet):
     queryset = JobInfo.objects.all()
     serializer_class = JobSerializer
     permission_classes = [AllowAny]
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['job_photographer__profile__user__username','job_customer__profile__user__username']
 
     # def get_permissions(self):
     #     if self.action == 'list':
@@ -118,6 +118,11 @@ class UserViewSet(viewsets.ModelViewSet):
     filter_backends = [filters.SearchFilter]
     search_fields = ['username']
 
+class ChangePasswordViewSet(mixins.UpdateModelMixin,viewsets.GenericViewSet):
+    queryset = CustomUser.objects.all()
+    serializer_class = ChangePasswordSerializer
+    permission_classes = [AllowAny]
+    lookup_field = 'username'   
 
 class ProfileViewSet(viewsets.ModelViewSet):
     queryset = CustomUserProfile.objects.all()
@@ -129,4 +134,8 @@ class ProfileViewSet(viewsets.ModelViewSet):
 
 class NotificationViewSet(viewsets.ModelViewSet):
     serializer_class = NotificationSerializer
-    queryset = Notification.objects.all()
+    queryset = Notification.objects.filter()
+    permission_classes = [AllowAny]
+    lookup_field = 'noti_receiver__user__username'
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['noti_receiver__user__username']

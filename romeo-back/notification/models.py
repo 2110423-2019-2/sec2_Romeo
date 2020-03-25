@@ -21,7 +21,7 @@ NOTI_STATUS_CHOICES = [('PENDING', 'Pending'),
 class Notification(models.Model): 
     noti_id = models.AutoField(primary_key=True)
     noti_field = models.CharField(choices=NOTI_FIELD_CHOICES, max_length=10)
-    noti_receiver = models.ForeignKey(CustomUserProfile,blank=False,related_name='noti_recipient',on_delete=models.CASCADE)
+    noti_receiver = models.ForeignKey(CustomUserProfile,blank=False,related_name='noti_receiver',on_delete=models.CASCADE)
     noti_actor = models.ForeignKey(CustomUserProfile,blank=False,related_name='noti_actor',on_delete=models.CASCADE)
     noti_action = models.CharField(max_length=100)
     noti_status = models.CharField(choices=NOTI_STATUS_CHOICES, max_length=10)

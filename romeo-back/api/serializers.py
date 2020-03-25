@@ -49,6 +49,22 @@ class UserSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
+class ChangePasswordSerializer(serializers.ModelSerializer):
+    old_password = serializers.CharField(max_length=128, write_only=True, required=True)
+    new_password = serializers.CharField(max_length=128, write_only=True, required=True)
+    class Meta:
+        model = CustomUser
+        fields = ['old_password','new_password']
+
+    def update(self, instance, validated_data):
+        old_password = validated_data.pop('old_password')
+        new_password = validated_data.pop('new_password')
+        if not instance.check_password(old_password):
+            raise serializers.ValidationError('Your old password was entered incorrectly. Please enter it again.')
+        else:
+                instance.set_password(new_password)
+        instance.save()
+        return instance
 
 class ProfileSerializer(serializers.ModelSerializer):
     user = UserSerializer(required=True, partial=True)
@@ -286,6 +302,9 @@ class CustomerSerializer(serializers.ModelSerializer):
     #     jobs_by_customer_data.save()
 
 class NotificationSerializer(serializers.ModelSerializer):
+    noti_actor = serializers.CharField(source='noti_actor.user.username')
+    noti_receiver = serializers.CharField(source='noti_receiver.user.username')
+        
     class Meta:
         model = Notification
         fields = '__all__'
