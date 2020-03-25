@@ -5,6 +5,7 @@ from .permissions import IsUser
 from rest_framework.permissions import AllowAny
 from django.shortcuts import get_object_or_404
 from django.db.models import Q, Avg
+import datetime
 
 # Import Serializers of apps
 from .serializers import PhotographerSerializer, CustomerSerializer, JobSerializer, JobReservationSerializer, UserSerializer, \
@@ -56,16 +57,37 @@ class StyleViewSet(viewsets.ModelViewSet):
 class PhotographerSearchViewSet(viewsets.ModelViewSet) :
     serializer_class = PhotographerSerializer
     def get_queryset(self):
+        #Filter name
         user = self.request.query_params.get('user')
         if user is not None :
-            qset = Photographer.objects.filter(Q(profile__user__username__icontains=user)|Q(profile__user__first_name__icontains=user)|Q(profile__user__last_name__icontains=user))
-        else : qset = Photographer.objects.all()
+            nameset = Photographer.objects.filter(Q(profile__user__username__icontains=user)|Q(profile__user__first_name__icontains=user)|Q(profile__user__last_name__icontains=user))
+        else : nameset = Photographer.objects.all()
+
+        #Filter other parameters
         style = self.request.query_params.get('style')
-        date = self.request.query_params.get('date')
         time = self.request.query_params.get('time')
-        metafil = {'photographer_style__style_name': style, 'photographer_avail_time__avail_date': date, 'photographer_avail_time__avail_time': time}
+        metafil = {'photographer_style__style_name': style, 'photographer_avail_time__avail_time': time}
         filters = {k: v for k, v in metafil.items() if v is not None}
-        queryset = qset.filter(**filters)
+        paraset = nameset.filter(**filters)
+
+        #Filter Date (allphotographer - photographerwithjobs)
+        date = self.request.query_params.get('date')
+        if date is not None :
+            #Filter Photographer by date
+            day, month, year = (int(x) for x in date.split('_')) 
+            sel_date = (datetime.date(year, month, day)).strftime('%A')
+            dateset = paraset.filter(photographer_avail_time__avail_date = sel_date)
+            #Filter out reserved photographer
+            compdate = "-".join(date.split("_")[::-1])
+            jobset = JobInfo.objects.filter(job_reservation__photoshoot_date = compdate).values_list('job_photographer_id', flat=True)
+            toremove = []
+            for cid in jobset :
+                if dateset.filter(profile__user__id=cid) is not None:
+                    toremove.append(cid)
+            queryset = dateset.filter(~Q(profile__user__id__in=toremove))
+        else : queryset = paraset
+        
+        #Sort
         sort = self.request.query_params.get('sort')
         if sort == "time_des" :
             return queryset.order_by("-photographer_last_online_time")
