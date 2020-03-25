@@ -97,6 +97,8 @@ class JobsViewSet(viewsets.ModelViewSet):
     queryset = JobInfo.objects.all()
     serializer_class = JobSerializer
     permission_classes = [AllowAny]
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['job_photographer__profile__user__username','job_customer__profile__user__username']
 
     # def get_permissions(self):
     #     if self.action == 'list':
