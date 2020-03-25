@@ -35,7 +35,7 @@ class JobInfo(models.Model):
     job_status = models.CharField(choices=JOB_STATUS_CHOICES, max_length=10, default='PENDING')
     job_start_date = models.DateField()
     job_end_date = models.DateField()
-    job_reservation = models.ManyToManyField(JobReservation, null=True, blank=True)
+    job_reservation = models.ManyToManyField(JobReservation, null=True)
     job_total_price = models.IntegerField(default=0)
     # is_reviewed
     # job_payment
