@@ -32,13 +32,16 @@ class Edit extends React.Component {
             }
             if (!err) {
                 const { username } = currentClient.profile.user
-                Axios.patch(`/api/users/${username}/`, {
-                    password: values.newPassword
+                Axios.put(`/api/password/${username}/`, {
+                    old_password: values.oldPassword,
+                    new_password: values.newPassword
                 }).then(res => {
                     scroll.scrollToTop();
                     this.setState({ success: true })
+                    this.setState({ wrongPassword: false })
                 }).catch(res => {
                     scroll.scrollToTop();
+                    this.setState({ success: false })
                     this.setState({ wrongPassword: true })
                 });
             }
@@ -72,7 +75,7 @@ class Edit extends React.Component {
                     ) }
                     { wrongPassword && (
                         <div className="error-banner">
-                            <b>Incorrect Password</b>
+                            <b>Incorrect Old Password</b>
                         </div>
                     ) }
                     { success && (

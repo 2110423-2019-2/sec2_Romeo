@@ -3,7 +3,7 @@ import { Link, Redirect } from "react-router-dom";
 import { Modal, Button, Tag, Icon, Divider } from "antd";
 import { connect } from "react-redux"
 import { getCurrentClientInfo } from "common/auth";
-import { formatDate } from "common/date";
+import { formatDateTime } from "common/date";
 import moment from "moment";
 import JobCalendar from "./calendar";
 import { styleColors } from "../../common/style-colors";
@@ -59,7 +59,7 @@ class Profile extends React.Component {
                                 {currentPhotographer.profile.user.first_name} {currentPhotographer.profile.user.last_name}
                             </h1>
                             <h3 className="mb-2">{username}</h3>
-                            <span className="t-color-light d-block">Last Online Time: {formatDate(moment(new Date()))}</span>
+                            <span className="t-color-light d-block">Last Online Time: {formatDateTime(currentPhotographer.photographer_last_online_time)}</span>
                             { (!isAuth || (currentClient && currentClient.profile.user.user_type !== 1)) && (
                                 <Button type="danger" size="large" shape="round" ghost className="mt-2">
                                     Favorite <Icon type="heart" theme='outlined' />
@@ -139,7 +139,7 @@ class Profile extends React.Component {
                             </div>
                         ) }
                         </div>
-                        { currentClient.profile.user.user_type !== 1 && (
+                        { currentClient && currentClient.profile.user.user_type !== 1 && (
                             <Button 
                                 type="primary" 
                                 onClick={() => this.setState({ showReserveModal: true })}
