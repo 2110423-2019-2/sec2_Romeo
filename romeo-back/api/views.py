@@ -1,5 +1,5 @@
 from rest_framework.decorators import action
-from rest_framework import status, viewsets, filters 
+from rest_framework import status, viewsets, filters, mixins
 from rest_framework.response import Response
 from .permissions import IsUser
 from rest_framework.permissions import AllowAny, SAFE_METHODS
@@ -9,8 +9,7 @@ from django.db.models import Q, Avg
 
 # Import Serializers of apps
 from .serializers import PhotographerSerializer, CustomerSerializer, JobSerializer, JobReservationSerializer, UserSerializer, \
-    PhotoSerializer, AvailTimeSerializer, EquipmentSerializer, ProfileSerializer, StyleSerializer, NotificationSerializer
-
+    PhotoSerializer, AvailTimeSerializer, EquipmentSerializer, ProfileSerializer, StyleSerializer, NotificationSerializer, ChangePasswordSerializer
 # Import models of apps for queryset
 from photographers.models import Photographer, Photo, AvailTime, Equipment, Style
 from customers.models import Customer
@@ -120,6 +119,11 @@ class UserViewSet(viewsets.ModelViewSet):
     filter_backends = [filters.SearchFilter]
     search_fields = ['username']
 
+class ChangePasswordViewSet(mixins.UpdateModelMixin,viewsets.GenericViewSet):
+    queryset = CustomUser.objects.all()
+    serializer_class = ChangePasswordSerializer
+    permission_classes = [AllowAny]
+    lookup_field = 'username'   
 
 class ProfileViewSet(viewsets.ModelViewSet):
     queryset = CustomUserProfile.objects.all()
