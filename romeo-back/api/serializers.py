@@ -302,6 +302,9 @@ class CustomerSerializer(serializers.ModelSerializer):
     #     jobs_by_customer_data.save()
 
 class NotificationSerializer(serializers.ModelSerializer):
+    noti_actor = serializers.CharField(source='noti_actor.user.username')
+    noti_receiver = serializers.CharField(source='noti_receiver.user.username')
+        
     class Meta:
         model = Notification
         fields = '__all__'

@@ -2,9 +2,8 @@ from rest_framework.decorators import action
 from rest_framework import status, viewsets, filters, mixins
 from rest_framework.response import Response
 from .permissions import IsUser
-from rest_framework.permissions import AllowAny, SAFE_METHODS
+from rest_framework.permissions import AllowAny
 from django.shortcuts import get_object_or_404
-from rest_framework.response import Response 
 from django.db.models import Q, Avg
 
 # Import Serializers of apps
@@ -135,4 +134,8 @@ class ProfileViewSet(viewsets.ModelViewSet):
 
 class NotificationViewSet(viewsets.ModelViewSet):
     serializer_class = NotificationSerializer
-    queryset = Notification.objects.all()
+    queryset = Notification.objects.filter()
+    permission_classes = [AllowAny]
+    lookup_field = 'noti_receiver__user__username'
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['noti_receiver__user__username']
