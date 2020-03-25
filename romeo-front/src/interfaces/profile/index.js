@@ -9,6 +9,7 @@ import JobCalendar from "./calendar";
 import { styleColors } from "../../common/style-colors";
 import Axios from "axios"
 import ReserveModal from "./ReserveModal";
+import SignInModal from "../signinreg/modal";
 
 class Profile extends React.Component {
     state = {
@@ -16,7 +17,8 @@ class Profile extends React.Component {
         currentPhotographer: null,
         currentPortfolio: null,
         currentClient: null,
-        showReserveModal: false
+        showReserveModal: false,
+        showSignIn: false
     }
 
     componentDidMount = async () => {
@@ -40,9 +42,17 @@ class Profile extends React.Component {
     }
 
     render() {
-        const { currentPhotographer, currentPortfolio, display, currentClient, showReserveModal } = this.state;
+        const { 
+            currentPhotographer, 
+            currentPortfolio, 
+            display, 
+            currentClient, 
+            showReserveModal,
+            showSignIn
+        } = this.state;
         const { username } = this.props.match.params;
-        if (currentPhotographer && (currentPhotographer.profile.username === username && currentPhotographer.profile.user_type !== 1)) {
+        if (currentPhotographer && (currentPhotographer.profile.username === username 
+            && currentPhotographer.profile.user_type !== 1)) {
             return <Redirect to="/"/>
         }
         
@@ -135,11 +145,11 @@ class Profile extends React.Component {
                             </div>
                         ) : (
                             <div className="pa-4">
-                                <JobCalendar currentPhotographer={currentPhotographer}/>
+                                <JobCalendar fullscreen={true} currentPhotographer={currentPhotographer}/>
                             </div>
                         ) }
                         </div>
-                        { currentClient && currentClient.profile.user.user_type !== 1 && (
+                        { currentClient && currentClient.profile.user.user_type !== 1 ? (
                             <Button 
                                 type="primary" 
                                 onClick={() => this.setState({ showReserveModal: true })}
@@ -155,15 +165,33 @@ class Profile extends React.Component {
                             >
                                 <Icon type="book" /> Reserve
                             </Button>
+                        ) : (
+                            <Button 
+                                type="primary" 
+                                onClick={() => this.setState({ showSignIn: true })}
+                                className="el-4 pos-fixed"
+                                size="large"
+                                shape="round"
+                                style={{
+                                    right: 36,
+                                    bottom: 24,
+                                    transform: 'scale(1.2)',
+                                    zIndex: 999
+                                }}
+                            >
+                                <Icon type="book" /> Sign In to Reserve
+                            </Button>
                         )}
-                        <Modal
-                            title="Reserve"
+                        <ReserveModal
                             visible={showReserveModal}
-                            onOk={this.handleReserve}
                             onCancel={() => this.setState({ showReserveModal: false })}
-                        >
-                            <ReserveModal/>
-                        </Modal>
+                            currentClient={currentClient}
+                            currentPhotographer={currentPhotographer}
+                        />
+                        <SignInModal 
+                            onCancel={() => this.setState({ showSignIn: false })} 
+                            visible={showSignIn} 
+                        />
                     </React.Fragment>
                 )}
             </div>

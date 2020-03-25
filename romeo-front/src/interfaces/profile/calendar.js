@@ -31,7 +31,14 @@ class JobCalendar extends React.Component {
         const listData = this.getListData(value);
         return (
           <div>
-            { listData.content && <Tag color="green" style={{ whiteSpace: 'normal' }}>{listData.content}</Tag>}
+            { listData.content && 
+                <Tag 
+                    color="green" 
+                    style={{ whiteSpace: 'normal' }}
+                >
+                    {listData.content}
+                </Tag>
+            }
           </div>
         );
     }
@@ -80,10 +87,15 @@ class JobCalendar extends React.Component {
         }
     }
     render() {
+        const { fullscreen } = this.props;
         return (
             <div className="calendar-wrapper">
                 <div className="calendar-container">
-                    <Calendar onPanelChange={this.onPanelChange} dateCellRender={this.dateCellRender}/>
+                    <Calendar 
+                        onPanelChange={this.onPanelChange} 
+                        dateCellRender={this.dateCellRender}
+                        fullscreen={fullscreen}
+                    />
                 </div>
             </div>
         )
