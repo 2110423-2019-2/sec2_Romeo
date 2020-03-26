@@ -9,13 +9,15 @@ import datetime
 
 # Import Serializers of apps
 from .serializers import PhotographerSerializer, CustomerSerializer, JobSerializer, JobReservationSerializer, UserSerializer, \
-    PhotoSerializer, AvailTimeSerializer, EquipmentSerializer, ProfileSerializer, StyleSerializer, NotificationSerializer, ChangePasswordSerializer
+    PhotoSerializer, AvailTimeSerializer, EquipmentSerializer, ProfileSerializer, StyleSerializer, NotificationSerializer, ChangePasswordSerializer, \
+        ReviewSerializer
 # Import models of apps for queryset
 from photographers.models import Photographer, Photo, AvailTime, Equipment, Style
 from customers.models import Customer
 from jobs.models import JobInfo, JobReservation
 from users.models import CustomUser, CustomUserProfile
 from notification.models import Notification
+from reviews.models import ReviewInfo
 
 
 class PhotographerViewSet(viewsets.ModelViewSet):
@@ -161,3 +163,8 @@ class NotificationViewSet(viewsets.ModelViewSet):
     lookup_field = 'noti_receiver__user__username'
     filter_backends = [filters.SearchFilter]
     search_fields = ['noti_receiver__user__username']
+
+class ReviewViewSet(viewsets.ModelViewSet):
+    queryset = ReviewInfo.objects.filter()
+    serializer_class = ReviewSerializer
+    permission_classes = [AllowAny]
