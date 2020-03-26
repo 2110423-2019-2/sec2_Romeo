@@ -129,7 +129,7 @@ class EquipmentViewSet(viewsets.ModelViewSet):
 
 
 class CustomerViewSet(viewsets.ModelViewSet):
-    queryset = Customer.objects.filter()
+    queryset = Customer.objects.all()
     serializer_class = CustomerSerializer
     permission_classes = [AllowAny]
     lookup_field = 'profile__user__username'
@@ -180,7 +180,7 @@ class ProfileViewSet(viewsets.ModelViewSet):
 
 class NotificationViewSet(viewsets.ModelViewSet):
     serializer_class = NotificationSerializer
-    queryset = Notification.objects.filter()
+    queryset = Notification.objects.all()
     permission_classes = [AllowAny]
     lookup_field = 'noti_receiver__user__username'
     filter_backends = [filters.SearchFilter]
