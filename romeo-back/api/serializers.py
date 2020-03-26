@@ -408,6 +408,8 @@ class JobSerializer(serializers.ModelSerializer):
             # Create a notification
             notification=NotificationSerializer.create(self,validated_data={'noti_field':'JOB', 'noti_receiver':instance.job_customer.profile, \
             'noti_actor':instance.job_photographer.profile, 'noti_action':'UPDATE', 'noti_status':instance.job_status})
+        if 'job_url' in validated_data:
+            instance.job_url = validated_data.pop('job_url')
 
         instance.save()
         return instance
