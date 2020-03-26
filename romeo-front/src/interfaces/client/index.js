@@ -8,6 +8,7 @@ import EditProfile from "./edit-profile/"
 import { getCurrentClient } from "common/auth";
 
 import { Menu } from 'antd';
+import Notifications from "./notifications";
 
 class ClientLanding extends React.Component {
     render() {
@@ -54,6 +55,13 @@ class ClientLanding extends React.Component {
                             <NavLink 
                                 className="ant-menu-item" 
                                 activeClassName="ant-menu-item-selected"
+                                to="/client/notifications"
+                            >
+                                All Notifications
+                            </NavLink>
+                            <NavLink 
+                                className="ant-menu-item" 
+                                activeClassName="ant-menu-item-selected"
                                 to="/client/edit"
                             >
                                 Personal Information
@@ -65,6 +73,7 @@ class ClientLanding extends React.Component {
                     <Route path="/client/edit/password" component={Password} />
                     <Route path="/client/edit" component={Edit} />
                     <Route path="/client/reservations" exact component={Reservations} />
+                    <Route path="/client/notifications" exact component={Notifications} />
                     <Route path="/client/edit-portfolio" exact component={EditPortfolio} />
                     <Route path="/client/edit-profile" exact component={EditProfile} />
                     <Route path="/client" exact component={RedirectToEdit} />

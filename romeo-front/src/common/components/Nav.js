@@ -6,7 +6,7 @@ import { connect } from "react-redux";
 import { signOut } from "common/actions/auth";
 import history from "common/router/history";
 import SignInRegModal from "interfaces/signinreg/modal";
-import { getNotifications, readNotifications } from "logic/Notifications";
+import { getNotifications, readNotifications, statusLabels } from "logic/Notifications";
 
 class Nav extends React.Component {
     state = {
@@ -21,7 +21,6 @@ class Nav extends React.Component {
     render() {
         const { showSignIn, notifications } = this.state;
         const { signOut, isAuth, transparent } = this.props;
-
         const currentClient = JSON.parse(localStorage.getItem('currentClient'))
         return (
             <nav className={`main-nav ${transparent ? "transparent" : ""}`}>
@@ -35,36 +34,39 @@ class Nav extends React.Component {
                         <div className="d-flex">
                             <div>
                                 <Dropdown 
-                                    onVisibleChange={v => {
-                                        if (v === false) readNotifications();
-                                    }}
                                     overlay={() => (
                                         <Menu>
                                             <Menu.Item>
                                                 <Icon type="bell" className="mr-2"/><b>Notifications</b>
                                             </Menu.Item>
-                                            { notifications && notifications.length > 0 ? (
-                                                <React.Fragment>
-                                                    <Menu.Divider/>
-                                                    {
-                                                        notifications.slice(0,4).map((e,i) => (
-                                                            <Menu.Item key={`notif${e.noti_id}`}>
-                                                                <div className="d-flex">
-                                                                    <span className="d-block mr-2">{e.content}</span>
-                                                                { e.front_new && <Tag color="#f50">New</Tag> }
-                                                                </div>
-                                                            </Menu.Item>
-                                                        ))
-                                                    }
-                                                    <Menu.Item>
-                                                        <Link to="/client/notifications">View All</Link>
+                                            { notifications && notifications.length > 0 && (
+                                                <Menu.Item>
+                                                    <span className="t-color-primary" onClick={() => readNotifications()}>Mark All as Read</span>
+                                                </Menu.Item>
+                                            )}
+                                            <Menu.Divider/>
+                                            { notifications && notifications.length > 0 ? 
+                                                notifications.slice(0,4).map((e,i) => (
+                                                    <Menu.Item key={`notif${e.noti_timestamp + i}`}>
+                                                        <div className="d-flex" style={{ padding: "5px 12px" }}>
+                                                            <div>
+                                                                { e.noti_field === "JOB" && 
+                                                                    <span>Your status has been updated to <b>{statusLabels(e.noti_status)}</b></span>
+                                                                }
+                                                            </div>
+                                                        { e.front_new && <Tag color="#f50">New</Tag> }
+                                                        </div>
                                                     </Menu.Item>
-                                                </React.Fragment>
+                                                )
                                             ) : (
                                                 <Menu.Item>
                                                     <span className="t-color-light">There are no notifications.</span>
                                                 </Menu.Item>
                                             )}
+                                            <Menu.Divider/>
+                                            <Menu.Item>
+                                                <Link to="/client/notifications">View All</Link>
+                                            </Menu.Item>
                                         </Menu>
                                     )} 
                                     trigger={['click']}
