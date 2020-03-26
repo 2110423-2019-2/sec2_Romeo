@@ -383,22 +383,21 @@ class JobSerializer(serializers.ModelSerializer):
             is_vaild = False
             for avail_time_instance in job_photographer.photographer_avail_time.all():
                 if avail_time_instance.avail_date == job_reservation_data['avail_date'] and avail_time_instance.avail_time == job_reservation_data['avail_time']:
+                    try :
+                        reservation_instance = JobReservation.objects.get(photoshoot_date=photoshoot_date,
+                                                                        job_reservation__avail_date=avail_time_instance.avail_date,
+                                                                        job_reservation__avail_time=avail_time_instance.avail_time,
+                                                                        job_reservation__photographer_price=avail_time_instance.photographer_price)
+                    except :
+                        reservation_instance = JobReservation.objects.create(photoshoot_date=photoshoot_date,
+                                                                        job_reservation__avail_date=avail_time_instance.avail_date,
+                                                                        job_reservation__avail_time=avail_time_instance.avail_time,
+                                                                        job_reservation__photographer_price=avail_time_instance.photographer_price)
+                    job_info.job_reservation.add(reservation_instance)
                     is_vaild = True
             if not is_vaild:
                 job_info.delete()
                 raise serializers.ValidationError('''Your selected date or time for reservation is invalid for the photographer, please check photographer's available time''')
-            
-            try :
-                reservation_instance = JobReservation.objects.get(photoshoot_date=photoshoot_date,
-                                                                job_reservation__avail_date=job_reservation_data['avail_date'],
-                                                                job_reservation__avail_time=job_reservation_data['avail_time'],
-                                                                job_reservation__photographer_price=job_reservation_data['photographer_price'])
-            except :
-                reservation_instance = JobReservation.objects.create(photoshoot_date=photoshoot_date,
-                                                                    job_reservation__avail_date=job_reservation_data['avail_date'],
-                                                                    job_reservation__avail_time=job_reservation_data['avail_time'],
-                                                                    job_reservation__photographer_price=job_reservation_data['photographer_price'])
-            job_info.job_reservation.add(reservation_instance)
         job_info.save()
 
         # Create a notification
