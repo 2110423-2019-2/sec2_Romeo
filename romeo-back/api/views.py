@@ -1,16 +1,15 @@
 from rest_framework.decorators import action
-from rest_framework import status, viewsets, filters 
+from rest_framework import status, viewsets, filters, mixins
 from rest_framework.response import Response
 from .permissions import IsUser
-from rest_framework.permissions import AllowAny, SAFE_METHODS
+from rest_framework.permissions import AllowAny
 from django.shortcuts import get_object_or_404
-from rest_framework.response import Response 
-from django.db.models import Q
+from django.db.models import Q, Avg
+import datetime
 
 # Import Serializers of apps
 from .serializers import PhotographerSerializer, CustomerSerializer, JobSerializer, JobReservationSerializer, UserSerializer, \
-    PhotoSerializer, AvailTimeSerializer, EquipmentSerializer, ProfileSerializer, StyleSerializer, NotificationSerializer
-
+    PhotoSerializer, AvailTimeSerializer, EquipmentSerializer, ProfileSerializer, StyleSerializer, NotificationSerializer, ChangePasswordSerializer
 # Import models of apps for queryset
 from photographers.models import Photographer, Photo, AvailTime, Equipment, Style
 from customers.models import Customer
@@ -58,16 +57,46 @@ class StyleViewSet(viewsets.ModelViewSet):
 class PhotographerSearchViewSet(viewsets.ModelViewSet) :
     serializer_class = PhotographerSerializer
     def get_queryset(self):
+        #Filter name
         user = self.request.query_params.get('user')
         if user is not None :
-            qset = Photographer.objects.filter(Q(profile__user__username__icontains=user)|Q(profile__user__first_name__icontains=user)|Q(profile__user__last_name__icontains=user))
-        else : qset = Photographer.objects.all()
+            nameset = Photographer.objects.filter(Q(profile__user__username__icontains=user)|Q(profile__user__first_name__icontains=user)|Q(profile__user__last_name__icontains=user))
+        else : nameset = Photographer.objects.all()
+
+        #Filter other parameters
         style = self.request.query_params.get('style')
-        date = self.request.query_params.get('date')
         time = self.request.query_params.get('time')
-        metafil = {'photographer_style__style_name': style, 'photographer_avail_time__avail_date': date, 'photographer_avail_time__avail_time': time}
+        metafil = {'photographer_style__style_name': style, 'photographer_avail_time__avail_time': time}
         filters = {k: v for k, v in metafil.items() if v is not None}
-        queryset = qset.filter(**filters)
+        paraset = nameset.filter(**filters)
+
+        #Filter Date (allphotographer - photographerwithjobs)
+        date = self.request.query_params.get('date')
+        if date is not None :
+            #Filter Photographer by date
+            day, month, year = (int(x) for x in date.split('_')) 
+            sel_date = (datetime.date(year, month, day)).strftime('%A')
+            dateset = paraset.filter(photographer_avail_time__avail_date = sel_date)
+            #Filter out reserved photographer
+            compdate = "-".join(date.split("_")[::-1])
+            jobset = JobInfo.objects.filter(job_reservation__photoshoot_date = compdate).values_list('job_photographer_id', flat=True)
+            toremove = []
+            for cid in jobset :
+                if dateset.filter(profile__user__id=cid) is not None:
+                    toremove.append(cid)
+            queryset = dateset.filter(~Q(profile__user__id__in=toremove))
+        else : queryset = paraset
+        
+        #Sort
+        sort = self.request.query_params.get('sort')
+        if sort == "time_des" :
+            return queryset.order_by("-photographer_last_online_time")
+        elif sort == "time_asc" :
+            return queryset.order_by("photographer_last_online_time")
+        elif sort == "price_des" :
+            return queryset.annotate(price=Avg('photographer_avail_time__photographer_price')).order_by('-price')
+        elif sort == "price_asc" :
+            return queryset.annotate(price=Avg('photographer_avail_time__photographer_price')).order_by('price')
         return queryset
 
 class EquipmentViewSet(viewsets.ModelViewSet):
@@ -88,6 +117,8 @@ class JobsViewSet(viewsets.ModelViewSet):
     queryset = JobInfo.objects.all()
     serializer_class = JobSerializer
     permission_classes = [AllowAny]
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['job_photographer__profile__user__username','job_customer__profile__user__username']
 
     # def get_permissions(self):
     #     if self.action == 'list':
@@ -99,7 +130,7 @@ class JobsViewSet(viewsets.ModelViewSet):
 class JobReservationViewSet(viewsets.ModelViewSet):
     queryset = JobReservation.objects.all()
     serializer_class = JobReservationSerializer
-    # permission_classes = [AllowAny]
+    permission_classes = [AllowAny]
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = CustomUser.objects.all()
@@ -109,6 +140,11 @@ class UserViewSet(viewsets.ModelViewSet):
     filter_backends = [filters.SearchFilter]
     search_fields = ['username']
 
+class ChangePasswordViewSet(mixins.UpdateModelMixin,viewsets.GenericViewSet):
+    queryset = CustomUser.objects.all()
+    serializer_class = ChangePasswordSerializer
+    permission_classes = [AllowAny]
+    lookup_field = 'username'   
 
 class ProfileViewSet(viewsets.ModelViewSet):
     queryset = CustomUserProfile.objects.all()
@@ -120,4 +156,8 @@ class ProfileViewSet(viewsets.ModelViewSet):
 
 class NotificationViewSet(viewsets.ModelViewSet):
     serializer_class = NotificationSerializer
-    queryset = Notification.objects.all()
+    queryset = Notification.objects.filter()
+    permission_classes = [AllowAny]
+    lookup_field = 'noti_receiver__user__username'
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['noti_receiver__user__username']
