@@ -12,7 +12,6 @@ JOB_STATUS_CHOICES = [('PENDING', 'Pending'),
                       ('PAID', 'Paid'),
                       ('CANCELLED', 'Cancelled'),
                       ('PROCESSING', 'Processing Photos'),
-                      ('DONE', 'Done'),
                       ('COMPLETED', 'Completed'),
                       ('CLOSED', 'Closed')]
 
