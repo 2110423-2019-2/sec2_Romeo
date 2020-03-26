@@ -152,9 +152,9 @@ class Profile extends React.Component {
                             </div>
                         ) }
                         </div>
-                        { currentClient && currentClient.profile.user.user_type !== 1 ? (
+                        { currentClient && currentClient.profile.user.user_type !== 1 && (
                             <Button 
-                                type="primary" 
+                                type={enableReserve ? "danger" : "primary"}
                                 onClick={() => this.setState({ display: 1, enableReserve: !enableReserve })}
                                 className="el-4 pos-fixed"
                                 size="large"
@@ -176,7 +176,8 @@ class Profile extends React.Component {
                                     </React.Fragment>
                                 )}
                             </Button>
-                        ) : (
+                        )}
+                        { currentClient ? <div/> : 
                             <Button 
                                 type="primary" 
                                 onClick={() => this.setState({ showSignIn: true })}
@@ -192,7 +193,7 @@ class Profile extends React.Component {
                             >
                                 <Icon type="book" /> Sign In to Reserve
                             </Button>
-                        )}
+                        }
                         <SignInModal 
                             onCancel={() => this.setState({ showSignIn: false })} 
                             visible={showSignIn} 

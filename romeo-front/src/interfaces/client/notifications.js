@@ -31,11 +31,6 @@ class Notifications extends React.Component {
         notifications: [],
     }
     render() {
-        const currentClient = getCurrentClient();
-        if (currentClient.type !== 2) {
-            return <Redirect to="/"/>
-        }
-
         const { notifications } = this.state;
         return (
             <div className="container mt-4 with-sidebar pl-4">

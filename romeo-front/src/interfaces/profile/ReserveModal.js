@@ -15,8 +15,7 @@ class ReserveModal extends React.Component {
         times: [],
         jobStartDate: moment(new Date()),
         jobEndDate: moment(new Date()),
-        dateError: false,
-        totalPrice: 0
+        dateError: false
     }
     componentDidMount() {
         this.props.form.validateFields();
@@ -52,8 +51,8 @@ class ReserveModal extends React.Component {
                     job_total_price: -1,
                     job_url: null
                 }
-                Axios.post("/api/jobs", req).then(res => {
-                    history.push("/client/reservations")
+                Axios.post("/api/jobs/", req).then(res => {
+                    history.push("/client/reservations/")
                 }).catch(err => console.log(err));
             }
         });
@@ -86,7 +85,7 @@ class ReserveModal extends React.Component {
     }
     render() {
         const { visible, onCancel, currentClient, currentPhotographer} = this.props;
-        const { times, dateError, totalPrice } = this.state;
+        const { times, dateError } = this.state;
         const { getFieldDecorator, getFieldsError, getFieldError, isFieldTouched } = this.props.form;
         // Validation
         const jobTitleError = isFieldTouched('jobTitle') && getFieldError('jobTitle');

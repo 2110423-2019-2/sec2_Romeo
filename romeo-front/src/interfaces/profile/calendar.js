@@ -80,6 +80,12 @@ class JobCalendar extends React.Component {
 
     getListData = (value) => {
         const { calOutput } = this.state;
+        if (moment(value).isBefore(new Date())) {
+            return {
+                content: null,
+                data: null
+            }
+        }
         switch (value.day()) {
             case 0: return {
                 content: this.getLabel(calOutput[6]),
