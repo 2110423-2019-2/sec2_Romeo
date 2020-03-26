@@ -1,14 +1,12 @@
 import React from "react";
 import { Link, Redirect } from "react-router-dom";
-import { Modal, Button, Tag, Icon, Divider } from "antd";
+import { Button, Tag, Icon, Divider } from "antd";
 import { connect } from "react-redux"
 import { getCurrentClientInfo } from "common/auth";
 import { formatDateTime } from "common/date";
-import moment from "moment";
 import JobCalendar from "./calendar";
 import { styleColors } from "../../common/style-colors";
 import Axios from "axios"
-import ReserveModal from "./ReserveModal";
 import SignInModal from "../signinreg/modal";
 
 class Profile extends React.Component {
@@ -17,8 +15,8 @@ class Profile extends React.Component {
         currentPhotographer: null,
         currentPortfolio: null,
         currentClient: null,
-        showReserveModal: false,
-        showSignIn: false
+        showSignIn: false,
+        enableReserve: false
     }
 
     componentDidMount = async () => {
@@ -47,8 +45,8 @@ class Profile extends React.Component {
             currentPortfolio, 
             display, 
             currentClient, 
-            showReserveModal,
-            showSignIn
+            showSignIn,
+            enableReserve
         } = this.state;
         const { username } = this.props.match.params;
         if (currentPhotographer && (currentPhotographer.profile.username === username 
@@ -118,7 +116,7 @@ class Profile extends React.Component {
                                 </div>
                                 <div 
                                     className={`profile-tabs-item ${display === 0 && 'active'}`}
-                                    onClick={() => this.setState({ display: 0})}
+                                    onClick={() => this.setState({ display: 0, enableReserve: false})}
                                 >
                                     Portfolio
                                 </div>
@@ -145,14 +143,19 @@ class Profile extends React.Component {
                             </div>
                         ) : (
                             <div className="pa-4">
-                                <JobCalendar fullscreen={true} currentPhotographer={currentPhotographer}/>
+                                <JobCalendar 
+                                    fullscreen={true} 
+                                    currentPhotographer={currentPhotographer}
+                                    currentClient={currentClient}
+                                    enableReserve={enableReserve}
+                                />
                             </div>
                         ) }
                         </div>
                         { currentClient && currentClient.profile.user.user_type !== 1 ? (
                             <Button 
                                 type="primary" 
-                                onClick={() => this.setState({ showReserveModal: true })}
+                                onClick={() => this.setState({ display: 1, enableReserve: !enableReserve })}
                                 className="el-4 pos-fixed"
                                 size="large"
                                 shape="round"
@@ -163,7 +166,15 @@ class Profile extends React.Component {
                                     zIndex: 999
                                 }}
                             >
-                                <Icon type="book" /> Reserve
+                                { enableReserve ? (
+                                    <React.Fragment>
+                                        <Icon type="close" /> Cancel
+                                    </React.Fragment>
+                                ): (
+                                    <React.Fragment>
+                                        <Icon type="book" /> Reserve
+                                    </React.Fragment>
+                                )}
                             </Button>
                         ) : (
                             <Button 
@@ -182,12 +193,6 @@ class Profile extends React.Component {
                                 <Icon type="book" /> Sign In to Reserve
                             </Button>
                         )}
-                        <ReserveModal
-                            visible={showReserveModal}
-                            onCancel={() => this.setState({ showReserveModal: false })}
-                            currentClient={currentClient}
-                            currentPhotographer={currentPhotographer}
-                        />
                         <SignInModal 
                             onCancel={() => this.setState({ showSignIn: false })} 
                             visible={showSignIn} 

@@ -5,6 +5,11 @@ export const formatDate = date => {
 	return moment(date).format("D/M/YYYY");
 };
 
+export const formatDashedDate = date => {
+	if (!date || date === "") return "-";
+	return moment(date).format("YYYY-MM-DD");
+};
+
 export const formatDateTime = date => {
 	if (!date || date === "") return "-";
 	return moment(date).format("D/M/YYYY HH:mm");

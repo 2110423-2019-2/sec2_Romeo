@@ -37,3 +37,11 @@ export const dayIndex = {
     SATURDAY: 5,
     SUNDAY: 6
 }
+
+export const timeLabels = {
+    HALF_DAY_MORNING: 'Morning-Noon',
+    HALF_DAY_NOON: 'Noon-Evening',
+    FULL_DAY: 'Full-Day',
+    NIGHT: 'Night',
+    FULL_DAY_NIGHT: 'Full-Day and Night',
+}

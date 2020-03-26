@@ -14,9 +14,11 @@ class Nav extends React.Component {
         notifications: []
     }
     async componentDidMount() {
-        const currentClient = JSON.parse(localStorage.getItem('currentClient'))
-        const n = await getNotifications(currentClient.username);
-        this.setState({ notifications: n });
+        if (this.props.isAuth && this.props.currentClient) {
+            const currentClient = JSON.parse(localStorage.getItem('currentClient'))
+            const n = await getNotifications(currentClient.username);
+            this.setState({ notifications: n });
+        }
     }
     render() {
         const { showSignIn, notifications } = this.state;
