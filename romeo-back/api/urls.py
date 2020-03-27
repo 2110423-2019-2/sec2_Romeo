@@ -4,6 +4,7 @@ from .views import PhotographerViewSet, PhotoViewSet, EquipmentViewSet, PhotoVie
     StyleViewSet, CustomerViewSet, JobsViewSet, JobReservationViewSet, UserViewSet, ProfileViewSet, \
     NotificationViewSet, PhotographerSearchViewSet, ChangePasswordViewSet, ReviewViewSet
 
+
 router = DefaultRouter()
 router.register(r'photographers', PhotographerViewSet, basename='photographers')
 router.register(r'photographersearch', PhotographerSearchViewSet, basename='photographersearch')
