@@ -414,8 +414,12 @@ class JobSerializer(serializers.ModelSerializer):
         if 'job_status' in validated_data:
             instance.job_status = validated_data.pop('job_status')
             # Create a notification
-            notification=NotificationSerializer.create(self,validated_data={'noti_receiver':instance.job_customer.profile, \
-            'noti_actor':instance.job_photographer.profile, 'noti_action':'UPDATE', 'noti_status':instance.job_status, 'noti_read':'UNREAD'})
+            if instance.job_status == 'CANCELLED_BY_CUSTOMER':
+                notification=NotificationSerializer.create(self,validated_data={'noti_receiver':instance.job_photographer.profile, \
+                'noti_actor':instance.job_customer.profile, 'noti_action':'UPDATE', 'noti_status':instance.job_status, 'noti_read':'UNREAD'})
+            else:
+                notification=NotificationSerializer.create(self,validated_data={'noti_receiver':instance.job_customer.profile, \
+                'noti_actor':instance.job_photographer.profile, 'noti_action':'UPDATE', 'noti_status':instance.job_status, 'noti_read':'UNREAD'})
         if 'job_url' in validated_data:
             instance.job_url = validated_data.pop('job_url')
 

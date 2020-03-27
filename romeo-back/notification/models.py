@@ -9,7 +9,8 @@ NOTI_STATUS_CHOICES = [('PENDING', 'Pending'),
                       ('DECLINED', 'Declined'),
                       ('MATCHED', 'Matched'),
                       ('PAID', 'Paid'),
-                      ('CANCELLED', 'Cancelled'),
+                      ('CANCELLED_BY_PHOTOGRAPHER', 'Cancelled by photographer'),
+                      ('CANCELLED_BY_CUSTOMER', 'Cancelled by customer'),
                       ('PROCESSING', 'Processing Photos'),
                       ('COMPLETED', 'Completed'),
                       ('CLOSED', 'Closed')]
@@ -22,7 +23,7 @@ class Notification(models.Model):
     noti_receiver = models.ForeignKey(CustomUserProfile,blank=False,related_name='noti_receiver',on_delete=models.CASCADE)
     noti_actor = models.ForeignKey(CustomUserProfile,blank=False,related_name='noti_actor',on_delete=models.CASCADE)
     noti_action = models.CharField(max_length=100)
-    noti_status = models.CharField(choices=NOTI_STATUS_CHOICES, max_length=10)
+    noti_status = models.CharField(choices=NOTI_STATUS_CHOICES, max_length=25)
     noti_description = models.TextField(blank=True, null=True,max_length=250)
     noti_timestamp = models.DateTimeField(default=timezone.now, db_index=True)
     noti_read = models.CharField(choices=NOTI_READ_CHOICES, default='UNREAD', max_length=10)
