@@ -99,28 +99,30 @@ class PhotographerSearchViewSet(viewsets.ModelViewSet) :
             return queryset.annotate(price=Avg('photographer_avail_time__photographer_price')).order_by('-price')
         elif sort == "price_asc" :
             return queryset.annotate(price=Avg('photographer_avail_time__photographer_price')).order_by('price')
-        elif sort == "review_des" or sort == "review_asc" :
+        elif sort == "review_des":
             counts = dict()
             jobidlist = ReviewInfo.objects.values_list('reviewJob', flat=True)
             for i in jobidlist :
                 pid = JobInfo.objects.filter(job_id=i).values_list('job_photographer_id', flat=True)
                 counts[pid[0]] = counts.get(pid[0], 0) + 1
-            if sort == "review_des" :
-                return queryset.annotate(
-                    score=Case(
-                        *[When(profile__user__id=k, then=Value(v)) for k,v in counts.items()],
-                        default=None,
-                        output_field=IntegerField(null=True)
-                    )
-                ).order_by('-score')
-            elif sort == "review_asc" :
-                return queryset.annotate(
-                    score=Case(
-                        *[When(profile__user__id=k, then=Value(v)) for k,v in counts.items()],
-                        default=None,
-                        output_field=IntegerField(null=True)
-                    )
-                ).order_by('score')
+            return queryset.annotate(
+                            score=Case(
+                            *[When(profile__user__id=k, then=Value(v)) for k,v in counts.items()],
+                            default=None,
+                            output_field=IntegerField(null=True)
+                            )).order_by('-score')
+        elif sort == "review_asc" :
+            counts = dict()
+            jobidlist = ReviewInfo.objects.values_list('reviewJob', flat=True)
+            for i in jobidlist :
+                pid = JobInfo.objects.filter(job_id=i).values_list('job_photographer_id', flat=True)
+                counts[pid[0]] = counts.get(pid[0], 0) + 1
+            return queryset.annotate(
+                            score=Case(
+                            *[When(profile__user__id=k, then=Value(v)) for k,v in counts.items()],
+                            default=None,
+                            output_field=IntegerField(null=True)
+                            )).order_by('score')
         return queryset
 
 class EquipmentViewSet(viewsets.ModelViewSet):
@@ -129,7 +131,7 @@ class EquipmentViewSet(viewsets.ModelViewSet):
 
 
 class CustomerViewSet(viewsets.ModelViewSet):
-    queryset = Customer.objects.filter()
+    queryset = Customer.objects.all()
     serializer_class = CustomerSerializer
     permission_classes = [AllowAny]
     lookup_field = 'profile__user__username'
@@ -180,9 +182,9 @@ class ProfileViewSet(viewsets.ModelViewSet):
 
 class NotificationViewSet(viewsets.ModelViewSet):
     serializer_class = NotificationSerializer
-    queryset = Notification.objects.filter()
+    queryset = Notification.objects.all()
     permission_classes = [AllowAny]
-    lookup_field = 'noti_receiver__user__username'
+    lookup_field = 'noti_id'
     filter_backends = [filters.SearchFilter]
     search_fields = ['noti_receiver__user__username']
 
