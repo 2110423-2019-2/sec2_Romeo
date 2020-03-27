@@ -131,11 +131,12 @@ class ReserveModal extends React.Component {
                         </Form.Item>
                         <label>Job Description</label>
                         <Form.Item className="mt-1">
-                            <Input.TextArea
-                                name="jobDescription"
-                                placeholder="Job Description"
-                                type="text"
-                            />
+                            {getFieldDecorator('jobDescription')(
+                                <Input.TextArea
+                                    placeholder="Job Description"
+                                    type="text"
+                                />
+                            )}
                         </Form.Item>
                         <label className="mb-2 d-block">Job Time(s)</label>
                         { times.map((e,i) => (

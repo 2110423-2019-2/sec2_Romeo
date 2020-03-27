@@ -27,7 +27,7 @@ main.main-content {
         margin-left: 256px;
         margin-right: 32px;
         width: 100%;
-        max-width: 100%;
+        max-width: calc(100vw - 288px);
         @media screen and (max-width: 599px) {
             & {
                 margin: auto;
@@ -116,4 +116,9 @@ h1,h2,h3,h4,h5,h6,b,strong {
 
 .ant-fullcalendar-header .ant-radio-group.ant-radio-group-outline.ant-radio-group-default {
     display: none;
+}
+
+.ant-table {
+    max-width: 100%;
+    overflow-x: scroll;
 }
