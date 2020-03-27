@@ -267,11 +267,12 @@ class CustomerSerializer(serializers.ModelSerializer):
 
     def update (self, instance, validated_data):
         # update profile
-        profile_data = dict(validated_data['profile'])
-        if 'user' in profile_data:
-            username = dict(profile_data['user'])['username']
-            profile_instance = CustomUserProfile.objects.get(user__username=username)
-            profile_instance = ProfileSerializer.update(ProfileSerializer, instance=profile_instance, validated_data=profile_data)
+        if 'profile' in validated_data:
+            profile_data = dict(validated_data['profile'])
+            if 'user' in profile_data:
+                username = dict(profile_data['user'])['username']
+                profile_instance = CustomUserProfile.objects.get(user__username=username)
+                profile_instance = ProfileSerializer.update(ProfileSerializer, instance=profile_instance, validated_data=profile_data)
 
         if 'fav_photographers' in validated_data:
             instance.fav_photographers.clear()
