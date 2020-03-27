@@ -43,15 +43,13 @@ class ClientLanding extends React.Component {
                                         Edit Profile
                                 </NavLink>
                             )}
-                            { type === 2 && (
-                                <NavLink 
-                                    className="ant-menu-item" 
-                                    activeClassName="ant-menu-item-selected"
-                                    to="/client/reservations"
-                                >
-                                        My Reservations
-                                </NavLink>
-                            )}
+                            <NavLink 
+                                className="ant-menu-item" 
+                                activeClassName="ant-menu-item-selected"
+                                to="/client/reservations"
+                            >
+                                    Reservations
+                            </NavLink>
                             <NavLink 
                                 className="ant-menu-item" 
                                 activeClassName="ant-menu-item-selected"

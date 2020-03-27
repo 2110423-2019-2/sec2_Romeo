@@ -22,21 +22,8 @@ export const decline = (job, actorType) => {
 }
 
 export const cancel = (job, actorType) => {
-    // Wait for backend to receive cancellation actor
     Axios.patch(`/api/jobs/${job.job_id}/`, {
-        job_status: "CANCELLED"
-    })
-}
-
-// Called by payment pages
-export const paid = (job) => {
-    Axios.patch(`/api/jobs/${job.job_id}/`, {
-        job_status: "PAID"
-    })
-}
-export const closeJob = (job) => {
-    Axios.patch(`/api/jobs/${job.job_id}/`, {
-        job_status: null
+        job_status: actorType === 1 ? "CANCELLED_BY_PHOTOGRAPHER" : "CANCELLED_BY_CUSTOMER"
     })
 }
 
@@ -52,21 +39,26 @@ export const proceed = (job, actorType, data) => {
             Axios.patch(`/api/jobs/${job.job_id}/`, {
                 job_status: "PROCESSING"
             })
-        } else if (job.job_status === "PROCESSING") {
+        } else if (job.job_status === "PROCESSING" || job.job_status === "COMPLETED") {
             Axios.patch(`/api/jobs/${job.job_id}/`, {
                 job_status: "COMPLETED",
-                job_url: data.job_url
+                job_url: data
             })
         }
     } else {
         // Customers
         if (job.job_status === "MATCHED") {
-            history.push("/payment/" + job.job_id);
+            Axios.patch(`/api/jobs/${job.job_id}/`, {
+                job_status: "PAID"
+            })
         }
         if (job.job_status === "COMPLETED") {
-            history.push("/payment/" + job.job_id);
+            Axios.patch(`/api/jobs/${job.job_id}/`, {
+                job_status: "CLOSED"
+            })
         }
     }
+    window.location.reload();
 }
 
 export const makeDepositPayment = (jobId) => {

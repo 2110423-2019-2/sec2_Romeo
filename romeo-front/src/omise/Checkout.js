@@ -1,8 +1,6 @@
 import React, { Component } from "react";
 import { Button } from "antd";
 
-import "./Checkout.css";
-
 let OmiseCard;
 
 export class Checkout extends Component {
@@ -25,10 +23,11 @@ export class Checkout extends Component {
   };
 
   omiseCardHandler = () => {
-    const { job, createCreditCardCharge } = this.props;
+    const { job, amount, createCreditCardCharge } = this.props;
     OmiseCard.open({
+      amount: amount * 100,
       onCreateTokenSuccess: token => {
-        createCreditCardCharge(job.job_id, token);
+        createCreditCardCharge(job, token);
       },
       onFormClosed: () => {}
     });
@@ -47,18 +46,17 @@ export class Checkout extends Component {
   render() {
       const { job } = this.props
     return (
-      <div className="own-form">
-        <form>
+        <form className="d-flex align-center">
           <Button
             id="credit-card"
             type="primary"
-            formType="button"
+            htmlType="button"
             onClick={this.handleClick}
+            shape="round"
           >
             {job.job_status === "MATCHED" ? "Pay Deposit" : "Pay for Full Price"}
           </Button>
         </form>
-      </div>
     );
   }
 }

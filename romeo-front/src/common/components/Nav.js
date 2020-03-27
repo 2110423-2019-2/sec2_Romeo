@@ -6,7 +6,7 @@ import { connect } from "react-redux";
 import { signOut } from "common/actions/auth";
 import history from "common/router/history";
 import SignInRegModal from "interfaces/signinreg/modal";
-import { getNotifications, readNotifications, getNotificationText } from "logic/Notifications";
+import { receiveNotifications, getNotificationText } from "logic/Notifications";
 
 class Nav extends React.Component {
     state = {
@@ -16,7 +16,7 @@ class Nav extends React.Component {
     async componentDidMount() {
         const currentClient = JSON.parse(localStorage.getItem('currentClient'))
         if (this.props.isAuth && currentClient) {
-            const n = await getNotifications(currentClient.username);
+            const n = await receiveNotifications(currentClient.username);
             this.setState({ notifications: n });
         }
     }
@@ -43,19 +43,25 @@ class Nav extends React.Component {
                                             </Menu.Item>
                                             { notifications && notifications.length > 0 && (
                                                 <Menu.Item>
-                                                    <span className="t-color-primary" onClick={() => readNotifications()}>Mark All as Read</span>
+                                                    <span className="t-color-primary">Mark All as Read</span>
                                                 </Menu.Item>
                                             )}
                                             <Menu.Divider/>
                                             { notifications && notifications.length > 0 ? 
                                                 notifications.slice(0,4).map((e,i) => (
-                                                    <Menu.Item key={`notif${e.noti_timestamp + i}`}>
-                                                        <div className="d-flex align-center" style={{ whiteSpace: "initial" }}>
-                                                            <div className="mr-2">
-                                                                { getNotificationText(e.noti_actor, e.noti_status) }
-                                                            </div>
-                                                        { e.front_new && <Tag color="#f50">New</Tag> }
-                                                        </div>
+                                                    <Menu.Item 
+                                                            key={`notif${e.noti_timestamp + i}`} 
+                                                            className="pb-2 pt-2"
+                                                            style={{ borderBottom: '1px solid #efefef' }}
+                                                        >
+                                                            <Link to="/client/reservations">
+                                                                <div className="d-flex align-center" style={{ whiteSpace: "initial" }}>
+                                                                    <div className="mr-2">
+                                                                        { getNotificationText(e.noti_actor, e.noti_status) }
+                                                                    </div>
+                                                                { e.front_new && <Tag color="#f50">New</Tag> }
+                                                                </div>
+                                                            </Link>
                                                     </Menu.Item>
                                                 )
                                             ) : (
@@ -63,7 +69,6 @@ class Nav extends React.Component {
                                                     <span className="t-color-light">There are no notifications.</span>
                                                 </Menu.Item>
                                             )}
-                                            <Menu.Divider/>
                                             <Menu.Item>
                                                 <Link to="/client/notifications">View All</Link>
                                             </Menu.Item>
