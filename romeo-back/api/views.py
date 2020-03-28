@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from .permissions import IsUser
 from rest_framework.permissions import AllowAny
 from django.shortcuts import get_object_or_404
-from django.db.models import Q, Avg, Case, IntegerField, Value, When
+from django.db.models import Q, Avg, Case, IntegerField, Value, When, Sum
 import datetime
 
 # Import Serializers of apps
@@ -146,12 +146,10 @@ class JobsViewSet(viewsets.ModelViewSet):
     filter_backends = [filters.SearchFilter]
     search_fields = ['job_photographer__profile__user__username','job_customer__profile__user__username']
 
-    # def get_permissions(self):
-    #     if self.action == 'list':
-    #         self.permission_classes = [IsSuperUser, ]
-    #     elif self.action in ['update', 'retrieve', 'destroy']:
-    #         self.permission_classes = [IsUser]
-    #     return super(self.__class__, self).get_permissions()
+    def get_queryset(self):
+        return JobInfo.objects.annotate(
+            total_price=Sum('job_reservation__job_reservation__photographer_price')
+        )
 
 class JobReservationViewSet(viewsets.ModelViewSet):
     queryset = JobReservation.objects.all()

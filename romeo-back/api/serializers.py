@@ -343,6 +343,7 @@ class JobSerializer(serializers.ModelSerializer):
     job_customer = serializers.CharField(source='job_customer.profile.user.username')
     job_photographer = serializers.CharField(source='job_photographer.profile.user.username')
     job_reservation = JobReservationSerializer(many=True, required=False, partial=True)
+    total_price = serializers.FloatField()
 
     class Meta:
         model = JobInfo

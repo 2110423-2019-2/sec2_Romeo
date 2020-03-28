@@ -36,7 +36,6 @@ class JobInfo(models.Model):
     job_start_date = models.DateField()
     job_end_date = models.DateField()
     job_reservation = models.ManyToManyField(JobReservation, null=True)
-    job_total_price = models.IntegerField(default=0)
     job_url = models.URLField(max_length = 200, null=True, blank=True)
     # is_reviewed
     # job_payment
