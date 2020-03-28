@@ -10,7 +10,7 @@ import datetime
 # Import Serializers of apps
 from .serializers import PhotographerSerializer, CustomerSerializer, JobSerializer, JobReservationSerializer, UserSerializer, \
     PhotoSerializer, AvailTimeSerializer, EquipmentSerializer, ProfileSerializer, StyleSerializer, NotificationSerializer, ChangePasswordSerializer, \
-        ReviewSerializer
+        ReviewSerializer, PaymentSerializer
 # Import models of apps for queryset
 from photographers.models import Photographer, Photo, AvailTime, Equipment, Style
 from customers.models import Customer
@@ -18,6 +18,7 @@ from jobs.models import JobInfo, JobReservation
 from users.models import CustomUser, CustomUserProfile
 from notification.models import Notification
 from reviews.models import ReviewInfo
+from payments.models import Payment
 
 
 class PhotographerViewSet(viewsets.ModelViewSet):
@@ -124,6 +125,19 @@ class PhotographerSearchViewSet(viewsets.ModelViewSet) :
                             output_field=IntegerField(null=True)
                             )).order_by('score')
         return queryset
+
+
+class PaymentViewSet(viewsets.ModelViewSet):
+    serializer_class = PaymentSerializer
+    queryset = Payment.objects.all()
+    permission_classes = [AllowAny]
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(data="payment success")
+
 
 class EquipmentViewSet(viewsets.ModelViewSet):
     serializer_class = EquipmentSerializer
