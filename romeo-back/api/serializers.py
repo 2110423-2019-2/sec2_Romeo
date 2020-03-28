@@ -453,7 +453,8 @@ class PaymentSerializer(serializers.ModelSerializer):
         payment_photographer_username=validated_data.pop('payment_photographer')['profile']['user']['username']
         payment_photographer=Photographer.objects.get(profile__user__username=payment_photographer_username)
 
-        payments = Payment.objects.create(payment_customer=payment_customer, 
+        payments = Payment.objects.create(payment_status=validated_data.pop('payment_status'),
+                                        payment_customer=payment_customer, 
                                         payment_photographer=payment_photographer, 
                                         payment_job=validated_data.pop('payment_job'), 
                                         payment_amount=validated_data.pop('payment_amount'))
