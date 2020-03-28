@@ -6,6 +6,8 @@ from rest_framework.permissions import AllowAny
 from django.shortcuts import get_object_or_404
 from django.db.models import Q, Avg, Case, IntegerField, Value, When, Sum
 import datetime
+import os
+import omise
 
 # Import Serializers of apps
 from .serializers import PhotographerSerializer, CustomerSerializer, JobSerializer, JobReservationSerializer, UserSerializer, \
@@ -132,11 +134,47 @@ class PaymentViewSet(viewsets.ModelViewSet):
     queryset = Payment.objects.all()
     permission_classes = [AllowAny]
     def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
+        data = {}
+        jid = request.data['job_id']
+        cardtoken = request.data['omiseToken']
+
+        #Create object
+        if not JobInfo.objects.filter(job_id=jid).exists() :
+            return Response(data="Job ID is invalid.")
+        job = JobInfo.objects.filter(job_id=jid)
+        data['payment_customer'] = job.values_list('job_customer__profile__user__username', flat=True)[0]
+        data['payment_photographer'] = job.values_list('job_photographer__profile__user__username', flat=True)[0]
+        data['payment_job'] = jid
+        amount = job.annotate(total_price=Sum('job_reservation__job_reservation__photographer_price')).values_list('total_price', flat=True)[0]
+        job_status = job.values_list('job_status', flat=True)[0]
+        if job_status == "MATCHED" :
+            amount = amount * 0.3
+            data['payment_amount'] = amount
+            data['payment_status'] = "DEPOSIT"
+        elif job_status == "COMPLETED" :
+            amount = amount * 0.7
+            data['payment_amount'] = amount
+            data['payment_status'] = "REMAINING"
+        else :
+            return Response(data="Job Status is invalid.")
+        
+        #Omise Payment
+        path = os.path.dirname(os.path.abspath(__file__))
+        tokenfile = os.path.join(path, 'token.txt')
+        with open(tokenfile, "r") as f :
+            token = f.read()
+        if not token : return Response(data="Server Token Error")
+        omise.api_secret = token
+        try :
+            charge = omise.Charge.create(amount=int(amount)*100, currency="thb", card=cardtoken)
+        except Exception as e :
+            return Response(data=str(e))
+
+        serializer = self.get_serializer(data=data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
-        return Response(data="payment success")
+        return Response(data="Payment Successful.")
 
 
 class EquipmentViewSet(viewsets.ModelViewSet):
