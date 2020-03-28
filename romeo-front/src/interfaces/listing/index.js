@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 import { Parallax } from 'react-parallax';
 import Card from "./Card";
 import Axios from "axios";
-import { Input, Skeleton, Card as AntCard, Avatar, Icon, Dropdown, Form, Radio, Button } from "antd";
+import { Input, Skeleton, Card as AntCard, Avatar, Icon, Dropdown, Form, Radio, Button, Menu } from "antd";
 import { getCurrentClientInfo } from "common/auth";
 import { availableStyles } from "logic/availableStyles"
 
@@ -14,6 +14,7 @@ class Listing extends React.Component {
         currentClient: null,
         typing: false,
         typingTimeout: 0,
+        activeSort: "none",
         params: {
             user: "",
             style: ""
@@ -96,6 +97,10 @@ class Listing extends React.Component {
         });
     }
 
+    onSortChange(newSort){
+        this.setState({ activeSort: newSort});
+    }
+
     render() {
         const {photographers, params, loading} = this.state;
         return (
@@ -152,6 +157,35 @@ class Listing extends React.Component {
                                 <Icon type="down" />
                             </Button>
                         </Dropdown>
+                        <Button.Group className="d-flex">
+                            <Dropdown overlay={() => (
+                                <Menu>
+                                    <Menu.Item 
+                                        onClick={() => this.onSortChange("none")}
+                                    >None</Menu.Item>
+                                    <Menu.Item 
+                                        onClick={() => this.onSortChange("price")}
+                                    >Price</Menu.Item>
+                                    <Menu.Item 
+                                        onClick={() => this.onSortChange("rating")}
+                                    >Rating</Menu.Item>
+                                </Menu>
+                            )} trigger={['click']}>
+                                <Button type="primary" size="large" className="pl-3 pr-2 ma-1 mr-0">
+                                    Sort By
+                                </Button>
+                            </Dropdown>
+                            <Dropdown overlay={() => (
+                                <Menu>
+                                    <Menu.Item onClick={() => {}}>Highest First</Menu.Item>
+                                    <Menu.Item onClick={() => {}}>Lowest First</Menu.Item>
+                                </Menu>
+                            )} trigger={['click']}>
+                                <Button type="primary" size="large" className="pl-1 pr-2 ma-1 ml-0">
+                                    <Icon type="down" />
+                                </Button>
+                            </Dropdown>
+                        </Button.Group>
                     </div>
                     <div className="d-flex flex-wrap justify-center align-center">
                         { (!loading) ? 
