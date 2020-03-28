@@ -58,7 +58,8 @@ INSTALLED_APPS = [
     'api.apps.ApiConfig',
     'users.apps.UsersConfig',
     'notification.apps.NotificationConfig',
-    'favPhotographers.apps.FavphotographersConfig'
+    'favPhotographers.apps.FavphotographersConfig',
+    'payments.apps.PaymentsConfig'
 ]
 
 MIDDLEWARE = [

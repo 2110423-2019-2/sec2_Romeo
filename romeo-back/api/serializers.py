@@ -13,6 +13,7 @@ from jobs.models import JobInfo, JobReservation
 from users.models import CustomUser, CustomUserProfile
 from notification.models import Notification
 from reviews.models import ReviewInfo
+from payments.models import Payment
 import datetime
 
 
@@ -436,3 +437,25 @@ class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = ReviewInfo
         fields = '__all__'
+
+class PaymentSerializer(serializers.ModelSerializer):
+    payment_customer = serializers.CharField(source='payment_customer.profile.user.username')
+    payment_photographer = serializers.CharField(source='payment_photographer.profile.user.username')
+
+    class Meta:
+        model = Payment
+        fields = '__all__'
+    
+    def create(self, validated_data):
+        payment_customer=validated_data.pop('payment_customer')
+        payment_customer=Customer.objects.get(profile__user__username=payment_customer['profile']['user']['username'])
+        
+        payment_photographer_username=validated_data.pop('payment_photographer')['profile']['user']['username']
+        payment_photographer=Photographer.objects.get(profile__user__username=payment_photographer_username)
+
+        payments = Payment.objects.create(payment_customer=payment_customer, 
+                                        payment_photographer=payment_photographer, 
+                                        payment_job=validated_data.pop('payment_job'), 
+                                        payment_amount=validated_data.pop('payment_amount'))
+        payments.save()
+        return payments
