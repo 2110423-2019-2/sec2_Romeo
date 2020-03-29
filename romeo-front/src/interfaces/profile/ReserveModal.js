@@ -1,10 +1,12 @@
 import React from "react";
-import { Button, Form, Input, Modal, DatePicker } from "antd";
+import { Button, Form, Input, Modal, DatePicker,
+Dropdown, Radio, Icon } from "antd";
 import { formatDashedDate, formatDate } from "common/date";
 import { timeLabels } from "logic/Calendar"
 import moment from "moment";
 import Axios from "axios";
 import history from "common/router/history";
+import { availableStyles, styleLabels } from "logic/Styles";
 
 function hasErrors(fieldsError) {
     return Object.keys(fieldsError).some(field => fieldsError[field]);
@@ -15,9 +17,12 @@ class ReserveModal extends React.Component {
         times: [],
         jobStartDate: moment(new Date()),
         jobEndDate: moment(new Date()),
-        dateError: false
+        selectedJobEndDate: moment(new Date()),
+        dateError: false,
+        style: ""
     }
     componentDidMount() {
+        const { currentClient, currentPhotographer} = this.props;
         this.props.form.validateFields();
         this.mapSelectedTimes();
     }
@@ -26,28 +31,37 @@ class ReserveModal extends React.Component {
         if (moment(date).isBefore(moment(jobEndDate))) {
             this.setState({ dateError: true })
         } else {
-            this.setState({ jobEndDate: formatDashedDate(date)});
+            this.setState({ selectedJobEndDate: formatDashedDate(date)});
             this.setState({ dateError: false });
         }
     }
     handleReserve = () => {
-        const { jobStartDate, jobEndDate, times } = this.state;
+        const { jobStartDate, selectedJobEndDate, times, style } = this.state;
         const { currentClient, currentPhotographer} = this.props;
+        if (!style || style === "") {
+            this.setState({
+                styleError: true
+            });
+            return;
+        }
         this.props.form.validateFields((err, values) => {
             if (!err) {
                 const {
                     jobTitle,
-                    jobDescription
+                    jobDescription,
+                    jobLocation
                 } = values;
                 const req = {
                     job_customer: currentClient.profile.user.username,
                     job_photographer: currentPhotographer.profile.user.username,
                     job_reservation: times,
                     job_title: jobTitle,
+                    job_location: jobLocation,
+                    job_style: style,
                     job_description: jobDescription,
                     job_status: "PENDING",
                     job_start_date: jobStartDate,
-                    job_end_date: jobEndDate,
+                    job_expected_complete_date: selectedJobEndDate,
                     job_total_price: -1,
                     job_url: null
                 }
@@ -63,7 +77,8 @@ class ReserveModal extends React.Component {
         Object.keys(selectedTimes).forEach(k => {
             out.push({
                 job_reservation: selectedTimes[k],
-                photoshoot_date: formatDashedDate(k)
+                photoshoot_date: formatDashedDate(k),
+                photoshoot_time: selectedTimes[k].avail_time
             })
         });
         // Calculate Job Start/End Date
@@ -85,10 +100,11 @@ class ReserveModal extends React.Component {
     }
     render() {
         const { visible, onCancel, currentClient, currentPhotographer} = this.props;
-        const { times, dateError } = this.state;
+        const { times, dateError, style, styleError } = this.state;
         const { getFieldDecorator, getFieldsError, getFieldError, isFieldTouched } = this.props.form;
         // Validation
         const jobTitleError = isFieldTouched('jobTitle') && getFieldError('jobTitle');
+        const jobLocationError = isFieldTouched('jobLocation') && getFieldError('jobLocation');
         const jobEndDateError = isFieldTouched('jobEndDate') && getFieldError('jobEndDate');
 
         return (
@@ -98,14 +114,6 @@ class ReserveModal extends React.Component {
                 onCancel={onCancel}
                 footer={null}
             >
-                { dateError && (
-                    <React.Fragment>
-                        <div className="error-banner">
-                            <b>Job's end date cannot be before the last day of the job.</b>
-                        </div>
-                        <div className="pb-3"/>
-                    </React.Fragment>
-                ) }
                 { currentPhotographer && (
                     <div className="mb-3">
                         <b>Photographer's Name: {currentPhotographer.profile.user.first_name} {currentPhotographer.profile.user.last_name}</b>
@@ -129,6 +137,52 @@ class ReserveModal extends React.Component {
                                 />,
                             )}
                         </Form.Item>
+                        <label>Job Location</label>
+                        <Form.Item 
+                            validateStatus={jobLocationError ? 'error' : ''} help={jobLocationError || ''}
+                            className="mb-2"
+                        >
+                            {getFieldDecorator('jobLocation', {
+                                rules: [
+                                    { required: true,message: 'This field is required.' },
+                                ],
+                            })(
+                                <Input
+                                    placeholder="Job Location"
+                                    type="text"
+                                />,
+                            )}
+                        </Form.Item>
+                        <label>Job Style</label><br/>
+                        <b className="d-block mb-1">
+                            Selected Style:{' '}
+                            {(style && style !== "") ? styleLabels[style] : "None"}
+                        </b>
+                        <Dropdown overlay={() => (
+                            <Form className="pa-3">
+                                <Radio.Group 
+                                    value={style}
+                                    onChange={e => this.setState({ style: e.target.value })} 
+                                    className="vertical"
+                                >
+                                    { availableStyles.map((e,i) => (
+                                        <Radio 
+                                            value={e.value} 
+                                            key={e.value+i} 
+                                            style={{display: 'block'}}
+                                        >{e.label}</Radio>
+                                    )) }
+                                </Radio.Group>
+                            </Form>
+                            )} 
+                            trigger={['click']}
+                        >
+                            <Button type="primary">
+                                <span>Select One</span>
+                                <Icon type="down" />
+                            </Button>
+                        </Dropdown>
+                        <div className="pb-3"/>
                         <label>Job Description</label>
                         <Form.Item className="mt-1">
                             {getFieldDecorator('jobDescription')(
@@ -152,9 +206,10 @@ class ReserveModal extends React.Component {
                         <label className="pb-3 d-block">
                             Job Start Date: <b>{formatDate(this.state.jobStartDate)}</b>
                         </label>
-                        <label>Job End Date</label>
+                        <label>Job Expected Complete Date</label>
                         <Form.Item
-                            validateStatus={jobEndDateError ? 'error' : ''} help={jobEndDateError || ''}
+                            validateStatus={(jobEndDateError || dateError) ? 'error' : ''} 
+                            help={dateError ? "Job's end date cannot be before the last day of the job." : (jobEndDateError || '')}
                         >
                             {getFieldDecorator('jobEndDate', {
                                 rules: [
@@ -171,14 +226,19 @@ class ReserveModal extends React.Component {
                         {/* Round to 2 decimal places */}
                         <h4 className="mb-2 t-color-light">Deposit: {Math.round(((this.calculateTotalPrice() * 30/100) *100) /100 )}THB</h4>
                         <small>You will not have to pay until the photographer accepts your reservation.</small>
-                        <div className="pb-4"/>
-                        <Form.Item>
+                        <div className="pb-3"/>
+                        { (styleError && style === "") && (
+                            <div className="error-banner">
+                                <b>Please select a style.</b>
+                            </div>
+                        ) }
+                        <Form.Item className="mb-0">
                             <Button 
                                 type="primary" 
                                 onClick={e => this.handleReserve(e)}
                                 className="mr-2"
                                 htmlType="submit" 
-                                disabled={hasErrors(getFieldsError())}
+                                disabled={hasErrors(getFieldsError()) || dateError}
                             >Confirm Reservation</Button>
                         </Form.Item>
                     </Form>

@@ -80,7 +80,7 @@ class JobCalendar extends React.Component {
 
     getListData = (value) => {
         const { calOutput } = this.state;
-        if (moment(value).isBefore(new Date())) {
+        if (moment(value).subtract(1,"days").isBefore(new Date())) {
             return {
                 content: null,
                 data: null

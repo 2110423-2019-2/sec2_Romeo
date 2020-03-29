@@ -160,11 +160,13 @@ class Reservations extends React.Component {
                                 onClick={() => proceed(record, 1, null)} 
                                 type="primary" 
                                 className="ma-1"
+                                shape="round"
                             >Accept</Button>
                             <Button 
                                 onClick={() => decline(record, 1)} 
                                 type="danger" 
                                 className="ma-1"
+                                shape="round"
                             >Decline</Button>
                         </React.Fragment>
                     );

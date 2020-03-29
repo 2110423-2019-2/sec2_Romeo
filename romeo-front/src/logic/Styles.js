@@ -20,3 +20,13 @@ export const availableStyles = [{
     value: "WEDDING",
     label: "Wedding"
 }];
+
+export const styleLabels = {
+    GRADUATION: "Graduation",
+    LANDSCAPE: "Landscape",
+    PORTRAIT: "Portrait",
+    PRODUCT: "Product",
+    FASHION: "Fashion",
+    EVENT: "Event",
+    WEDDING: "Wedding"
+}
