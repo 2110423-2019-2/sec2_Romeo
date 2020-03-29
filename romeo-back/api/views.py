@@ -198,10 +198,10 @@ class JobsViewSet(viewsets.ModelViewSet):
     filter_backends = [filters.SearchFilter]
     search_fields = ['job_photographer__profile__user__username','job_customer__profile__user__username']
 
-    def get_queryset(self):
-        return JobInfo.objects.annotate(
-            total_price=Sum('job_reservation__job_reservation__photographer_price')
-        )
+    # def get_queryset(self):
+    #     return JobInfo.objects.annotate(
+    #         total_price=Sum('job_reservation__job_reservation__photographer_price')
+    #     )
 
 class JobReservationViewSet(viewsets.ModelViewSet):
     queryset = JobReservation.objects.all()

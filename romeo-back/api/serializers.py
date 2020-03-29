@@ -383,27 +383,27 @@ class NotificationSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         if 'noti_read' in validated_data:
             instance.noti_read = validated_data.pop('noti_read')
-
         instance.save()
         return instance
 
 class JobReservationSerializer(serializers.ModelSerializer):
-    job_reservation = AvailTimeSerializer(partial=True)
+    # job_reservation = AvailTimeSerializer(partial=True)
     class Meta:
         model = JobReservation
         fields = '__all__'
 
     # Override default create method to auto create nested profile from photographer
-    def create(self, validated_data):
-        if validated_data['photoshoot_date'].get_weekday() not in validated_data['job_reservation.avail_date']:
-            raise serializers.ValidationError('The photographer is not available at the selected date.')
-        reservation = JobReservation.objects.create(**validated_data)
-        return reservation
+    # def create(self, validated_data):
+    #     if validated_data['photoshoot_date'].get_weekday() not in validated_data['job_reservation.avail_date']:
+    #         raise serializers.ValidationError('The photographer is not available at the selected date.')
+    #     reservation = JobReservation.objects.create(**validated_data)
+    #     return reservation
 
 class JobSerializer(serializers.ModelSerializer):
-    # Reservation=True
     job_customer = serializers.CharField(source='job_customer.profile.user.username')
     job_photographer = serializers.CharField(source='job_photographer.profile.user.username')
+    # job_customer = CustomerSerializer(required=True, partial=True)
+    # job_photographer = PhotographerSerializer(required=True, partial=True)
     job_reservation = JobReservationSerializer(many=True, required=False, partial=True)
     total_price = serializers.FloatField()
 
@@ -413,13 +413,6 @@ class JobSerializer(serializers.ModelSerializer):
 
     # Override default create method to auto create nested profile from photographer
     def create(self, validated_data):
-        # Check if start date is valid
-        if validated_data["job_start_date"] < datetime.date.today():
-            raise serializers.ValidationError('The selected date should not be before today.')
-        # Check valid start&end date
-        if validated_data["job_end_date"] < validated_data["job_start_date"]:
-            raise serializers.ValidationError('End date should not be before start date.')
-
         job_customer=validated_data.pop('job_customer')
         job_customer=Customer.objects.get(profile__user__username=job_customer['profile']['user']['username'])
         
@@ -430,39 +423,66 @@ class JobSerializer(serializers.ModelSerializer):
         
         job_total_price = 0
         reservation_list = []
-        # create job reservation instances and store them in reservation_list
+        # create job reservation instances and store them in reservation_list        
         for reservation_data in validated_data.pop('job_reservation'):
             reservation_data = dict(reservation_data)
-            job_reservation_data = dict(reservation_data['job_reservation'])
+            # job_reservation_data = dict(reservation_data['job_reservation'])
+            
             photoshoot_date = reservation_data['photoshoot_date']
+            photoshoot_time = reservation_data['photoshoot_time']
+
+            # Check if start date is valid
+            if photoshoot_date < datetime.date.today():
+                raise serializers.ValidationError('The selected date should not be before today.')
+            # Check valid start&end date
+            if validated_data["job_expected_complete_date"] < photoshoot_date:
+                raise serializers.ValidationError('End date should not be before start date.')
+
             # check if reservation date and time is valid
             is_vaild = False
+            week_days = ("MONDAY","TUESDAY","WEDNESDAY","THURSDAY","FRIDAY","SATURDAY","SUNDAY")
             for avail_time_instance in job_photographer.photographer_avail_time.all():
-                if avail_time_instance.avail_date == job_reservation_data['avail_date'] and avail_time_instance.avail_time == job_reservation_data['avail_time']:
-                    # prevent creating job when photographer already has a job in the selected time 
-                    if JobInfo.objects.filter(Q(job_reservation__photoshoot_date=photoshoot_date) & 
-                                                Q(job_photographer__profile__user__username=job_photographer_username)).exists():
-                        raise serializers.ValidationError('''Photographer is not available in this time''')
+                if avail_time_instance.avail_date == week_days[photoshoot_date.weekday()] and avail_time_instance.avail_time == photoshoot_time:
+                    # prevent creating job when photographer already has a job in the selected time
+                    print(photoshoot_date.weekday())
+                    if JobInfo.objects.filter(Q(job_photographer__profile__user__username=job_photographer_username) &
+                                              Q(job_reservation__photoshoot_date=photoshoot_date) & #old: no photoshoot_time
+                                              Q(job_reservation__photoshoot_time=photoshoot_time) &
+                                              Q(job_status='MATCHED')).exists(): #reconsider for more job_status
+                        raise serializers.ValidationError('''The photographer is not available at this time''')
+                ##########################################################################
                     try :
                         reservation_instance = JobReservation.objects.get(photoshoot_date=photoshoot_date,
-                                                                        job_reservation=avail_time_instance)
+                                                                          photoshoot_time=photoshoot_time)
                     except :
                         reservation_instance = JobReservation.objects.create(photoshoot_date=photoshoot_date,
-                                                                        job_reservation=avail_time_instance)
+                                                                             photoshoot_time=photoshoot_time)
+                ##########################################################################
+    #                 try :
+    #                     reservation_instance = JobReservation.objects.get(photoshoot_date=photoshoot_date,
+    #                                                                     job_reservation=avail_time_instance)
+    #                 except :
+    #                     reservation_instance = JobReservation.objects.create(photoshoot_date=photoshoot_date,
+    #                                                                     job_reservation=avail_time_instance)
+
                     job_total_price += avail_time_instance.photographer_price
                     reservation_list.append(reservation_instance)
                     is_vaild = True
             if not is_vaild:
-                raise serializers.ValidationError('''Your selected date or time for reservation is invalid for the photographer, please check photographer's available time''')
+                raise serializers.ValidationError('''Your selected date and time for reservation is invalid for the photographer, please checkout photographer's available time''')
         
         job_info = JobInfo.objects.create(job_title=validated_data.pop('job_title'), 
                                         job_description=validated_data.pop('job_description'), 
                                         job_customer=job_customer, 
                                         job_photographer=job_photographer, 
-                                        job_status='PENDING', 
-                                        job_start_date=validated_data.pop('job_start_date'), 
-                                        job_end_date=validated_data.pop('job_end_date'), 
-                                        job_total_price=job_total_price)
+                                        job_status='PENDING',
+                                        job_style=validated_data.pop('job_style'),
+                                        job_location=validated_data.pop('job_location'),
+                                        job_expected_complete_date=validated_data.pop('job_expected_complete_date'),
+                                        job_special_requirement=validated_data.pop('job_special_requirement'))
+                                        # job_start_date=validated_data.pop('job_start_date'), 
+                                        # job_end_date=validated_data.pop('job_end_date'))
+                                        # job_total_price=job_total_price)
         job_info.job_reservation.add(*reservation_list)
         job_info.save()
 

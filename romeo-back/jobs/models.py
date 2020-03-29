@@ -16,12 +16,28 @@ JOB_STATUS_CHOICES = [('PENDING', 'Pending'),
                       ('COMPLETED', 'Completed'),
                       ('CLOSED', 'Closed')]
 
+TIME_CHOICES = [('HALF_DAY_MORNING', "Half-day(Morning-Noon)"),
+                     ('HALF_DAY_NOON', "Half-day(Noon-Evening)"),
+                     ('FULL_DAY', "Full-Day"),
+                     ('NIGHT', "Night"),
+                     ('FULL_DAY_NIGHT', "Full-Day and Night")]
+
+STYLE_CHOICES = [('GRADUATION', 'Graduation'),
+                 ('LANDSCAPE', 'Landscape'),
+                 ('PORTRAIT', 'Portrait'),
+                 ('PRODUCT', 'Product'),
+                 ('FASHION', 'Fashion'),
+                 ('EVENT', 'Event'),
+                 ('WEDDING', 'Wedding'),
+                 ('NONE', 'None')]
+
 class JobReservation(models.Model):
     photoshoot_date = models.DateField()
-    job_reservation = models.ForeignKey(AvailTime, related_name='photographer_avail_time', on_delete=models.CASCADE)
+    photoshoot_time = models.CharField(choices=TIME_CHOICES, max_length=20)
+    # job_reservation = models.ForeignKey(AvailTime, related_name='photographer_avail_time', on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.job_reservation.avail_date + ' ' + self.job_reservation.avail_time
+        return str(self.photoshoot_date) + ' ' + self.photoshoot_time
 
 class JobInfo(models.Model):
     # TODO write function to calculate Job Total price
@@ -30,15 +46,18 @@ class JobInfo(models.Model):
     job_id = models.AutoField(primary_key=True)
     job_title = models.CharField(max_length = 250)
     job_description = models.TextField(blank=True, null=True)
-    job_customer = models.ForeignKey(Customer, related_name='jobs_by_customer', on_delete=models.CASCADE)
+    job_customer = models.ForeignKey(Customer, related_name='jobs_customer', on_delete=models.CASCADE)
     job_photographer = models.ForeignKey(Photographer, related_name='jobs_of_photographer', on_delete=models.CASCADE)
     job_status = models.CharField(choices=JOB_STATUS_CHOICES, max_length=25, default='PENDING')
-    job_start_date = models.DateField()
-    job_end_date = models.DateField()
+    # job_start_date = models.DateField()
+    job_style = models.CharField(choices=STYLE_CHOICES, max_length=15)
+    job_location = models.CharField(max_length=400)    
+    job_expected_complete_date = models.DateField()
+    job_special_requirement = models.CharField(max_length=400, blank=True, null=True)
+    # job_reservation = models.ManyToManyField(JobReservation, null=True, blank=True)
     job_reservation = models.ManyToManyField(JobReservation, null=True)
     job_url = models.URLField(max_length = 200, null=True, blank=True)
     # is_reviewed
-    # job_payment
 
     def __str__(self):
         return self.job_title + '\n' + self.job_customer.profile.user.first_name + " " + self.job_photographer.profile.user.first_name
