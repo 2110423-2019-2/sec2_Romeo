@@ -1,5 +1,5 @@
 from rest_framework.decorators import action
-from rest_framework import status, viewsets, filters, mixins
+from rest_framework import status, viewsets, filters, mixins, pagination
 from rest_framework.response import Response
 from .permissions import IsUser
 from rest_framework.permissions import AllowAny
@@ -59,8 +59,13 @@ class StyleViewSet(viewsets.ModelViewSet):
     serializer_class = StyleSerializer
     queryset = Style.objects.all()
 
+class PhotographerSearchPagination(pagination.PageNumberPagination):
+    page_size = 20
+    page_size_query_param = 'page_size'
+
 class PhotographerSearchViewSet(viewsets.ModelViewSet) :
     serializer_class = PhotographerSerializer
+    pagination_class = PhotographerSearchPagination
     def get_queryset(self):
         #Filter name
         user = self.request.query_params.get('user')
