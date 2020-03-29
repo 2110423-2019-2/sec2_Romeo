@@ -31,19 +31,6 @@ class PhotographerViewSet(viewsets.ModelViewSet):
     filter_backends = [filters.SearchFilter]
     search_fields = ['profile__user__username',"profile__user__first_name","profile__user__last_name"]
 
-    # # custom action routing for photographers to update photos
-    # @action(detail=True, methods=['get', 'post', 'delete'], url_path='update_photos')
-    # def update_photos(self, request, *args, **kwargs):
-    #     user = self.get_object()
-    #     serializer = PhotoSerializer(data=self.request.query_params.get('PhotographerPhotos'))
-    #     if serializer.is_valid():
-    #         user.update_photos(serializer.data)
-    #         user.save()
-    #         return Response({'status': 'password set'})
-    #     else:
-    #         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    #
-
 
 class PhotoViewSet(viewsets.ModelViewSet):
     serializer_class = PhotoSerializer
@@ -231,19 +218,6 @@ class ChangePasswordViewSet(mixins.UpdateModelMixin,viewsets.GenericViewSet):
     serializer_class = ChangePasswordSerializer
     permission_classes = [AllowAny]
     lookup_field = 'username'   
-
-class RegisterViewSet(mixins.CreateModelMixin,viewsets.GenericViewSet):
-    permission_classes = [AllowAny]
-
-    def create(self, request, *args, **kwargs):
-        user_type = request.data['profile']['user']['user_type']
-        username = request.data['profile']['user']['username']
-        message = 'Hello '+username+'! Your registeration is successful.'
-        if user_type == 1: # photographer
-            user = PhotographerSerializer.create(PhotographerSerializer(), validated_data=request.data)
-        elif user_type == 2: # customer
-            user = CustomerSerializer.create(CustomerSerializer(), validated_data=request.data)
-        return Response(data={'message': message})
 
 class ProfileViewSet(viewsets.ModelViewSet):
     queryset = CustomUserProfile.objects.all()

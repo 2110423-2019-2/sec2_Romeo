@@ -20,7 +20,7 @@ import datetime
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = '__all__'
+        exclude = ('is_superuser', 'is_staff', 'is_active', 'date_joined', 'groups', 'user_permissions',)
         extra_kwargs = {
             'username': {
                 'validators': [UnicodeUsernameValidator()],
@@ -344,32 +344,12 @@ class CustomerSerializer(serializers.ModelSerializer):
 
         instance.save()
         return instance
-    # def create(self, validated_data):
-    #     jobs_by_customer_data = validated_data.pop('jobs_by_customer')
-    #     customer = Customer.objects.create(**validated_data)
-    #     for job_by_customer_data in jobs_by_customer_data :
-    #         JobInfo.objects.create(**job_by_customer_data)
-    #     return customer
-    #
-    # # Allows only update of status, the rest is the same
-    # def update_job_status(self, instance, validated_data):
-    #     jobs_by_customer_data = validated_data.pop('jobs_by_customer')
-    #     jobs_by_customer = instance.jobs_by_customer
-    #
-    #     instance.JobID = validated_data.get('JobId', instance.JobID)
-    #     instance.JobCustomer = validated_data.get('JobCustomer', instance.JobCustomer)
-    #     instance.JobPhotographer = validated_data.get('JobPhotographer', instance.JobPhotographer)
-    #     instance.JobStartDate = validated_data.get('JobStartDate', instance.JobStartDate)
-    #     instance.JobEndDate = validated_data.get('JobEndDate', instance.JobEndDate)
-    #     instance.save()
-    #
-    #     jobs_by_customer.JobStatus = jobs_by_customer_data.get('JobStatus', jobs_by_customer.JobStatus)
-    #     jobs_by_customer_data.save()
+
 
 class NotificationSerializer(serializers.ModelSerializer):
-    noti_actor = serializers.CharField(source='noti_actor.user.username')
-    noti_receiver = serializers.CharField(source='noti_receiver.user.username')
-        
+    noti_receiver = ProfileSerializer(required=True, partial=True)
+    noti_actor = ProfileSerializer(required=True, partial=True)
+
     class Meta:
         model = Notification
         fields = '__all__'
@@ -392,18 +372,12 @@ class JobReservationSerializer(serializers.ModelSerializer):
         model = JobReservation
         fields = '__all__'
 
-    # Override default create method to auto create nested profile from photographer
-    # def create(self, validated_data):
-    #     if validated_data['photoshoot_date'].get_weekday() not in validated_data['job_reservation.avail_date']:
-    #         raise serializers.ValidationError('The photographer is not available at the selected date.')
-    #     reservation = JobReservation.objects.create(**validated_data)
-    #     return reservation
 
 class JobSerializer(serializers.ModelSerializer):
-    job_customer = serializers.CharField(source='job_customer.profile.user.username')
-    job_photographer = serializers.CharField(source='job_photographer.profile.user.username')
-    # job_customer = CustomerSerializer(required=True, partial=True)
-    # job_photographer = PhotographerSerializer(required=True, partial=True)
+    # job_customer = serializers.CharField(source='job_customer.profile.user.username')
+    # job_photographer = serializers.CharField(source='job_photographer.profile.user.username')
+    job_customer = CustomerSerializer(required=True, partial=True)
+    job_photographer = PhotographerSerializer(required=True, partial=True)
     job_reservation = JobReservationSerializer(many=True, required=False, partial=True)
     job_total_price = serializers.FloatField(read_only=True)
 
