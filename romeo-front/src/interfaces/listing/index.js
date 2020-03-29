@@ -6,6 +6,8 @@ import Axios from "axios";
 import { Input, Skeleton, Card as AntCard, Avatar, Icon, Dropdown, Form, Radio, Button, Menu, DatePicker} from "antd";
 import { getCurrentClientInfo } from "common/auth";
 import { availableStyles } from "logic/availableStyles"
+import { availableSorts } from "logic/availableSorts"
+import { availableDayTypes } from "logic/availableDayTypes"
 
 class Listing extends React.Component {
 
@@ -14,10 +16,11 @@ class Listing extends React.Component {
         currentClient: null,
         typing: false,
         typingTimeout: 0,
-        activeSort: "none",
         params: {
             user: "",
-            style: ""
+            style: "",
+            activeSort: "",
+            dayType: ""
         }
     }
 
@@ -97,8 +100,15 @@ class Listing extends React.Component {
         });
     }
 
-    onSortChange(newSort){
-        this.setState({ activeSort: newSort});
+    onSortChange() {
+
+    }
+
+    onDayTypeChange(){
+
+    }
+    onDateChange(){
+        
     }
 
     render() {
@@ -131,7 +141,7 @@ class Listing extends React.Component {
                             size="large"
                             className="ma-1"
                         />
-                        <div>
+                        <div style={{paddingTop: 48}}>
                             <div className="d-flex">
                                 <Dropdown overlay={() => (
                                     <Form className="pa-3">
@@ -159,45 +169,63 @@ class Listing extends React.Component {
                                         <Icon type="down" />
                                     </Button>
                                 </Dropdown>
-                                <Button.Group className="d-flex">
-                                    <Dropdown overlay={() => (
-                                        <Menu>
-                                            <Menu.Item 
-                                                onClick={() => this.onSortChange("none")}
-                                            >None</Menu.Item>
-                                            <Menu.Item 
-                                                onClick={() => this.onSortChange("price")}
-                                            >Price</Menu.Item>
-                                            <Menu.Item 
-                                                onClick={() => this.onSortChange("rating")}
-                                            >Rating</Menu.Item>
-                                        </Menu>
+                                <Dropdown overlay={() => (
+                                    <Form className="pa-3">
+                                        <Radio.Group 
+                                            value={[params.activeSort]}
+                                            onChange={this.onSortChange} 
+                                            className="vertical"
+                                        >
+                                            <Radio 
+                                                value=""
+                                                style={{display: 'block'}}
+                                            >None</Radio>
+                                            { availableSorts.map((e,i) => (
+                                                <Radio 
+                                                    className="vertical"
+                                                    value={e.value} 
+                                                    key={e.value+i} 
+                                                    style={{display: 'block'}}
+                                                >{e.label}</Radio>
+                                            )) }
+                                        </Radio.Group>
+                                    </Form>
                                     )} trigger={['click']}>
-                                        <Button type="primary" size="large" className="pl-3 pr-2 ma-1 mr-0">
+                                        <Button type="primary" size="large" className="pr-2 ma-1">
                                             Sort By
-                                        </Button>
-                                    </Dropdown>
-                                    <Dropdown overlay={() => (
-                                        <Menu>
-                                            <Menu.Item onClick={() => {}}>Highest First</Menu.Item>
-                                            <Menu.Item onClick={() => {}}>Lowest First</Menu.Item>
-                                        </Menu>
-                                    )} trigger={['click']}>
-                                        <Button type="primary" size="large" className="pl-1 pr-2 ma-1 ml-0">
                                             <Icon type="down" />
                                         </Button>
                                     </Dropdown>
-                                </Button.Group> 
                             </div>
                             <Button.Group className="d-flex ma-1" style={{ maxWidth: 500}}>
-                                <DatePicker type="primary" size="large" style={{ minWidth: 125}}
+                                <DatePicker 
+                                    type="primary" 
+                                    size="large" 
+                                    style={{ minWidth: 125}}
+                                    onChange={this.onDateChange}
                                 >
                                 </DatePicker>
                                 <Dropdown overlay={() => (
-                                    <Menu>
-                                        <Menu.Item onClick={() => {}}>Half Day</Menu.Item>
-                                        <Menu.Item onClick={() => {}}>Full Day</Menu.Item>
-                                    </Menu>
+                                    <Form className="pa-3">
+                                    <Radio.Group 
+                                        value={[params.dayType]}
+                                        onChange={this.onDayTypeChange} 
+                                        className="vertical"
+                                    >
+                                        <Radio 
+                                            value=""
+                                            style={{display: 'block'}}
+                                        >None</Radio>
+                                        { availableDayTypes.map((e,i) => (
+                                            <Radio 
+                                                className="vertical"
+                                                value={e.value} 
+                                                key={e.value+i} 
+                                                style={{display: 'block'}}
+                                            >{e.label}</Radio>
+                                        )) }
+                                    </Radio.Group>
+                                </Form>
                                 )} trigger={['click']}>
                                     <Button type="primary" size="large" className="pl-1 pr-2 ml-0">
                                         <Icon type="down" />
