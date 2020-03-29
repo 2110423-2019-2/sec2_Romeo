@@ -542,3 +542,9 @@ class PaymentSerializer(serializers.ModelSerializer):
                                         payment_amount=validated_data.pop('payment_amount'))
         payments.save()
         return payments
+    
+    def update(self, instance, validated_data) :
+        if validated_data['payment_status'] == "DEPOSIT" :
+            instance.update(job_status="PAID")
+        elif validated_data['payment_status'] == "REMAINING" :
+            instance.update(job_status="CLOSED")

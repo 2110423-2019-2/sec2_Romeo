@@ -145,7 +145,7 @@ class PaymentViewSet(viewsets.ModelViewSet):
         data['payment_customer'] = job.values_list('job_customer__profile__user__username', flat=True)[0]
         data['payment_photographer'] = job.values_list('job_photographer__profile__user__username', flat=True)[0]
         data['payment_job'] = jid
-        amount = job.annotate(total_price=Sum('job_reservation__job_reservation__photographer_price')).values_list('total_price', flat=True)[0]
+        amount = job.values_list('job_total_price', flat=True)[0]
         job_status = job.values_list('job_status', flat=True)[0]
         if job_status == "MATCHED" :
             amount = amount * 0.3
@@ -170,10 +170,15 @@ class PaymentViewSet(viewsets.ModelViewSet):
         except Exception as e :
             return Response(data=str(e))
 
+        #Update Job Status
+        PaymentSerializer.update(self, job, validated_data=data)
+
+        #Create Payment Object
         serializer = self.get_serializer(data=data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
+
         return Response(data="Payment Successful.")
 
 
