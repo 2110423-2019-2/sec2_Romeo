@@ -23,19 +23,41 @@ class Listing extends React.Component {
             style: "",
             activeSort: "",
             dayType: "",
-            date: "",
-            page: 1
+            date: ""
+        },
+        pagination: {
+            next: null,
+            prev: null
         }
     }
 
     componentDidMount = async () => {
         this.setState({ loading: true })
         const res =  await Axios.get("/api/photographersearch");
+        console.log(res);
         const currentClient = await getCurrentClientInfo();
         this.setState({
             photographers: res.data.results,
-            currentClient,
-            loading: false
+            pagination: {
+                next: res.data.next,
+                prev: res.data.previous
+            },
+            loading: false,
+            currentClient
+        });
+    }
+
+    onPaginationClick = async (np) => {
+        const { next, prev } = this.state.pagination;
+        this.setState({ loading: true });
+        const res =  await Axios.get(np === 0 ? next : prev);
+        this.setState({
+            photographers: res.data.results,
+            pagination: {
+                next: res.data.next,
+                prev: res.data.previous
+            },
+            loading: false,
         });
     }
 
@@ -79,7 +101,11 @@ class Listing extends React.Component {
             })
         );
         this.setState({
-            photographers: res.data,
+            photographers: res.data.results,
+            pagination: {
+                next: res.data.next,
+                prev: res.data.previous
+            },
             loading: false
         });
     }
@@ -99,7 +125,11 @@ class Listing extends React.Component {
             })
         );
         this.setState({
-            photographers: res.data,
+            photographers: res.data.results,
+            pagination: {
+                next: res.data.next,
+                prev: res.data.previous
+            },
             loading: false
         });
     }
@@ -119,7 +149,11 @@ class Listing extends React.Component {
             })
         );
         this.setState({
-            photographers: res.data,
+            photographers: res.data.results,
+            pagination: {
+                next: res.data.next,
+                prev: res.data.previous
+            },
             loading: false
         });
     }
@@ -139,7 +173,11 @@ class Listing extends React.Component {
             })
         );
         this.setState({
-            photographers: res.data,
+            photographers: res.data.results,
+            pagination: {
+                next: res.data.next,
+                prev: res.data.previous
+            },
             loading: false
         });
     }
@@ -158,13 +196,16 @@ class Listing extends React.Component {
             })
         );
         this.setState({
-            photographers: res.data,
+            photographers: res.data.results,
+            pagination: {
+                next: res.data.next,
+                prev: res.data.previous
+            },
             loading: false
         });
     }
-
     render() {
-        const {photographers, params, loading} = this.state;
+        const {photographers, params, loading, pagination} = this.state;
         return (
             <div style={{ marginTop: -64 }}>
                 <Parallax
@@ -318,6 +359,18 @@ class Listing extends React.Component {
                         )
                     }
                     </div>
+                    { (photographers.length > 0 && !loading) && (
+                        <div className="d-flex align-center justify-center mt-4">
+                            <Button className="ma-1" disabled={!pagination.prev}>
+                                <Icon type="left" />
+                                Previous
+                            </Button>
+                            <Button className="ma-1" disabled={!pagination.next}>
+                                Next
+                                <Icon type="right"/>
+                            </Button>
+                        </div>
+                    )}
                 </div>
             </div>
         );
