@@ -232,6 +232,19 @@ class ChangePasswordViewSet(mixins.UpdateModelMixin,viewsets.GenericViewSet):
     permission_classes = [AllowAny]
     lookup_field = 'username'   
 
+class RegisterViewSet(mixins.CreateModelMixin,viewsets.GenericViewSet):
+    permission_classes = [AllowAny]
+
+    def create(self, request, *args, **kwargs):
+        user_type = request.data['profile']['user']['user_type']
+        username = request.data['profile']['user']['username']
+        message = 'Hello '+username+'! Your registeration is successful.'
+        if user_type == 1: # photographer
+            user = PhotographerSerializer.create(PhotographerSerializer(), validated_data=request.data)
+        elif user_type == 2: # customer
+            user = CustomerSerializer.create(CustomerSerializer(), validated_data=request.data)
+        return Response(data={'message': message})
+
 class ProfileViewSet(viewsets.ModelViewSet):
     queryset = CustomUserProfile.objects.all()
     serializer_class = ProfileSerializer
