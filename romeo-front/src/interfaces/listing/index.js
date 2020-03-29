@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 import { Parallax } from 'react-parallax';
 import Card from "./Card";
 import Axios from "axios";
-import { Input, Skeleton, Card as AntCard, Avatar, Icon, Dropdown, Form, Radio, Button, Menu } from "antd";
+import { Input, Skeleton, Card as AntCard, Avatar, Icon, Dropdown, Form, Radio, Button, Menu, DatePicker} from "antd";
 import { getCurrentClientInfo } from "common/auth";
 import { availableStyles } from "logic/availableStyles"
 
@@ -131,61 +131,81 @@ class Listing extends React.Component {
                             size="large"
                             className="ma-1"
                         />
-                        <Dropdown overlay={() => (
-                            <Form className="pa-3">
-                                <Radio.Group 
-                                    value={params.style}
-                                    onChange={this.onStyleChange} 
-                                    className="vertical"
+                        <div>
+                            <div className="d-flex">
+                                <Dropdown overlay={() => (
+                                    <Form className="pa-3">
+                                        <Radio.Group 
+                                            value={params.style}
+                                            onChange={this.onStyleChange} 
+                                            className="vertical"
+                                        >
+                                            <Radio 
+                                                value=""
+                                                style={{display: 'block'}}
+                                            >Any</Radio>
+                                            { availableStyles.map((e,i) => (
+                                                <Radio 
+                                                    value={e.value} 
+                                                    key={e.value+i} 
+                                                    style={{display: 'block'}}
+                                                >{e.label}</Radio>
+                                            )) }
+                                        </Radio.Group>
+                                    </Form>
+                                )} trigger={['click']}>
+                                    <Button type="primary" size="large" className="ma-1 pr-2">
+                                        <span>Styles</span>
+                                        <Icon type="down" />
+                                    </Button>
+                                </Dropdown>
+                                <Button.Group className="d-flex">
+                                    <Dropdown overlay={() => (
+                                        <Menu>
+                                            <Menu.Item 
+                                                onClick={() => this.onSortChange("none")}
+                                            >None</Menu.Item>
+                                            <Menu.Item 
+                                                onClick={() => this.onSortChange("price")}
+                                            >Price</Menu.Item>
+                                            <Menu.Item 
+                                                onClick={() => this.onSortChange("rating")}
+                                            >Rating</Menu.Item>
+                                        </Menu>
+                                    )} trigger={['click']}>
+                                        <Button type="primary" size="large" className="pl-3 pr-2 ma-1 mr-0">
+                                            Sort By
+                                        </Button>
+                                    </Dropdown>
+                                    <Dropdown overlay={() => (
+                                        <Menu>
+                                            <Menu.Item onClick={() => {}}>Highest First</Menu.Item>
+                                            <Menu.Item onClick={() => {}}>Lowest First</Menu.Item>
+                                        </Menu>
+                                    )} trigger={['click']}>
+                                        <Button type="primary" size="large" className="pl-1 pr-2 ma-1 ml-0">
+                                            <Icon type="down" />
+                                        </Button>
+                                    </Dropdown>
+                                </Button.Group> 
+                            </div>
+                            <Button.Group className="d-flex ma-1" style={{ maxWidth: 500}}>
+                                <DatePicker type="primary" size="large" style={{ minWidth: 125}}
                                 >
-                                    <Radio 
-                                        value=""
-                                        style={{display: 'block'}}
-                                    >Any</Radio>
-                                    { availableStyles.map((e,i) => (
-                                        <Radio 
-                                            value={e.value} 
-                                            key={e.value+i} 
-                                            style={{display: 'block'}}
-                                        >{e.label}</Radio>
-                                    )) }
-                                </Radio.Group>
-                            </Form>
-                        )} trigger={['click']}>
-                            <Button type="primary" size="large" className="ma-1">
-                                <span>Styles</span>
-                                <Icon type="down" />
-                            </Button>
-                        </Dropdown>
-                        <Button.Group className="d-flex">
-                            <Dropdown overlay={() => (
-                                <Menu>
-                                    <Menu.Item 
-                                        onClick={() => this.onSortChange("none")}
-                                    >None</Menu.Item>
-                                    <Menu.Item 
-                                        onClick={() => this.onSortChange("price")}
-                                    >Price</Menu.Item>
-                                    <Menu.Item 
-                                        onClick={() => this.onSortChange("rating")}
-                                    >Rating</Menu.Item>
-                                </Menu>
-                            )} trigger={['click']}>
-                                <Button type="primary" size="large" className="pl-3 pr-2 ma-1 mr-0">
-                                    Sort By
-                                </Button>
-                            </Dropdown>
-                            <Dropdown overlay={() => (
-                                <Menu>
-                                    <Menu.Item onClick={() => {}}>Highest First</Menu.Item>
-                                    <Menu.Item onClick={() => {}}>Lowest First</Menu.Item>
-                                </Menu>
-                            )} trigger={['click']}>
-                                <Button type="primary" size="large" className="pl-1 pr-2 ma-1 ml-0">
-                                    <Icon type="down" />
-                                </Button>
-                            </Dropdown>
-                        </Button.Group>
+                                </DatePicker>
+                                <Dropdown overlay={() => (
+                                    <Menu>
+                                        <Menu.Item onClick={() => {}}>Half Day</Menu.Item>
+                                        <Menu.Item onClick={() => {}}>Full Day</Menu.Item>
+                                    </Menu>
+                                )} trigger={['click']}>
+                                    <Button type="primary" size="large" className="pl-1 pr-2 ml-0">
+                                        <Icon type="down" />
+                                    </Button>
+                                </Dropdown>
+                            </Button.Group>                            
+                        </div>
+                        
                     </div>
                     <div className="d-flex flex-wrap justify-center align-center">
                         { (!loading) ? 
