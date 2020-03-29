@@ -61,6 +61,21 @@ export const proceed = (job, actorType, data) => {
     window.location.reload();
 }
 
-export const makeDepositPayment = (jobId) => {
-
+export const createCreditCardCharge = async (job, token) => {
+    try {
+        const res = await Axios({
+            method: "POST",
+            url: "/api/charge",
+            data: { 
+                job_id: job.job_id, 
+                token 
+            },
+            headers: {
+                "Content-Type": "application/json"
+            }
+        });
+        if (res.data) window.location.reload();
+    } catch (err) {
+        console.log(err);
+    }
 }

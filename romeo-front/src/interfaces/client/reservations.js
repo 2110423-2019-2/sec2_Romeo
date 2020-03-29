@@ -9,11 +9,14 @@ import {
     statusLabels,
     proceed,
     cancel,
-    decline
+    decline,
+    createCreditCardCharge
 } from "logic/Reservation"
 import {
     timeLabels
 } from "logic/Calendar";
+
+const { confirm } = Modal;
 
 function hasErrors(fieldsError) {
     return Object.keys(fieldsError).some(field => fieldsError[field]);
@@ -23,8 +26,6 @@ class Reservations extends React.Component {
         const res = await Axios.get("/api/jobs?search=" + getCurrentClient().username);
         this.setState({
             reservations: res.data,
-            showURLModal: false,
-            showConfirmModal: false
         });
     }
     state = {
@@ -32,6 +33,7 @@ class Reservations extends React.Component {
         payAmount: 0,
         link: "",
         showURLModal: false,
+        showConfirmModal: false,
         selectedJob: null
     }
 
@@ -150,7 +152,7 @@ class Reservations extends React.Component {
                     case "CANCELLED": return (<span/>);
                     case "MATCHED": return (
                         <Button 
-                            onClick={() => cancel(record, 1)} 
+                            onClick={this.showDeleteConfirm(1)}
                             type="danger"
                             shape="round"
                         >
@@ -167,9 +169,9 @@ class Reservations extends React.Component {
                             >
                                 Start Processing Photos
                             </Button>
-                            { moment(record.job_start_date).isBefore(new Date()) && (
+                            { moment(record.job_start_date).subtract(1, 'days').isBefore(new Date()) && (
                                 <Button 
-                                    onClick={() => cancel(record, 1)} 
+                                    onClick={this.showDeleteConfirm(record, 1)}
                                     type="danger"
                                     shape="round"
                                     className="ma-1"
@@ -225,7 +227,7 @@ class Reservations extends React.Component {
                     case "PENDING": return (
                         <React.Fragment>
                             <Button 
-                                onClick={() => cancel(record, 2)} 
+                                onClick={() => this.showDeleteConfirm(record, 2)} 
                                 type="danger" 
                                 className="ma-1"
                                 shape="round"
@@ -242,7 +244,7 @@ class Reservations extends React.Component {
                                 createCreditCardCharge={createCreditCardCharge}
                             />
                             <Button 
-                                onClick={() => cancel(record, 2)} 
+                                onClick={() => this.showDeleteConfirm(record, 2)}
                                 type="danger" 
                                 className="ma-1"
                                 shape="round"
@@ -250,11 +252,11 @@ class Reservations extends React.Component {
                         </React.Fragment>
                     );
                     case "PAID": return (
-                        moment(record.job_start_date).isBefore(new Date()) ? (
+                        moment(record.job_start_date).subtract(1, 'days').isBefore(new Date()) ? (
                             <span>You cannot cancel your job right now.</span>
                         ) : (
                             <Button 
-                                onClick={() => cancel(record, 2)} 
+                                onClick={() => this.showDeleteConfirm(record, 2)}
                                 type="danger"
                                 shape="round"
                             >
@@ -279,26 +281,25 @@ class Reservations extends React.Component {
                 }
             }
         }
-        
-        const createCreditCardCharge = async (job, token) => {
-            // try {
-            //     const res = await Axios({
-            //         method: "POST",
-            //         url: "/api/charge",
-            //         data: { 
-            //             job_id: job.job_id, 
-            //             token 
-            //         },
-            //         headers: {
-            //             "Content-Type": "application/json"
-            //         }
-            //     });
-            //     if (res.data) window.location.reload();
-            // } catch (err) {
-            //     console.log(err);
-            // }
-            proceed(job, 2, null);
-            window.location.reload();
+
+        showDeleteConfirm = (record, userType) => {
+            const paid = record.job_status === "PAID";
+            let content = "";
+            if (paid) {
+                content = userType === 2 ? "Your paid deposit will not be refunded." : "The deposit will be refunded to the customer"
+            } else {
+                content = "You will need to make a reservation again if you change your mind."
+            }
+            confirm({
+              title: 'Are you sure cancel',
+              content,
+              okText: 'Yes',
+              okType: 'danger',
+              cancelText: 'No',
+              onOk() {
+                cancel()
+              }
+            });
         }
 
         return (
