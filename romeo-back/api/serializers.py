@@ -405,7 +405,7 @@ class JobSerializer(serializers.ModelSerializer):
     # job_customer = CustomerSerializer(required=True, partial=True)
     # job_photographer = PhotographerSerializer(required=True, partial=True)
     job_reservation = JobReservationSerializer(many=True, required=False, partial=True)
-    total_price = serializers.FloatField()
+    # total_price = serializers.FloatField()
 
     class Meta:
         model = JobInfo
@@ -479,7 +479,8 @@ class JobSerializer(serializers.ModelSerializer):
                                         job_style=validated_data.pop('job_style'),
                                         job_location=validated_data.pop('job_location'),
                                         job_expected_complete_date=validated_data.pop('job_expected_complete_date'),
-                                        job_special_requirement=validated_data.pop('job_special_requirement'))
+                                        job_special_requirement=validated_data.pop('job_special_requirement'),
+                                        job_total_price=job_total_price)
                                         # job_start_date=validated_data.pop('job_start_date'), 
                                         # job_end_date=validated_data.pop('job_end_date'))
                                         # job_total_price=job_total_price)
