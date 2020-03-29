@@ -1,5 +1,5 @@
 from rest_framework.decorators import action
-from rest_framework import status, viewsets, filters, mixins
+from rest_framework import status, viewsets, filters, mixins, pagination
 from rest_framework.response import Response
 from .permissions import IsUser
 from rest_framework.permissions import AllowAny
@@ -31,19 +31,6 @@ class PhotographerViewSet(viewsets.ModelViewSet):
     filter_backends = [filters.SearchFilter]
     search_fields = ['profile__user__username',"profile__user__first_name","profile__user__last_name"]
 
-    # # custom action routing for photographers to update photos
-    # @action(detail=True, methods=['get', 'post', 'delete'], url_path='update_photos')
-    # def update_photos(self, request, *args, **kwargs):
-    #     user = self.get_object()
-    #     serializer = PhotoSerializer(data=self.request.query_params.get('PhotographerPhotos'))
-    #     if serializer.is_valid():
-    #         user.update_photos(serializer.data)
-    #         user.save()
-    #         return Response({'status': 'password set'})
-    #     else:
-    #         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    #
-
 
 class PhotoViewSet(viewsets.ModelViewSet):
     serializer_class = PhotoSerializer
@@ -59,8 +46,13 @@ class StyleViewSet(viewsets.ModelViewSet):
     serializer_class = StyleSerializer
     queryset = Style.objects.all()
 
+class PhotographerSearchPagination(pagination.PageNumberPagination):
+    page_size = 20
+    page_size_query_param = 'page_size'
+
 class PhotographerSearchViewSet(viewsets.ModelViewSet) :
     serializer_class = PhotographerSerializer
+    pagination_class = PhotographerSearchPagination
     def get_queryset(self):
         #Filter name
         user = self.request.query_params.get('user')
@@ -145,7 +137,7 @@ class PaymentViewSet(viewsets.ModelViewSet):
         data['payment_customer'] = job.values_list('job_customer__profile__user__username', flat=True)[0]
         data['payment_photographer'] = job.values_list('job_photographer__profile__user__username', flat=True)[0]
         data['payment_job'] = jid
-        amount = job.values_list('job_total_price', flat=True)[0]
+        amount = job.annotate(job_total_price=Sum('job_reservation__job_avail_time__photographer_price')).values_list('job_total_price', flat=True)[0]
         job_status = job.values_list('job_status', flat=True)[0]
         if job_status == "MATCHED" :
             amount = amount * 0.3
@@ -203,10 +195,10 @@ class JobsViewSet(viewsets.ModelViewSet):
     filter_backends = [filters.SearchFilter]
     search_fields = ['job_photographer__profile__user__username','job_customer__profile__user__username']
 
-    # def get_queryset(self):
-    #     return JobInfo.objects.annotate(
-    #         total_price=Sum('job_reservation__job_reservation__photographer_price')
-    #     )
+    def get_queryset(self):
+        return JobInfo.objects.annotate(
+            job_total_price = Sum('job_reservation__job_avail_time__photographer_price')
+        )
 
 class JobReservationViewSet(viewsets.ModelViewSet):
     queryset = JobReservation.objects.all()

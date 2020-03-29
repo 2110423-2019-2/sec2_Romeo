@@ -34,7 +34,7 @@ STYLE_CHOICES = [('GRADUATION', 'Graduation'),
 class JobReservation(models.Model):
     photoshoot_date = models.DateField()
     photoshoot_time = models.CharField(choices=TIME_CHOICES, max_length=20)
-    # job_reservation = models.ForeignKey(AvailTime, related_name='photographer_avail_time', on_delete=models.CASCADE)
+    job_avail_time = models.ForeignKey(AvailTime, related_name='photographer_avail_time', on_delete=models.CASCADE)
 
     def __str__(self):
         return str(self.photoshoot_date) + ' ' + self.photoshoot_time
@@ -49,14 +49,11 @@ class JobInfo(models.Model):
     job_customer = models.ForeignKey(Customer, related_name='jobs_customer', on_delete=models.CASCADE)
     job_photographer = models.ForeignKey(Photographer, related_name='jobs_of_photographer', on_delete=models.CASCADE)
     job_status = models.CharField(choices=JOB_STATUS_CHOICES, max_length=25, default='PENDING')
-    # job_start_date = models.DateField()
     job_style = models.CharField(choices=STYLE_CHOICES, max_length=15)
     job_location = models.CharField(max_length=400)    
     job_expected_complete_date = models.DateField()
     job_special_requirement = models.CharField(max_length=400, blank=True, null=True)
-    # job_reservation = models.ManyToManyField(JobReservation, null=True, blank=True)
     job_reservation = models.ManyToManyField(JobReservation, null=True)
-    job_total_price = models.FloatField(default=0)
     job_url = models.URLField(max_length = 200, null=True, blank=True)
     # is_reviewed
 
