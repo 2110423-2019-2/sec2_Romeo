@@ -41,6 +41,26 @@ class Reservations extends React.Component {
         const { link, selectedJob } = this.state;
         proceed(selectedJob, 1, link)
     }
+    
+    showDeleteConfirm = (record, userType) => {
+        const paid = record.job_status === "PAID";
+        let content = "";
+        if (paid) {
+            content = userType === 2 ? "Your paid deposit will not be refunded." : "The deposit will be refunded to the customer"
+        } else {
+            content = "You will need to make a reservation again if you change your mind."
+        }
+        confirm({
+          title: 'Are you sure cancel',
+          content,
+          okText: 'Yes',
+          okType: 'danger',
+          cancelText: 'No',
+          onOk() {
+            cancel()
+          }
+        });
+    }
     render() {
         const { reservations, selectedJob, showConfirmModal } = this.state;
         const { getFieldDecorator, getFieldsError, getFieldError, isFieldTouched } = this.props.form;
@@ -124,7 +144,7 @@ class Reservations extends React.Component {
             render: (status, record) => {
                 return (
                     <div className="d-flex">
-                        {renderActions(record)}
+                        {record && renderActions(record)}
                     </div>
                 )
             }
@@ -282,33 +302,13 @@ class Reservations extends React.Component {
             }
         }
 
-        showDeleteConfirm = (record, userType) => {
-            const paid = record.job_status === "PAID";
-            let content = "";
-            if (paid) {
-                content = userType === 2 ? "Your paid deposit will not be refunded." : "The deposit will be refunded to the customer"
-            } else {
-                content = "You will need to make a reservation again if you change your mind."
-            }
-            confirm({
-              title: 'Are you sure cancel',
-              content,
-              okText: 'Yes',
-              okType: 'danger',
-              cancelText: 'No',
-              onOk() {
-                cancel()
-              }
-            });
-        }
-
         return (
             <div className="container mt-4 pl-4 with-sidebar">
                 <h1>My Reservations</h1>
                 <div className="full-width">
-                    { reservations.length >= 0 && (
+                    { reservations.length >= 0 ? (
                         <Table dataSource={reservations} columns={columns} />
-                    )}
+                    ) : <Table dataSource={[]} columns={columns} />}
                 </div>
                 <Modal
                     title="Edit Photos Storage URL"

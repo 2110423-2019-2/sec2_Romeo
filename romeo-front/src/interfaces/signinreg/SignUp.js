@@ -26,9 +26,9 @@ class SignUp extends React.Component {
         }, history);
     }
 
-    handleSubmit = e => {
+    handleSubmit = async e => {
         e.preventDefault();
-        this.props.form.validateFields((err, values) => {
+        this.props.form.validateFields( async (err, values) => {
             if (!err) {
                 const { username, 
                     firstName, 
@@ -67,6 +67,7 @@ class SignUp extends React.Component {
                     bank_account_name: bankAccountName,
                     phone,
                 }
+                const favPhotographers = [];
                 const photographerInfo = {
                     photographer_last_online_time: moment(new Date()),
                     photographer_avail_time: [],
@@ -75,21 +76,25 @@ class SignUp extends React.Component {
                     photographer_style: []
                 }
                 if (type === 1) {
-                    Axios.post('/api/photographers/',{
+                    const res = await Axios.post('/api/photographers/',{
                         profile,
                         ...photographerInfo
-                    }).then(res => {
+                    });
+                    if (res.data) {
                         this.signInUser(username, password);
-                    })
-                    .catch(err => console.log(err))
+                    } else {
+                        console.log(res)
+                    }
                 } else {
-                    Axios.post('/api/customers/',{
-                        profile
-                    })
-                    .then(res => {
+                    const res = await Axios.post('/api/customers/',{
+                        profile,
+                        fav_photographers: favPhotographers
+                    });
+                    if (res.data) {
                         this.signInUser(username, password);
-                    })
-                    .catch(err => console.log(err))
+                    } else {
+                        console.log(res)
+                    }
                 }
             }
         });
