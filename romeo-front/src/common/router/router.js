@@ -9,12 +9,14 @@ import Profile from "interfaces/profile";
 import Listing from "interfaces/listing"
 import ClientLanding from "interfaces/client";
 import SignUp from "interfaces/signinreg/SignUp";
+import Error from "../components/Error";
 
 
 class AppRouter extends React.Component {
     render() {
         return (
             <React.Fragment>
+                <Error/>
                 <Router history={history}>
                     <Switch>
                         <PrivateRoute path="/client" component={ClientLanding}/>

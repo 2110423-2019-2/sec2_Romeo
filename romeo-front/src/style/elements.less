@@ -224,3 +224,26 @@
         }
     }
 }
+
+// Snack Bar
+.snack-bar {
+    .bg-error-light();
+    position: fixed;
+    top:0;
+    left: 0;
+    right: 0;
+    transform: translateY(-100%);
+    border-left: 4px solid @error-color;
+    transition: all 0.3s;
+    z-index: 9999;
+    &.active {
+        transform: translateY(0);
+    }
+    i {
+        color: @error-color;
+    }
+    .container {
+        padding-top:12px;
+        padding-bottom:12px;
+    }
+}

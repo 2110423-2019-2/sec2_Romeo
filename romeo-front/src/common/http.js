@@ -1,6 +1,6 @@
 import Axios from "axios";
 import store from "./store";
-// import { setError } from "./actions/error";
+import { setError } from "./actions/error";
 import { removeAuthToken } from "./auth";
 import { setAuth } from "./actions/auth";
 
@@ -11,7 +11,8 @@ export default () => {
 		Axios.defaults.headers.post["authorization"] = localStorage.getItem("token");
 	}
 	Axios.interceptors.response.use(null, function(err) {
-		// store.dispatch(setError(err.response));
+		store.dispatch(setError(err.response.data));
+		console.log(err.response);
 		console.warn(err);
 		if (err.status === 403) {
 			removeAuthToken();
