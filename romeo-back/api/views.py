@@ -184,7 +184,7 @@ class NotificationViewSet(viewsets.ModelViewSet):
     serializer_class = NotificationSerializer
     queryset = Notification.objects.all()
     permission_classes = [AllowAny]
-    lookup_field = 'noti_receiver__user__username'
+    lookup_field = 'noti_id'
     filter_backends = [filters.SearchFilter]
     search_fields = ['noti_receiver__user__username']
 

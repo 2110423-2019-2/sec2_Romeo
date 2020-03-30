@@ -10,7 +10,8 @@ JOB_STATUS_CHOICES = [('PENDING', 'Pending'),
                       ('DECLINED', 'Declined'),
                       ('MATCHED', 'Matched'),
                       ('PAID', 'Paid'),
-                      ('CANCELLED', 'Cancelled'),
+                      ('CANCELLED_BY_PHOTOGRAPHER', 'Cancelled by photographer'),
+                      ('CANCELLED_BY_CUSTOMER', 'Cancelled by customer'),
                       ('PROCESSING', 'Processing Photos'),
                       ('COMPLETED', 'Completed'),
                       ('CLOSED', 'Closed')]
@@ -31,7 +32,7 @@ class JobInfo(models.Model):
     job_description = models.TextField(blank=True, null=True)
     job_customer = models.ForeignKey(Customer, related_name='jobs_by_customer', on_delete=models.CASCADE)
     job_photographer = models.ForeignKey(Photographer, related_name='jobs_of_photographer', on_delete=models.CASCADE)
-    job_status = models.CharField(choices=JOB_STATUS_CHOICES, max_length=10, default='PENDING')
+    job_status = models.CharField(choices=JOB_STATUS_CHOICES, max_length=25, default='PENDING')
     job_start_date = models.DateField()
     job_end_date = models.DateField()
     job_reservation = models.ManyToManyField(JobReservation, null=True)
