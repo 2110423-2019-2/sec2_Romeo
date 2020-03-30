@@ -44,6 +44,7 @@ class Edit extends React.Component {
                 Axios.patch(`${url}/${username}/`, {
                     profile: {
                         user: {
+                            username,
                             first_name: firstName,
                             last_name: lastName,
                             email,
