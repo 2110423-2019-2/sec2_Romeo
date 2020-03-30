@@ -3,7 +3,8 @@ from django.utils import timezone
 from users.models import CustomUserProfile
 
 NOTI_ACTION_CHOICES = [('CREATE', 'Create'),
-                      ('UPDATE', 'Update')]
+                      ('UPDATE', 'Update'),
+                      ('CANCEL', 'Cancel')]
 
 NOTI_STATUS_CHOICES = [('PENDING', 'Pending'),
                       ('DECLINED', 'Declined'),
@@ -28,9 +29,7 @@ class Notification(models.Model):
     noti_timestamp = models.DateTimeField(default=timezone.now, db_index=True)
     noti_read = models.CharField(choices=NOTI_READ_CHOICES, default='UNREAD', max_length=10)
 
-    
     # public = models.BooleanField(default=False, db_index=True)
-
 
     def __str__(self):
         return self.noti_actor.user.username + ' -> ' + self.noti_receiver.user.username \

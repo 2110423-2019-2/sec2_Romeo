@@ -58,7 +58,8 @@ INSTALLED_APPS = [
     'api.apps.ApiConfig',
     'users.apps.UsersConfig',
     'notification.apps.NotificationConfig',
-    'favPhotographers.apps.FavphotographersConfig'
+    'favPhotographers.apps.FavphotographersConfig',
+    'payments.apps.PaymentsConfig'
 ]
 
 MIDDLEWARE = [
@@ -111,7 +112,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'romeo-database',
         'USER': 'root',
-        'PASSWORD': '1834',
+        'PASSWORD': 'P@ssw0rd',
         'HOST': 'localhost',
         'PORT': '3306',
     }
@@ -147,8 +148,6 @@ REST_FRAMEWORK = {
      'DEFAULT_FILTER_BACKENDS':(
         'django_filters.rest_framework.DjangoFilterBackend',
     ),
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 50
 }
 DJOSER= {
     # 'SERIALIZERS':{

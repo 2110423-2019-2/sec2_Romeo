@@ -23,9 +23,7 @@ class CustomUserProfile(models.Model):
     bank_account_name = models.CharField(max_length=50, blank=True, default="")
     phone = models.CharField(max_length=11, blank=True, default="")
 
-    # USERNAME_FIELD = 'username'
-    #
-    #
+
     def __str__(self):
         return self.user.username
 

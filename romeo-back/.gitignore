@@ -56,4 +56,7 @@ docs/_build/
 # PyBuilder
 target/
 
+#Token
+token.txt
+
 .DS_Store

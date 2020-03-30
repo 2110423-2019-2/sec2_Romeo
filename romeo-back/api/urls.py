@@ -2,12 +2,13 @@ from django.conf.urls import url
 from rest_framework.routers import DefaultRouter
 from .views import PhotographerViewSet, PhotoViewSet, EquipmentViewSet, PhotoViewSet, AvailTimeViewSet, \
     StyleViewSet, CustomerViewSet, JobsViewSet, JobReservationViewSet, UserViewSet, ProfileViewSet, \
-    NotificationViewSet, PhotographerSearchViewSet, ChangePasswordViewSet, ReviewViewSet
+    NotificationViewSet, PhotographerSearchViewSet, ChangePasswordViewSet, ReviewViewSet, PaymentViewSet
 
 
 router = DefaultRouter()
 router.register(r'photographers', PhotographerViewSet, basename='photographers')
 router.register(r'photographersearch', PhotographerSearchViewSet, basename='photographersearch')
+router.register(r'payment', PaymentViewSet, basename='payment')
 router.register(r'customers', CustomerViewSet, basename='customer')
 router.register(r'jobs', JobsViewSet, basename='jobs')
 router.register(r'reservation', JobReservationViewSet, basename='reservation')
