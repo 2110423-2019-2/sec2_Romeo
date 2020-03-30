@@ -49,7 +49,8 @@ class ReserveModal extends React.Component {
                 const {
                     jobTitle,
                     jobDescription,
-                    jobLocation
+                    jobLocation,
+                    jobSpecialReq
                 } = values;
                 const req = {
                     job_customer: currentClient.profile.user.username,
@@ -62,6 +63,7 @@ class ReserveModal extends React.Component {
                     job_status: "PENDING",
                     job_start_date: jobStartDate,
                     job_expected_complete_date: selectedJobEndDate,
+                    job_special_requirement: jobSpecialReq,
                     job_total_price: -1,
                     job_url: null
                 }
@@ -76,7 +78,7 @@ class ReserveModal extends React.Component {
         let out = [];
         Object.keys(selectedTimes).forEach(k => {
             out.push({
-                job_reservation: selectedTimes[k],
+                job_avail_time: selectedTimes[k],
                 photoshoot_date: formatDashedDate(k),
                 photoshoot_time: selectedTimes[k].avail_time
             })
@@ -188,6 +190,15 @@ class ReserveModal extends React.Component {
                             {getFieldDecorator('jobDescription')(
                                 <Input.TextArea
                                     placeholder="Job Description"
+                                    type="text"
+                                />
+                            )}
+                        </Form.Item>
+                        <label>Special Requirements</label>
+                        <Form.Item className="mt-1">
+                            {getFieldDecorator('jobSpecialReq')(
+                                <Input
+                                    placeholder="Special Requirements"
                                     type="text"
                                 />
                             )}
