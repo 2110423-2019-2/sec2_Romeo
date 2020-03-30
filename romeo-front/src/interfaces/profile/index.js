@@ -8,6 +8,7 @@ import JobCalendar from "./calendar";
 import { styleColors } from "../../common/style-colors";
 import Axios from "axios"
 import SignInModal from "../signinreg/modal";
+import history from "common/router/history";
 
 class Profile extends React.Component {
     state = {
@@ -22,17 +23,21 @@ class Profile extends React.Component {
     componentDidMount = async () => {
         const currentClient = await getCurrentClientInfo();
         const { username } = this.props.match.params;
-        const res =  await Axios.get("/api/photographers/" + username)
-        const photographer = res.data;
-        this.setState({
-            photographer
-        });
-        const currentPortfolio = photographer.photographer_photos;
-        this.setState({
-            currentPhotographer: photographer,
-            currentPortfolio,
-            currentClient
-        });
+        try {
+            const res =  await Axios.get("/api/photographers/" + username)
+            const photographer = res.data;
+            this.setState({
+                photographer
+            });
+            const currentPortfolio = photographer.photographer_photos;
+            this.setState({
+                currentPhotographer: photographer,
+                currentPortfolio,
+                currentClient
+            });
+        } catch (err) {
+            history.push('/');
+        }
     }
 
     handleReserve = () => {

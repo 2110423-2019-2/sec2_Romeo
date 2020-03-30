@@ -70,19 +70,23 @@ class ClientLanding extends React.Component {
                 <Switch>
                     <Route path="/client/edit/password" component={Password} />
                     <Route path="/client/edit" component={Edit} />
-                    <Route path="/client/reservations" exact component={Reservations} />
-                    <Route path="/client/notifications" exact component={Notifications} />
-                    <Route path="/client/edit-portfolio" exact component={EditPortfolio} />
-                    <Route path="/client/edit-profile" exact component={EditProfile} />
-                    <Route path="/client" exact component={RedirectToEdit} />
+                    <Route path="/client/reservations" component={Reservations} />
+                    <Route path="/client/notifications" component={Notifications} />
+                    <Route path="/client/edit-portfolio" component={EditPortfolio} />
+                    <Route path="/client/edit-profile" component={EditProfile} />
+                    <Route path="/client" component={RedirectToEdit} />
                 </Switch>
             </div>
         );
     }
 }
 
+const RedirectTo404 = () => (
+    <Redirect to="/not-found" />
+)
+
 const RedirectToEdit = () => (
-    <Redirect to="/user/edit" />
+    <Redirect to="/client/edit" />
 )
 
 export default ClientLanding

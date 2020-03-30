@@ -1,5 +1,5 @@
 import React from "react";
-import { Router, Switch } from "react-router-dom";
+import { Router, Switch, Route } from "react-router-dom";
 import PrivateRoute from "./layouts/PrivateRoute";
 import PublicRoute from "./layouts/PublicRoute";
 import history from "./history";
@@ -10,6 +10,7 @@ import Listing from "interfaces/listing"
 import ClientLanding from "interfaces/client";
 import SignUp from "interfaces/signinreg/SignUp";
 import Error from "../components/Error";
+import NotFound from "../components/NotFound";
 
 
 class AppRouter extends React.Component {
@@ -23,6 +24,7 @@ class AppRouter extends React.Component {
                         <PublicRoute path="/signup" component={SignUp}/>
                         <PublicRoute path="/profile/:username" component={Profile}/>
                         <PublicRoute path="/" component={Listing} exact/>
+                        <Route path="/" component={NotFound}/>
                     </Switch>
                 </Router>
             </React.Fragment>
