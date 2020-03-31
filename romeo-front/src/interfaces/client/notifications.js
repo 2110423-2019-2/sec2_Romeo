@@ -26,7 +26,7 @@ class Notifications extends React.Component {
     async componentDidMount () {
         const currentClient = getCurrentClient();
         const res = await Axios.get("/api/notification/?search=" + currentClient.username);
-        this.setState({ notifications: res.data });
+        this.setState({ notifications: res.data.reverse() });
     }
     state = {
         notifications: [],

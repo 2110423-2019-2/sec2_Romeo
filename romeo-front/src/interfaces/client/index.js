@@ -5,6 +5,7 @@ import Password from "./password"
 import Reservations from "./reservations";
 import EditPortfolio from "./edit-portfolio/"
 import EditProfile from "./edit-profile/"
+import Calendar from "./calendar";
 import JobDetails from "./job-details";
 import { getCurrentClient } from "common/auth";
 
@@ -49,7 +50,14 @@ class ClientLanding extends React.Component {
                                 activeClassName="ant-menu-item-selected"
                                 to="/client/reservations"
                             >
-                                    Reservations
+                                    My Reservations
+                            </NavLink>
+                            <NavLink 
+                                className="ant-menu-item" 
+                                activeClassName="ant-menu-item-selected"
+                                to="/client/calendar"
+                            >
+                                My Calendar
                             </NavLink>
                             <NavLink 
                                 className="ant-menu-item" 
@@ -73,6 +81,7 @@ class ClientLanding extends React.Component {
                     <Route path="/client/edit" component={Edit} />
                     <Route path="/client/reservations/:jobId" component={JobDetails} />
                     <Route path="/client/reservations" component={Reservations} />
+                    <Route path="/client/calendar" component={Calendar} />
                     <Route path="/client/notifications" component={Notifications} />
                     <Route path="/client/edit-portfolio" component={EditPortfolio} />
                     <Route path="/client/edit-profile" component={EditProfile} />

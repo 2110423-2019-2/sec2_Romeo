@@ -98,6 +98,9 @@ class Nav extends React.Component {
                                             <Menu.Item key="pho0">
                                                 <Link to="/client/reservations">My Reservations</Link>
                                             </Menu.Item>
+                                            <Menu.Item key="pho5">
+                                                <Link to="/client/calendar">My Calendar</Link>
+                                            </Menu.Item>
                                             <Menu.Item key="pho1">
                                                 <Link to="/client/edit-portfolio">Edit Portfolio</Link>
                                             </Menu.Item>
@@ -119,6 +122,9 @@ class Nav extends React.Component {
                                             <Menu.Divider />
                                             <Menu.Item key="cus1">
                                                 <Link to="/client/reservations">My Reservations</Link>
+                                            </Menu.Item>
+                                            <Menu.Item key="cus5">
+                                                <Link to="/client/calendar">My Calendar</Link>
                                             </Menu.Item>
                                             <Menu.Item key="cus2">
                                                 <Link to="/client/edit">Personal Information</Link>

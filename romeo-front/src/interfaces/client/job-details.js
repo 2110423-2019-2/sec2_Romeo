@@ -41,12 +41,10 @@ class JobDetails extends React.Component {
                     <React.Fragment>
                         <div className="mb-4">
                             <h1 className="mr-3 mb-0">Reservation details</h1>
-                            <Link to="/client/reservations">
-                                <Button type="link">
-                                    <Icon type="left"/>
-                                    Back to Reservations Table
-                                </Button>
-                            </Link>
+                            <Button type="link" onClick={() => window.history.back()}>
+                                <Icon type="left"/>
+                                Back
+                            </Button>
                         </div>
                         <Content label="Title" content={currentJob.job_title}/>
                         <Content 
@@ -138,7 +136,7 @@ class JobDetails extends React.Component {
                             </span>
                         </div>
                         <div className="mb-3">
-                            <b className="d-block mb-1">Photos</b>
+                            <b className="d-block mb-2">Photos</b>
                             {
                                 getCurrentClient().type === 1 ? (
                                     (currentJob.job_status === "COMPLETED" || currentJob.job_status === "CLOSED") ? (

@@ -47,7 +47,7 @@ class Reservations extends React.Component {
     async componentDidMount() {
         const res = await Axios.get("/api/getjobs?search=" + getCurrentClient().username);
         this.setState({
-            reservations: res.data,
+            reservations: res.data.reverse(),
         });
     }
     state = {
@@ -105,7 +105,11 @@ class Reservations extends React.Component {
         const { getFieldDecorator, getFieldsError, getFieldError, isFieldTouched } = this.props.form;
         const linkError = isFieldTouched('link') && getFieldError('link');
 
-        const columns = [{
+        const columns = [,{
+            title: 'ID',
+            dataIndex: 'job_id',
+            key: 'job_id',
+        },{
             title: 'Title',
             dataIndex: 'job_title',
             key: 'job_title'
@@ -167,7 +171,7 @@ class Reservations extends React.Component {
         },{
             title: 'More',
             dataIndex: 'job_id',
-            key: 'job_id',
+            key: 'job_id_1',
             render: (id) => {
                 return (
                     <Link to={`/client/reservations/${id}`}>
