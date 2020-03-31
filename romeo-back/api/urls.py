@@ -23,6 +23,6 @@ router.register(r'availtimes', AvailTimeViewSet, basename='availtimes')
 router.register(r'styles', StyleViewSet, basename='styles')
 router.register(r'notification', NotificationViewSet, basename='notification')
 router.register(r'password', ChangePasswordViewSet, basename='password')
-router.register(r'registeration', RegisterViewSet, basename='registeration')
+router.register(r'registration', RegisterViewSet, basename='registration')
 
 urlpatterns = router.urls
