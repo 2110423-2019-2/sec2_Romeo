@@ -2,7 +2,7 @@ from rest_framework.decorators import action
 from rest_framework import status, viewsets, filters, mixins, pagination
 from rest_framework.response import Response
 from .permissions import IsUser
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.shortcuts import get_object_or_404
 from django.db.models import Q, Avg, Case, IntegerField, Value, When, Sum
 import datetime
@@ -26,7 +26,7 @@ from payments.models import Payment
 class PhotographerViewSet(viewsets.ModelViewSet):
     serializer_class = PhotographerSerializer
     queryset = Photographer.objects.all()
-    permission_classes = [AllowAny]
+    # permission_classes = [AllowAny]
     lookup_field = 'profile__user__username'
     filter_backends = [filters.SearchFilter]
     search_fields = ['profile__user__username',"profile__user__first_name","profile__user__last_name"]
@@ -124,7 +124,7 @@ class PhotographerSearchViewSet(viewsets.ModelViewSet) :
 class PaymentViewSet(viewsets.ModelViewSet):
     serializer_class = PaymentSerializer
     queryset = Payment.objects.all()
-    permission_classes = [AllowAny]
+    # permission_classes = [AllowAny]
     def create(self, request, *args, **kwargs):
         data = {}
         jid = request.data['job_id']
@@ -182,7 +182,7 @@ class EquipmentViewSet(viewsets.ModelViewSet):
 class CustomerViewSet(viewsets.ModelViewSet):
     queryset = Customer.objects.all()
     serializer_class = CustomerSerializer
-    permission_classes = [AllowAny]
+    # permission_classes = [AllowAny]
     lookup_field = 'profile__user__username'
     filter_backends = [filters.SearchFilter]
     search_fields = ['profile__user__username']
@@ -191,7 +191,7 @@ class CustomerViewSet(viewsets.ModelViewSet):
 class JobsViewSet(viewsets.ModelViewSet):
     queryset = JobInfo.objects.all()
     serializer_class = JobSerializer
-    permission_classes = [AllowAny]
+    # permission_classes = [AllowAny]
     filter_backends = [filters.SearchFilter]
     search_fields = ['job_photographer__profile__user__username','job_customer__profile__user__username']
 
@@ -203,12 +203,12 @@ class JobsViewSet(viewsets.ModelViewSet):
 class JobReservationViewSet(viewsets.ModelViewSet):
     queryset = JobReservation.objects.all()
     serializer_class = JobReservationSerializer
-    permission_classes = [AllowAny]
+    # permission_classes = [AllowAny]
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = CustomUser.objects.all()
     serializer_class = UserSerializer
-    permission_classes = [AllowAny]
+    # permission_classes = [AllowAny]
     lookup_field = 'username'
     filter_backends = [filters.SearchFilter]
     search_fields = ['username']
@@ -216,13 +216,26 @@ class UserViewSet(viewsets.ModelViewSet):
 class ChangePasswordViewSet(mixins.UpdateModelMixin,viewsets.GenericViewSet):
     queryset = CustomUser.objects.all()
     serializer_class = ChangePasswordSerializer
-    permission_classes = [AllowAny]
+    # permission_classes = [AllowAny]
     lookup_field = 'username'   
+
+class RegisterViewSet(mixins.CreateModelMixin,viewsets.GenericViewSet):
+    permission_classes = [AllowAny]
+
+    def create(self, request, *args, **kwargs):
+        user_type = request.data['profile']['user']['user_type']
+        username = request.data['profile']['user']['username']
+        message = 'Hello '+username+'! Your registeration is successful.'
+        if user_type == 1: # photographer
+            user = PhotographerSerializer.create(PhotographerSerializer(), validated_data=request.data)
+        elif user_type == 2: # customer
+            user = CustomerSerializer.create(CustomerSerializer(), validated_data=request.data)
+        return Response(data={'message': message})
 
 class ProfileViewSet(viewsets.ModelViewSet):
     queryset = CustomUserProfile.objects.all()
     serializer_class = ProfileSerializer
-    permission_classes = [AllowAny]
+    # permission_classes = [AllowAny]
     lookup_field = 'user__username'
     filter_backends = [filters.SearchFilter]
     search_fields = ['user__username']
@@ -230,7 +243,7 @@ class ProfileViewSet(viewsets.ModelViewSet):
 class NotificationViewSet(viewsets.ModelViewSet):
     serializer_class = NotificationSerializer
     queryset = Notification.objects.all()
-    permission_classes = [AllowAny]
+    # permission_classes = [AllowAny]
     lookup_field = 'noti_id'
     filter_backends = [filters.SearchFilter]
     search_fields = ['noti_receiver__user__username']
@@ -238,4 +251,4 @@ class NotificationViewSet(viewsets.ModelViewSet):
 class ReviewViewSet(viewsets.ModelViewSet):
     queryset = ReviewInfo.objects.filter()
     serializer_class = ReviewSerializer
-    permission_classes = [AllowAny]
+    # permission_classes = [AllowAny]
