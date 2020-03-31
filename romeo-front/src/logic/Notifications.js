@@ -2,7 +2,8 @@ import React from "react";
 import Axios from "axios";
 import { statusLabels } from "./Reservation";
 
-export const getNotificationText = (username, status) => {
+export const getNotificationText = (user, status) => {
+    const { username } = user.user;
     switch (status) {
         case "PENDING": return <span>You have a new reservation request from <b>{username}</b></span>
         case "DECLINED": return <span>Your reservation for <b>{username}</b> has been declined.`}</span>

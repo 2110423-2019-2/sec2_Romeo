@@ -59,11 +59,11 @@ class ReserveModal extends React.Component {
                     job_title: jobTitle,
                     job_location: jobLocation,
                     job_style: style,
-                    job_description: jobDescription,
+                    job_description: jobDescription ? jobDescription : "",
                     job_status: "PENDING",
                     job_start_date: jobStartDate,
                     job_expected_complete_date: selectedJobEndDate,
-                    job_special_requirement: jobSpecialReq,
+                    job_special_requirement: jobSpecialReq ? jobDescription : "",
                     job_total_price: -1,
                     job_url: null
                 }
@@ -96,7 +96,7 @@ class ReserveModal extends React.Component {
     calculateTotalPrice = () => {
         let out = 0;
         this.state.times.forEach(e => {
-            out += e.job_reservation.photographer_price
+            out += e.job_avail_time.photographer_price
         });
         return out;
     }
@@ -207,10 +207,10 @@ class ReserveModal extends React.Component {
                         { times.map((e,i) => (
                             <div className="snippet d-flex justify-space-between" key={i + e.photoshoot_date}>
                                 <div>
-                                    {formatDate(e.photoshoot_date)} ({e.job_reservation.avail_date}),{' '} 
-                                    {timeLabels[e.job_reservation.avail_time]}
+                                    {formatDate(e.photoshoot_date)} ({e.job_avail_time.avail_date}),{' '} 
+                                    {timeLabels[e.job_avail_time.avail_time]}
                                 </div>
-                                <div><b>Price: {e.job_reservation.photographer_price}THB</b></div>
+                                <div><b>Price: {e.job_avail_time.photographer_price}THB</b></div>
                             </div>
                         ))}
                         <div className="pb-3"/>

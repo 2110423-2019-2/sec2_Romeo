@@ -1,5 +1,6 @@
 import React from "react"
-import { Input, Table, Button, Modal, Dropdown, Menu, Form } from "antd";
+import { Input, Table, Button, Modal, Dropdown, Menu, Form, Icon } from "antd";
+import { Link } from "react-router-dom";
 import CheckoutCreditCard from "../../omise/Checkout";
 import { formatDate } from "common/date";
 import { getCurrentClient } from "common/auth";
@@ -18,12 +19,32 @@ import {
 
 const { confirm } = Modal;
 
+export const calculateTotalPrice = (job_reservation) => {
+    let out = 0;
+    job_reservation.forEach(e => out += e.job_avail_time.photographer_price);
+    return out
+}
+
+export const calculateLeftoverPrice = (job_reservation) => {
+    let out = 0;
+    job_reservation.forEach(e => out += e.job_avail_time.photographer_price);
+    out = ((out * 70/100)*100)/100
+    return out
+}
+
+export const calculateDepositPrice = (job_reservation) => {
+    let out = 0;
+    job_reservation.forEach(e => out += e.job_avail_time.photographer_price);
+    out = ((out * 30/100)*100)/100
+    return out
+}
+
 function hasErrors(fieldsError) {
     return Object.keys(fieldsError).some(field => fieldsError[field]);
 }
 class Reservations extends React.Component {
     async componentDidMount() {
-        const res = await Axios.get("/api/jobs?search=" + getCurrentClient().username);
+        const res = await Axios.get("/api/getjobs?search=" + getCurrentClient().username);
         this.setState({
             reservations: res.data,
         });
@@ -57,7 +78,7 @@ class Reservations extends React.Component {
           okType: 'danger',
           cancelText: 'No',
           onOk() {
-            cancel()
+            cancel(record, userType)
           }
         });
     }
@@ -67,44 +88,18 @@ class Reservations extends React.Component {
         const linkError = isFieldTouched('link') && getFieldError('link');
 
         const columns = [{
-            title: 'Job ID',
-            dataIndex: 'job_id',
-            key: 'job_id'
-        },{
             title: 'Title',
             dataIndex: 'job_title',
             key: 'job_title'
-        },{
-            title: 'Description',
-            dataIndex: 'job_description',
-            key: 'job_description',
-            render: desc => {
-                return desc === "" ? <span className="t-color-light">No description provided.</span> : 
-                <span>{desc}</span>
-            }
         },{
             title: (getCurrentClient() && getCurrentClient().type === 1) ? "Customer" : "Photographer",
             dataIndex: 'job_photographer',
             key: "user",
             render: (user, record) => {
                 if (getCurrentClient() && getCurrentClient().type === 1) {
-                    return <b>{record.job_customer}</b>
+                    return <b>{record.job_customer.profile.user.username}</b>
                 }
-                return <b>{user}</b>
-            }
-        },{
-            title: 'Start Date',
-            dataIndex: 'job_start_date',
-            key: 'job_start_date',
-            render: date => {
-                return <span>{formatDate(date)}</span>
-            }
-        },{
-            title: 'End Date',
-            dataIndex: 'job_end_date',
-            key: 'job_end_date',
-            render: date => {
-                return <span>{formatDate(date)}</span>
+                return <b>{user.profile.user.username}</b>
             }
         },{
             title: 'Reservation Times',
@@ -117,7 +112,7 @@ class Reservations extends React.Component {
                             {data.map((e,i) => (
                                 <Menu.Item key={e.photoshoot_date} style={{ pointerEvents: 'none' }}>
                                     <span><b>{formatDate(e.photoshoot_date)}</b>{' '}
-                                    {timeLabels[e.job_reservation.avail_time]}</span>
+                                    {timeLabels[e.job_avail_time.avail_time]}</span>
                                 </Menu.Item>
                             ))}
                         </Menu>
@@ -128,8 +123,11 @@ class Reservations extends React.Component {
             }
         },{
             title: 'Total Price',
-            dataIndex: 'job_total_price',
-            key: 'job_total_price'
+            dataIndex: 'job_reservation',
+            key: 'job_reservation_1',
+            render: (e) => {
+                return <span>{calculateTotalPrice(e)}</span>
+            }
         },{
             title: 'Status',
             dataIndex: 'job_status',
@@ -148,7 +146,21 @@ class Reservations extends React.Component {
                     </div>
                 )
             }
-        }]
+        },{
+            title: 'More',
+            dataIndex: 'job_id',
+            key: 'job_id',
+            render: (id) => {
+                return (
+                    <Link to={`/client/reservations/${id}`}>
+                        <Button shape="round">
+                            Details
+                            <Icon type="right"/>
+                        </Button>
+                    </Link>
+                )
+            }
+        },]
         
         const renderActions = (record) => {
             if (getCurrentClient().type === 1) {
@@ -174,7 +186,7 @@ class Reservations extends React.Component {
                     case "CANCELLED": return (<span/>);
                     case "MATCHED": return (
                         <Button 
-                            onClick={this.showDeleteConfirm(1)}
+                            onClick={() => this.showDeleteConfirm(record, 1)}
                             type="danger"
                             shape="round"
                         >
@@ -193,7 +205,7 @@ class Reservations extends React.Component {
                             </Button>
                             { moment(record.job_start_date).subtract(1, 'days').isBefore(new Date()) && (
                                 <Button 
-                                    onClick={this.showDeleteConfirm(record, 1)}
+                                    onClick={() => this.showDeleteConfirm(record, 1)}
                                     type="danger"
                                     shape="round"
                                     className="ma-1"
@@ -256,13 +268,13 @@ class Reservations extends React.Component {
                             >Cancel</Button>
                         </React.Fragment>
                     );
-                    case "DECLINED": return (<span>Reservation declined by the photographer.</span>);
+                    case "DECLINED": return (<span/>);
                     case "CANCELLED": return (<span/>);
                     case "MATCHED": return (
                         <React.Fragment>
                             <CheckoutCreditCard
                                 job={record}
-                                amount={record.job_total_price * 30/100}
+                                amount={calculateDepositPrice(record.job_reservation)}
                                 createCreditCardCharge={createCreditCardCharge}
                             />
                             <Button 
@@ -275,8 +287,6 @@ class Reservations extends React.Component {
                     );
                     case "PAID": return (
                         moment(record.job_start_date).subtract(1, 'days').isBefore(new Date()) ? (
-                            <span>You cannot cancel your job right now.</span>
-                        ) : (
                             <Button 
                                 onClick={() => this.showDeleteConfirm(record, 2)}
                                 type="danger"
@@ -284,13 +294,15 @@ class Reservations extends React.Component {
                             >
                                 Cancel
                             </Button>
+                        ) : (
+                            <span>You cannot cancel your job right now.</span>
                         )
                     );
                     case "PROCESSING": return (<span/>);
                     case "COMPLETED": return (
                         <CheckoutCreditCard
                             job={record}
-                            amount={record.job_total_price * 70/100}
+                            amount={calculateLeftoverPrice(record.job_reservation)}
                             createCreditCardCharge={createCreditCardCharge}
                         />
                     );
@@ -331,7 +343,7 @@ class Reservations extends React.Component {
                                 ],
                             })(
                                 <Input
-                                    placeholder="Photos Storage URL"
+                                    placeholder="Photos Storage URL (ex: https://www.example.com)"
                                     onChange={e => this.setState({ link: e.target.value })}
                                 />,
                             )}

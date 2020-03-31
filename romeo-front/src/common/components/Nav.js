@@ -95,6 +95,9 @@ class Nav extends React.Component {
                                                 </Link>
                                             </Menu.Item>
                                             <Menu.Divider />
+                                            <Menu.Item key="pho0">
+                                                <Link to="/client/reservations">My Reservations</Link>
+                                            </Menu.Item>
                                             <Menu.Item key="pho1">
                                                 <Link to="/client/edit-portfolio">Edit Portfolio</Link>
                                             </Menu.Item>

@@ -9,7 +9,9 @@ export const statusLabels = {
     CANCELLED: "Cancelled",
     PROCESSING: "Processing Photos",
     COMPLETED: "Completed",
-    CLOSED: "Closed"
+    CLOSED: "Closed",
+    CANCELLED_BY_CUSTOMER: "Cancelled by Customer",
+    CANCELLED_BY_PHOTOGRAPHER: "Cancelled by Photographer"
 }
 
 export const decline = (job, actorType) => {
@@ -19,28 +21,30 @@ export const decline = (job, actorType) => {
             job_status: "DECLINED"
         })
     }
+    window.location.reload();
 }
 
 export const cancel = (job, actorType) => {
     Axios.patch(`/api/jobs/${job.job_id}/`, {
         job_status: actorType === 1 ? "CANCELLED_BY_PHOTOGRAPHER" : "CANCELLED_BY_CUSTOMER"
     })
+    window.location.reload();
 }
 
-export const proceed = (job, actorType, data) => {
+export const proceed = async (job, actorType, data) => {
     // Normal flow of events
     if (actorType === 1) {
         // Photographers
         if (job.job_status === "PENDING") {
-            Axios.patch(`/api/jobs/${job.job_id}/`, {
+            await Axios.patch(`/api/jobs/${job.job_id}/`, {
                 job_status: "MATCHED"
             })
         } else if (job.job_status === "PAID") {
-            Axios.patch(`/api/jobs/${job.job_id}/`, {
+            await Axios.patch(`/api/jobs/${job.job_id}/`, {
                 job_status: "PROCESSING"
             })
         } else if (job.job_status === "PROCESSING" || job.job_status === "COMPLETED") {
-            Axios.patch(`/api/jobs/${job.job_id}/`, {
+            await Axios.patch(`/api/jobs/${job.job_id}/`, {
                 job_status: "COMPLETED",
                 job_url: data
             })
@@ -48,12 +52,12 @@ export const proceed = (job, actorType, data) => {
     } else {
         // Customers
         if (job.job_status === "MATCHED") {
-            Axios.patch(`/api/jobs/${job.job_id}/`, {
+            await Axios.patch(`/api/jobs/${job.job_id}/`, {
                 job_status: "PAID"
             })
         }
         if (job.job_status === "COMPLETED") {
-            Axios.patch(`/api/jobs/${job.job_id}/`, {
+            await Axios.patch(`/api/jobs/${job.job_id}/`, {
                 job_status: "CLOSED"
             })
         }
@@ -65,10 +69,10 @@ export const createCreditCardCharge = async (job, token) => {
     try {
         const res = await Axios({
             method: "POST",
-            url: "/api/charge",
+            url: "/api/payment/",
             data: { 
                 job_id: job.job_id, 
-                token 
+                omiseToken: token 
             },
             headers: {
                 "Content-Type": "application/json"

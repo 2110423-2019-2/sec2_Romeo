@@ -5,6 +5,7 @@ import Password from "./password"
 import Reservations from "./reservations";
 import EditPortfolio from "./edit-portfolio/"
 import EditProfile from "./edit-profile/"
+import JobDetails from "./job-details";
 import { getCurrentClient } from "common/auth";
 
 import { Menu } from 'antd';
@@ -70,6 +71,7 @@ class ClientLanding extends React.Component {
                 <Switch>
                     <Route path="/client/edit/password" component={Password} />
                     <Route path="/client/edit" component={Edit} />
+                    <Route path="/client/reservations/:jobId" component={JobDetails} />
                     <Route path="/client/reservations" component={Reservations} />
                     <Route path="/client/notifications" component={Notifications} />
                     <Route path="/client/edit-portfolio" component={EditPortfolio} />

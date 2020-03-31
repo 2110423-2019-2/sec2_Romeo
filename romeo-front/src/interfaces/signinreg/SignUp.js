@@ -76,7 +76,7 @@ class SignUp extends React.Component {
                     photographer_style: []
                 }
                 if (type === 1) {
-                    const res = await Axios.post('/api/photographers/',{
+                    const res = await Axios.post('/api/registration/',{
                         profile,
                         ...photographerInfo
                     });
@@ -86,7 +86,7 @@ class SignUp extends React.Component {
                         console.log(res)
                     }
                 } else {
-                    const res = await Axios.post('/api/customers/',{
+                    const res = await Axios.post('/api/registration/',{
                         profile,
                         fav_photographers: favPhotographers
                     });
