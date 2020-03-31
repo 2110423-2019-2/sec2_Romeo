@@ -1,6 +1,13 @@
 import { SET_AUTH } from "../action-types";
-import { setAuthToken, setRefreshToken, removeAuthToken, setCurrentClient, removeCurrentClient } from "../auth";
+import { setAuthToken, 
+	setRefreshToken, 
+	removeAuthToken, 
+	setCurrentClient, 
+	removeCurrentClient,
+	getCurrentClient
+} from "../auth";
 import Axios from "axios";
+import moment from "moment";
 
 export const signIn = (credentials, history) => async dispatch => {
 	try {
@@ -34,6 +41,12 @@ export const signOut = history => dispatch => {
 
 export const setAuth = user => {
 	if (user) {
+		const currentClient = getCurrentClient()
+		if (currentClient.type === 1) {
+			Axios.patch("/api/photographers/" + currentClient.username + "/", {
+				photographer_last_online_time: moment(new Date())
+			})
+		}
 		return {
 			type: SET_AUTH,
 			payload: {

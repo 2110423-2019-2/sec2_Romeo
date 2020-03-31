@@ -5,9 +5,12 @@ import Password from "./password"
 import Reservations from "./reservations";
 import EditPortfolio from "./edit-portfolio/"
 import EditProfile from "./edit-profile/"
+import Calendar from "./calendar";
+import JobDetails from "./job-details";
 import { getCurrentClient } from "common/auth";
 
 import { Menu } from 'antd';
+import Notifications from "./notifications";
 
 class ClientLanding extends React.Component {
     render() {
@@ -42,15 +45,27 @@ class ClientLanding extends React.Component {
                                         Edit Profile
                                 </NavLink>
                             )}
-                            { type === 2 && (
-                                <NavLink 
-                                    className="ant-menu-item" 
-                                    activeClassName="ant-menu-item-selected"
-                                    to="/client/reservations"
-                                >
-                                        My Reservations
-                                </NavLink>
-                            )}
+                            <NavLink 
+                                className="ant-menu-item" 
+                                activeClassName="ant-menu-item-selected"
+                                to="/client/reservations"
+                            >
+                                    My Reservations
+                            </NavLink>
+                            <NavLink 
+                                className="ant-menu-item" 
+                                activeClassName="ant-menu-item-selected"
+                                to="/client/calendar"
+                            >
+                                My Calendar
+                            </NavLink>
+                            <NavLink 
+                                className="ant-menu-item" 
+                                activeClassName="ant-menu-item-selected"
+                                to="/client/notifications"
+                            >
+                                All Notifications
+                            </NavLink>
                             <NavLink 
                                 className="ant-menu-item" 
                                 activeClassName="ant-menu-item-selected"
@@ -64,18 +79,25 @@ class ClientLanding extends React.Component {
                 <Switch>
                     <Route path="/client/edit/password" component={Password} />
                     <Route path="/client/edit" component={Edit} />
-                    <Route path="/client/reservations" exact component={Reservations} />
-                    <Route path="/client/edit-portfolio" exact component={EditPortfolio} />
-                    <Route path="/client/edit-profile" exact component={EditProfile} />
-                    <Route path="/client" exact component={RedirectToEdit} />
+                    <Route path="/client/reservations/:jobId" component={JobDetails} />
+                    <Route path="/client/reservations" component={Reservations} />
+                    <Route path="/client/calendar" component={Calendar} />
+                    <Route path="/client/notifications" component={Notifications} />
+                    <Route path="/client/edit-portfolio" component={EditPortfolio} />
+                    <Route path="/client/edit-profile" component={EditProfile} />
+                    <Route path="/client" component={RedirectToEdit} />
                 </Switch>
             </div>
         );
     }
 }
 
+const RedirectTo404 = () => (
+    <Redirect to="/not-found" />
+)
+
 const RedirectToEdit = () => (
-    <Redirect to="/user/edit" />
+    <Redirect to="/client/edit" />
 )
 
 export default ClientLanding

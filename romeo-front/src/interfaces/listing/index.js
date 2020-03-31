@@ -3,9 +3,13 @@ import { connect } from "react-redux";
 import { Parallax } from 'react-parallax';
 import Card from "./Card";
 import Axios from "axios";
-import { Input, Skeleton, Card as AntCard, Avatar, Icon, Dropdown, Form, Radio, Button } from "antd";
+import { Input, Skeleton, Card as AntCard, Avatar, Icon, Dropdown, Form, Radio, Button, Menu, DatePicker} from "antd";
 import { getCurrentClientInfo } from "common/auth";
-import { availableStyles } from "logic/availableStyles"
+import { availableStyles } from "logic/Styles"
+import { availableSorts } from "logic/Listing"
+import { timeLabels } from "logic/Calendar"
+import { formatSnakeDate } from "common/date";
+import moment from "moment"; 
 
 class Listing extends React.Component {
 
@@ -16,18 +20,44 @@ class Listing extends React.Component {
         typingTimeout: 0,
         params: {
             user: "",
-            style: ""
+            style: "",
+            activeSort: "",
+            dayType: "",
+            date: ""
+        },
+        pagination: {
+            next: null,
+            prev: null
         }
     }
 
     componentDidMount = async () => {
         this.setState({ loading: true })
         const res =  await Axios.get("/api/photographersearch");
+        console.log(res);
         const currentClient = await getCurrentClientInfo();
         this.setState({
-            photographers: res.data,
-            currentClient,
-            loading: false
+            photographers: res.data.results,
+            pagination: {
+                next: res.data.next,
+                prev: res.data.previous
+            },
+            loading: false,
+            currentClient
+        });
+    }
+
+    onPaginationClick = async (np) => {
+        const { next, prev } = this.state.pagination;
+        this.setState({ loading: true });
+        const res =  await Axios.get(np === 0 ? next : prev);
+        this.setState({
+            photographers: res.data.results,
+            pagination: {
+                next: res.data.next,
+                prev: res.data.previous
+            },
+            loading: false,
         });
     }
 
@@ -71,7 +101,11 @@ class Listing extends React.Component {
             })
         );
         this.setState({
-            photographers: res.data,
+            photographers: res.data.results,
+            pagination: {
+                next: res.data.next,
+                prev: res.data.previous
+            },
             loading: false
         });
     }
@@ -91,13 +125,87 @@ class Listing extends React.Component {
             })
         );
         this.setState({
-            photographers: res.data,
+            photographers: res.data.results,
+            pagination: {
+                next: res.data.next,
+                prev: res.data.previous
+            },
             loading: false
         });
     }
 
+    onSortChange = async (e) => {
+        this.setState({ 
+            params: {
+                ...this.state.params,
+                activeSort: e.target.value
+            }, 
+            loading: true 
+        });
+        const res =  await Axios.get("/api/photographersearch?" 
+            + this.getParamString({
+                ...this.state.params,
+                sort: e.target.value
+            })
+        );
+        this.setState({
+            photographers: res.data.results,
+            pagination: {
+                next: res.data.next,
+                prev: res.data.previous
+            },
+            loading: false
+        });
+    }
+
+    onDayTypeChange = async (e) =>{
+        this.setState({ 
+            params: {
+                ...this.state.params,
+                dayType: e.target.value
+            }, 
+            loading: true 
+        });
+        const res =  await Axios.get("/api/photographersearch?" 
+            + this.getParamString({
+                ...this.state.params,
+                time: e.target.value
+            })
+        );
+        this.setState({
+            photographers: res.data.results,
+            pagination: {
+                next: res.data.next,
+                prev: res.data.previous
+            },
+            loading: false
+        });
+    }
+    onDateChange = async (date, dateString) => {
+        this.setState({ 
+            params: {
+                ...this.state.params,
+                date: formatSnakeDate(date)
+            }, 
+            loading: true 
+        });
+        const res =  await Axios.get("/api/photographersearch?" 
+            + this.getParamString({
+                ...this.state.params,
+                date: formatSnakeDate(date)
+            })
+        );
+        this.setState({
+            photographers: res.data.results,
+            pagination: {
+                next: res.data.next,
+                prev: res.data.previous
+            },
+            loading: false
+        });
+    }
     render() {
-        const {photographers, params, loading} = this.state;
+        const {photographers, params, loading, pagination} = this.state;
         return (
             <div style={{ marginTop: -64 }}>
                 <Parallax
@@ -116,9 +224,9 @@ class Listing extends React.Component {
                 </Parallax>
                 <div className="container mt-5 mb-5">
                     <div className="secondary-label mb-3 pl-0 t-color-default" style={{ textAlign: 'center' }}>
-                        Search by Name or Filter by Style
+                        Search and Filter
                     </div>
-                    <div className="d-flex align-center mb-4" style={{ maxWidth: 500, margin: 'auto' }}>
+                    <div className="d-flex align-center" style={{ maxWidth: 500, margin: 'auto' }}>
                         <Input.Search 
                             value={params.user} 
                             placeholder="Search" 
@@ -126,6 +234,16 @@ class Listing extends React.Component {
                             size="large"
                             className="ma-1"
                         />
+                        <DatePicker 
+                            type="primary" 
+                            size="large" 
+                            style={{ minWidth: 120, width: 200 }}
+                            onChange={this.onDateChange}
+                            format="D/M/YYYY"
+                        >
+                        </DatePicker>
+                    </div>
+                    <div className="d-flex align-center justify-center mb-4" style={{ maxWidth: 500, margin: 'auto' }}>
                         <Dropdown overlay={() => (
                             <Form className="pa-3">
                                 <Radio.Group 
@@ -146,12 +264,69 @@ class Listing extends React.Component {
                                     )) }
                                 </Radio.Group>
                             </Form>
-                        )} trigger={['click']}>
-                            <Button type="primary" size="large" className="ma-1">
+                            )} 
+                            trigger={['click']}
+                        >
+                            <Button type="primary" size="large" className="mr-1 mb-1 pr-2 pl-3">
                                 <span>Styles</span>
                                 <Icon type="down" />
                             </Button>
                         </Dropdown>
+                        <Dropdown overlay={() => (
+                            <Form className="pa-3">
+                                <Radio.Group 
+                                    value={params.activeSort}
+                                    onChange={this.onSortChange} 
+                                    className="vertical"
+                                >
+                                    <Radio 
+                                        value=""
+                                        style={{display: 'block'}}
+                                    >None</Radio>
+                                    { availableSorts.map((e,i) => (
+                                        <Radio 
+                                            className="vertical"
+                                            value={e.value} 
+                                            key={e.value+i} 
+                                            style={{display: 'block'}}
+                                        >{e.label}</Radio>
+                                    )) }
+                                </Radio.Group>
+                            </Form>
+                            )} 
+                            trigger={['click']}
+                        >
+                            <Button type="primary" size="large" className="mr-1 mb-1 pr-2 pl-3">
+                                Sort By
+                                <Icon type="down" />
+                            </Button>
+                        </Dropdown>
+                        <Dropdown overlay={() => (
+                            <Form className="pa-3">
+                                <Radio.Group 
+                                    value={params.dayType}
+                                    onChange={this.onDayTypeChange} 
+                                    className="vertical"
+                                >
+                                    <Radio 
+                                        value=""
+                                        style={{display: 'block'}}
+                                    >None</Radio>
+                                    { Object.keys(timeLabels).map((e,i) => (
+                                        <Radio 
+                                            className="vertical"
+                                            value={e} 
+                                            key={e+"filter"} 
+                                            style={{display: 'block'}}
+                                        >{timeLabels[e]}</Radio>
+                                    )) }
+                                </Radio.Group>
+                            </Form>
+                        )} trigger={['click']}>
+                            <Button type="primary" size="large" className="mr-1 mb-1 pr-2 pl-3">
+                                Time <Icon type="down" />
+                            </Button>
+                        </Dropdown>                        
                     </div>
                     <div className="d-flex flex-wrap justify-center align-center">
                         { (!loading) ? 
@@ -184,6 +359,18 @@ class Listing extends React.Component {
                         )
                     }
                     </div>
+                    { (photographers.length > 0 && !loading) && (
+                        <div className="d-flex align-center justify-center mt-4">
+                            <Button className="ma-1" disabled={!pagination.prev}>
+                                <Icon type="left" />
+                                Previous
+                            </Button>
+                            <Button className="ma-1" disabled={!pagination.next}>
+                                Next
+                                <Icon type="right"/>
+                            </Button>
+                        </div>
+                    )}
                 </div>
             </div>
         );

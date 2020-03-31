@@ -20,6 +20,9 @@ class Equipment extends React.Component {
                 equipment_name: equipmentName
             }])
         }
+        this.setState({
+            equipmentName: ""
+        })
     }
     deleteEquipment = key => {
         let { currentEquipment, setCurrentEquipment } = this.props;

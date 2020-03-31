@@ -18,16 +18,17 @@ initHttp();
 const token = localStorage.getItem("token");
 const refresh = localStorage.getItem("refresh");
 if (token) {
-	store.dispatch(setAuth(true));
-	if (refresh) {
-		Axios.post("/auth/jwt/refresh", {
-			refresh
-		});
-	}
 	if (!getCurrentClient()) {
 		store.dispatch(setAuth(false));
 		removeCurrentClient();
 		removeAuthToken();
+	} else {
+		store.dispatch(setAuth(true));
+		if (refresh) {
+			Axios.post("/auth/jwt/refresh", {
+				refresh
+			});
+		}
 	}
 } else {
 	store.dispatch(setAuth(false));

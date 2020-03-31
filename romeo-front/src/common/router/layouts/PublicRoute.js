@@ -1,7 +1,7 @@
 import React from "react";
 import { connect } from "react-redux";
 import { Route } from "react-router-dom";
-import TransparentNav from "../../components/TransparentNav";
+import Nav from "../../components/Nav";
 
 const PublicRoute = props => {
     let { isAuth, path, component: Component, ...rest } = props;
@@ -11,7 +11,7 @@ const PublicRoute = props => {
 			path={path}
 			component={props =>
 				<React.Fragment>
-					<TransparentNav/>
+					<Nav transparent={true} />
 					<main className="main-content">
 						<Component {...props} />
 					</main>

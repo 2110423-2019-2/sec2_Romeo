@@ -1,25 +1,37 @@
 import React from "react";
-import { Calendar, Tag } from 'antd';
+import { Calendar, Tag, Tooltip, Button, Icon } from 'antd';
 import moment from "moment";
-import { dayIndex, defaultDays } from "logic/Calendar";
-
-const timeLabels = {
-    HALF_DAY_MORNING: 'Morning-Noon',
-    HALF_DAY_NOON: 'Noon-Evening',
-    FULL_DAY: 'Full-Day',
-    NIGHT: 'Night',
-    FULL_DAY_NIGHT: 'Full-Day and Night',
-}
+import { dayIndex, defaultDays, timeLabels } from "logic/Calendar";
+import Axios from "axios";
+import ReserveModal from "./ReserveModal";
+import { formatDashedDate } from "common/date";
 
 class JobCalendar extends React.Component {
     state = {
         today: moment(new Date()),
-        calOutput: defaultDays
+        calOutput: defaultDays,
+        showReserveModal: false,
+        selectedTimes: {},
+        unavailableDays: []
     };
-    componentDidMount() {
+    async componentDidMount() {
         const { currentPhotographer } = this.props;
         const { photographer_avail_time } = currentPhotographer;
-        
+
+        const res = await Axios.get("/api/jobs?search="+currentPhotographer.profile.user.username);
+        if (res.data) {
+            const jobs = res.data;
+            let out = [];
+            jobs.forEach(j => {
+                if (j.job_status === "MATCHED" || j.job_status === "PAID" || j.job_status === "PROCESSING") {
+                    j.job_reservation.forEach(jr => {
+                        out.push(jr.photoshoot_date)
+                    })
+                }
+            });
+            this.setState({ unavailableDays: out })
+        }
+
         let out = [...this.state.calOutput];
         photographer_avail_time.forEach((e,i) => {
             out.splice(dayIndex[e.avail_date],1)
@@ -27,11 +39,45 @@ class JobCalendar extends React.Component {
         });
         this.setState({ calOutput: out });
     }
+    selectTime = (data, value) => {
+        let out = {...this.state.selectedTimes};
+        if (out[moment(value)]) {
+            delete out[moment(value)]
+        } else {
+            out[moment(value)] = data;
+        }
+        this.setState({ selectedTimes: out});
+    }
     dateCellRender = (value) => {
         const listData = this.getListData(value);
+        const { enableReserve } = this.props;
+        const { selectedTimes, unavailableDays } = this.state;
         return (
+        
           <div>
-            { listData.content && <Tag color="green" style={{ whiteSpace: 'normal' }}>{listData.content}</Tag>}
+            { enableReserve ? (
+                (listData.content && !unavailableDays.includes(formatDashedDate(value))) && (
+                    <Tooltip title={selectedTimes[value] ? "Unselect" : "Select Time"}>
+                        <Tag 
+                            color={selectedTimes[value] ? "#51bba8" : ""}
+                            style={{ whiteSpace: 'normal' }} 
+                            onClick={() => this.selectTime(listData.data, value)}
+                        >
+                            {listData.content}
+                        </Tag>
+                    </Tooltip>
+                )
+            ) : (
+                (listData.content && !unavailableDays.includes(formatDashedDate(value))) && (
+                    <Tag 
+                        color="green" 
+                        style={{ whiteSpace: 'normal' }}
+                        
+                    >
+                        {listData.content}
+                    </Tag>
+                )
+            )}
           </div>
         );
     }
@@ -52,27 +98,40 @@ class JobCalendar extends React.Component {
 
     getListData = (value) => {
         const { calOutput } = this.state;
+        if (moment(value).subtract(1,"days").isBefore(new Date())) {
+            return {
+                content: null,
+                data: null
+            }
+        }
         switch (value.day()) {
             case 0: return {
-                content: this.getLabel(calOutput[6])
+                content: this.getLabel(calOutput[6]),
+                data: calOutput[6]
             };
             case 1: return {
-                content: this.getLabel(calOutput[0])
+                content: this.getLabel(calOutput[0]),
+                data: calOutput[0]
             };
             case 2: return {
-                content: this.getLabel(calOutput[1])
+                content: this.getLabel(calOutput[1]),
+                data: calOutput[1]
             };
             case 3: return {
-                content: this.getLabel(calOutput[2])
+                content: this.getLabel(calOutput[2]),
+                data: calOutput[2]
             };
             case 4: return {
-                content: this.getLabel(calOutput[3])
+                content: this.getLabel(calOutput[3]),
+                data: calOutput[3]
             };
             case 5: return {
-                content: this.getLabel(calOutput[4])
+                content: this.getLabel(calOutput[4]),
+                data: calOutput[4]
             };
             case 6: return {
-                content: this.getLabel(calOutput[5])
+                content: this.getLabel(calOutput[5]),
+                data: calOutput[5]
             };
             default: return {
                 content: ""
@@ -80,12 +139,50 @@ class JobCalendar extends React.Component {
         }
     }
     render() {
+        const { fullscreen, 
+            currentPhotographer, 
+            currentClient,
+            enableReserve
+        } = this.props;
+        const { showReserveModal, selectedTimes } = this.state;
         return (
-            <div className="calendar-wrapper">
-                <div className="calendar-container">
-                    <Calendar onPanelChange={this.onPanelChange} dateCellRender={this.dateCellRender}/>
+            <React.Fragment>
+                { enableReserve && (
+                    <div className="mb-2" style={{ textAlign: 'center' }}>
+                        <span className="secondary-label" style={{ letterSpacing: 2, fontWeight: 'normal' }}>
+                            Click the available times on the calendar to start reserving.
+                        </span>
+                        <Button 
+                            type="primary" 
+                            shape="round"
+                            className="ml-2 mb-2 mt-2"
+                            onClick={() => this.setState({ showReserveModal: true })}
+                            disabled={!Object.keys(selectedTimes).length > 0}
+                        >
+                            PROCEED
+                            <Icon type="caret-right"/>
+                        </Button>
+                    </div>
+                )}
+                <div className="calendar-wrapper">
+                    <div className="calendar-container">
+                        <Calendar 
+                            onPanelChange={this.onPanelChange} 
+                            dateCellRender={this.dateCellRender}
+                            fullscreen={fullscreen}
+                        />
+                    </div>
+                    { (showReserveModal && selectedTimes) && (
+                        <ReserveModal
+                            visible={showReserveModal}
+                            onCancel={() => this.setState({ showReserveModal: false })}
+                            currentClient={currentClient}
+                            currentPhotographer={currentPhotographer}
+                            selectedTimes={selectedTimes}
+                        />
+                    )}
                 </div>
-            </div>
+            </React.Fragment>
         )
     }
 }
