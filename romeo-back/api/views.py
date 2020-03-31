@@ -12,7 +12,7 @@ import omise
 # Import Serializers of apps
 from .serializers import PhotographerSerializer, CustomerSerializer, JobSerializer, JobReservationSerializer, UserSerializer, \
     PhotoSerializer, AvailTimeSerializer, EquipmentSerializer, ProfileSerializer, StyleSerializer, NotificationSerializer, ChangePasswordSerializer, \
-        ReviewSerializer, PaymentSerializer
+        ReviewSerializer, PaymentSerializer, GetJobsSerializer
 # Import models of apps for queryset
 from photographers.models import Photographer, Photo, AvailTime, Equipment, Style
 from customers.models import Customer
@@ -200,10 +200,17 @@ class JobsViewSet(viewsets.ModelViewSet):
             job_total_price = Sum('job_reservation__job_avail_time__photographer_price')
         )
 
+class GetjobsViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = JobInfo.objects.all()
+    serializer_class = GetJobsSerializer
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['job_photographer__profile__user__username','job_customer__profile__user__username'] 
+
 class JobReservationViewSet(viewsets.ModelViewSet):
     queryset = JobReservation.objects.all()
     serializer_class = JobReservationSerializer
     # permission_classes = [AllowAny]
+
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = CustomUser.objects.all()
