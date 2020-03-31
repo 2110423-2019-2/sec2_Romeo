@@ -175,7 +175,7 @@ class Profile extends React.Component {
                         { currentClient && currentClient.profile.user.user_type !== 1 && (
                             <Button 
                                 type={enableReserve ? "danger" : "primary"}
-                                onClick={() => this.setState({ display: 1, enableReserve: !enableReserve })}
+                                onClick={() => this.setState({ display: 2, enableReserve: !enableReserve })}
                                 className="el-4 pos-fixed"
                                 size="large"
                                 shape="round"

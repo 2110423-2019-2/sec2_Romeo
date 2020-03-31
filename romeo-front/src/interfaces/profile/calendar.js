@@ -2,19 +2,36 @@ import React from "react";
 import { Calendar, Tag, Tooltip, Button, Icon } from 'antd';
 import moment from "moment";
 import { dayIndex, defaultDays, timeLabels } from "logic/Calendar";
+import Axios from "axios";
 import ReserveModal from "./ReserveModal";
+import { formatDashedDate } from "common/date";
 
 class JobCalendar extends React.Component {
     state = {
         today: moment(new Date()),
         calOutput: defaultDays,
         showReserveModal: false,
-        selectedTimes: {}
+        selectedTimes: {},
+        unavailableDays: []
     };
-    componentDidMount() {
+    async componentDidMount() {
         const { currentPhotographer } = this.props;
         const { photographer_avail_time } = currentPhotographer;
-        
+
+        const res = await Axios.get("/api/jobs?search="+currentPhotographer.profile.user.username);
+        if (res.data) {
+            const jobs = res.data;
+            let out = [];
+            jobs.forEach(j => {
+                if (j.job_status === "MATCHED" || j.job_status === "PAID" || j.job_status === "PROCESSING") {
+                    j.job_reservation.forEach(jr => {
+                        out.push(jr.photoshoot_date)
+                    })
+                }
+            });
+            this.setState({ unavailableDays: out })
+        }
+
         let out = [...this.state.calOutput];
         photographer_avail_time.forEach((e,i) => {
             out.splice(dayIndex[e.avail_date],1)
@@ -34,11 +51,12 @@ class JobCalendar extends React.Component {
     dateCellRender = (value) => {
         const listData = this.getListData(value);
         const { enableReserve } = this.props;
-        const { selectedTimes } = this.state;
+        const { selectedTimes, unavailableDays } = this.state;
         return (
+        
           <div>
             { enableReserve ? (
-                listData.content && (
+                (listData.content && !unavailableDays.includes(formatDashedDate(value))) && (
                     <Tooltip title={selectedTimes[value] ? "Unselect" : "Select Time"}>
                         <Tag 
                             color={selectedTimes[value] ? "#51bba8" : ""}
@@ -50,7 +68,7 @@ class JobCalendar extends React.Component {
                     </Tooltip>
                 )
             ) : (
-                listData.content && (
+                (listData.content && !unavailableDays.includes(formatDashedDate(value))) && (
                     <Tag 
                         color="green" 
                         style={{ whiteSpace: 'normal' }}
