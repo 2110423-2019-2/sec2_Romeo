@@ -9,6 +9,7 @@ import { styleColors } from "../../common/style-colors";
 import Axios from "axios"
 import SignInModal from "../signinreg/modal";
 import history from "common/router/history";
+import Reviews from "./reviews";
 
 class Profile extends React.Component {
     state = {
@@ -126,15 +127,21 @@ class Profile extends React.Component {
                                     Portfolio
                                 </div>
                                 <div 
-                                    className={`profile-tabs-item ${display === 1 && 'active'}`}
+                                    className={`profile-tabs-item ${display === 1&& 'active'}`}
                                     onClick={() => this.setState({ display: 1})}
+                                >
+                                    Reviews
+                                </div>
+                                <div 
+                                    className={`profile-tabs-item ${display === 2 && 'active'}`}
+                                    onClick={() => this.setState({ display: 2})}
                                 >
                                     Available Times
                                 </div>
                             </div>
                         </div>
                         <div className="container with-sidebar full-width-xs portfolio-container">
-                        { display === 0 ? (
+                        { display === 0 && (
                             <div className="photo-grid">
                                 { currentPortfolio && currentPortfolio.length > 0 ? (
                                     currentPortfolio.map((e,i) => (
@@ -146,7 +153,15 @@ class Profile extends React.Component {
                                     <p className="pa-3" style={{ textAlign: 'center' }}>There are no photos to show in this portfolio.</p>
                                 )}
                             </div>
-                        ) : (
+                        )}
+                        { display === 1 && (
+                            <div className="pa-4">
+                                <Reviews 
+                                    currentPhotographer={currentPhotographer}
+                                />
+                            </div>
+                        ) }
+                        { display === 2 && (
                             <div className="pa-4">
                                 <JobCalendar 
                                     fullscreen={true} 

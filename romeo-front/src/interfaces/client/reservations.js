@@ -1,5 +1,6 @@
 import React from "react"
-import { Input, Table, Button, Modal, Dropdown, Menu, Form, Icon } from "antd";
+import { Input, Table, Button, Modal, 
+    Dropdown, Menu, Form, Icon, Rate } from "antd";
 import { Link } from "react-router-dom";
 import CheckoutCreditCard from "../../omise/Checkout";
 import { formatDate } from "common/date";
@@ -55,12 +56,29 @@ class Reservations extends React.Component {
         link: "",
         showURLModal: false,
         showConfirmModal: false,
-        selectedJob: null
+        selectedJob: null,
+        showReviewModal: false,
+        review: "",
+        rating: 0
     }
 
     handleLinkSubmit = () => {
         const { link, selectedJob } = this.state;
         proceed(selectedJob, 1, link)
+    }
+
+    handleReviewSubmit = async () => {
+        const { selectedJob, review, rating  } = this.state;
+        try {
+            const res = await Axios.post("/api/review/",{
+                reviewJob: selectedJob.job_id,
+                reviewDetail: review,
+                rateJob: rating*2
+            });
+            if (res.data) window.location.reload();
+        } catch (err) {
+            console.log(err);
+        }
     }
     
     showDeleteConfirm = (record, userType) => {
@@ -83,7 +101,7 @@ class Reservations extends React.Component {
         });
     }
     render() {
-        const { reservations, selectedJob, showConfirmModal } = this.state;
+        const { reservations, selectedJob } = this.state;
         const { getFieldDecorator, getFieldsError, getFieldError, isFieldTouched } = this.props.form;
         const linkError = isFieldTouched('link') && getFieldError('link');
 
@@ -307,9 +325,21 @@ class Reservations extends React.Component {
                         />
                     );
                     case "CLOSED": return (
-                        <a href={record.job_url} target="_blank">
-                            <Button shape="round" type="primary">See Photos</Button>
-                        </a>
+                        <React.Fragment>
+                            <a href={record.job_url} target="_blank">
+                                <Button shape="round" type="primary" className="ma-1">See Photos</Button>
+                            </a>
+                            <Button 
+                                shape="round" 
+                                className="ma-1" 
+                                onClick={() => this.setState({ 
+                                    showReviewModal: true, 
+                                    selectedJob: record
+                                })}
+                            >
+                                Write a Review
+                            </Button>
+                        </React.Fragment>
                     );
                     default: return <span/>
                 }
@@ -355,6 +385,39 @@ class Reservations extends React.Component {
                                 htmlType="submit" 
                                 disabled={hasErrors(getFieldsError())}
                             >Confirm Edits</Button>
+                        </Form.Item>
+                    </Form>
+                </Modal>
+                <Modal
+                    title="Review this Photographer"
+                    visible={this.state.showReviewModal}
+                    footer={null}
+                    onCancel={() => this.setState({ showReviewModal: false })}
+                >
+                    <Form>
+                        <b>Rate</b><br/>
+                        <Rate 
+                            allowHalf 
+                            defaultValue={0} 
+                            onChange={e => this.setState({ rating: e })} 
+                            value={this.state.rating} 
+                            className="mb-3"
+                        />
+                        <b className="d-block mb-1">Review</b>
+                        <Form.Item>
+                            <Input.TextArea
+                                placeholder="Your review:"
+                                onChange={e => this.setState({ review: e.target.value })}
+                                value={this.state.review}
+                            />
+                        </Form.Item>
+                        <Form.Item className="mb-0">
+                            <Button 
+                                type="primary" 
+                                onClick={() => this.handleReviewSubmit()}
+                                htmlType="submit"
+                                disabled={this.state.rating === 0}
+                            >Post Review</Button>
                         </Form.Item>
                     </Form>
                 </Modal>
