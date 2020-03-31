@@ -239,3 +239,6 @@ class ReviewViewSet(viewsets.ModelViewSet):
     queryset = ReviewInfo.objects.filter()
     serializer_class = ReviewSerializer
     permission_classes = [AllowAny]
+    lookup_field = 'reviewJob__job_id'
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['reviewJob__job_photographer__profile__user__username']
