@@ -6,7 +6,7 @@ export const getNotificationText = (user, status) => {
     const { username } = user.user;
     switch (status) {
         case "PENDING": return <span>You have a new reservation request from <b>{username}</b></span>
-        case "DECLINED": return <span>Your reservation for <b>{username}</b> has been declined.`}</span>
+        case "DECLINED": return <span>Your reservation for <b>{username}</b> has been declined.</span>
         case "MATCHED": return <span>Your reservation for <b>{username}</b> has been accepted. Please pay the deposit.</span>
         case "PAID": return <span>Customer <b>{username}</b> has paid the deposit.</span>
         case "CANCELLED": return <span>Your reservation of <b>{username}</b> has been cancelled.</span>

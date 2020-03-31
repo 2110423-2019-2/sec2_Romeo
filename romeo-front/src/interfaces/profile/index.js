@@ -18,7 +18,8 @@ class Profile extends React.Component {
         currentPortfolio: null,
         currentClient: null,
         showSignIn: false,
-        enableReserve: false
+        enableReserve: false,
+        favorited: false
     }
 
     componentDidMount = async () => {
@@ -34,15 +35,53 @@ class Profile extends React.Component {
             this.setState({
                 currentPhotographer: photographer,
                 currentPortfolio,
-                currentClient
+                currentClient,
+                favorited: (currentClient && currentClient.fav_photographers) ? 
+                    [...currentClient.fav_photographers].includes(photographer.profile.user.id) : false
             });
         } catch (err) {
             history.push('/');
         }
     }
 
-    handleReserve = () => {
-        console.log("reserve");
+    toggleFav = async () => {
+        const { 
+            currentPhotographer, 
+            currentClient, 
+            favorited
+        } = this.state;
+
+        if (!currentClient) {
+            this.setState({ showSignIn: true });
+            return;
+        }
+
+        const photographerId = currentPhotographer.profile.user.id;
+        const { fav_photographers } = currentClient;
+        if (!favorited) {
+            const res = await Axios.patch("/api/customers/"+currentClient.profile.user.username+"/", {
+                fav_photographers: [...fav_photographers, photographerId]
+            });
+            if (res.data) {
+                this.setState({
+                    favorited: true
+                })
+            }
+        } else {
+            let index = currentClient.fav_photographers.indexOf(photographerId);
+            const fav = [...currentClient.fav_photographers]
+            const rem = [...fav.slice(0,index),...fav.slice(index+1, fav.length)];
+            if (index > -1) {
+                const res = await Axios.patch("/api/customers/"+currentClient.profile.user.username+"/", {
+                    fav_photographers: rem
+                });
+                if (res.data) {
+                    this.setState({
+                        favorited: false
+                    })
+                }
+            }
+        }
     }
 
     render() {
@@ -52,13 +91,14 @@ class Profile extends React.Component {
             display, 
             currentClient, 
             showSignIn,
-            enableReserve
+            enableReserve,
+            favorited
         } = this.state;
         const { username } = this.props.match.params;
-        if (currentPhotographer && (currentPhotographer.profile.username === username 
-            && currentPhotographer.profile.user_type !== 1)) {
-            return <Redirect to="/"/>
-        }
+        // if (currentPhotographer && (currentPhotographer.profile.username === username 
+        //     && currentPhotographer.profile.user_type !== 1)) {
+        //     return <Redirect to="/"/>
+        // }
         
         const { isAuth } = this.props;
 
@@ -75,7 +115,14 @@ class Profile extends React.Component {
                             <h3 className="mb-2">{username}</h3>
                             <span className="t-color-light d-block">Last Online Time: {formatDateTime(currentPhotographer.photographer_last_online_time)}</span>
                             { (!isAuth || (currentClient && currentClient.profile.user.user_type !== 1)) && (
-                                <Button type="danger" size="large" shape="round" ghost className="mt-2">
+                                <Button 
+                                    type="danger" 
+                                    size="large" 
+                                    shape="round" 
+                                    ghost={(currentClient && favorited) ? false : true}
+                                    className="mt-2"
+                                    onClick={() => this.toggleFav()}
+                                >
                                     Favorite <Icon type="heart" theme='outlined' />
                                 </Button>
                             )} 
