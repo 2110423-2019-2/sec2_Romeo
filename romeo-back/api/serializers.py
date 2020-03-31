@@ -374,10 +374,8 @@ class JobReservationSerializer(serializers.ModelSerializer):
 
 
 class JobSerializer(serializers.ModelSerializer):
-    # job_customer = serializers.CharField(source='job_customer.profile.user.username')
-    # job_photographer = serializers.CharField(source='job_photographer.profile.user.username')
-    job_customer = CustomerSerializer(required=True, partial=True)
-    job_photographer = PhotographerSerializer(required=True, partial=True)
+    job_customer = serializers.CharField(source='job_customer.profile.user.username')
+    job_photographer = serializers.CharField(source='job_photographer.profile.user.username')
     job_reservation = JobReservationSerializer(many=True, required=False, partial=True)
     job_total_price = serializers.FloatField(read_only=True)
 
@@ -504,6 +502,16 @@ class JobSerializer(serializers.ModelSerializer):
 
         instance.save()
         return instance
+
+class GetJobsSerializer(serializers.ModelSerializer):
+    job_customer = CustomerSerializer(required=True, partial=True)
+    job_photographer = PhotographerSerializer(required=True, partial=True)
+    job_reservation = JobReservationSerializer(many=True, required=False, partial=True)
+    job_total_price = serializers.FloatField(read_only=True)
+
+    class Meta:
+        model = JobInfo
+        fields = '__all__'
 
 class ReviewSerializer(serializers.ModelSerializer):
     class Meta:

@@ -21,3 +21,7 @@ romeo-back/notification/migrations/
 romeo-back/config/settings.py
 
 romeo-back/favPhotographers/migrations/
+
+romeo-back/reviews/migrations/
+
+romeo-back/payments/migrations/
