@@ -20,7 +20,7 @@ import datetime
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        exclude = ('is_superuser', 'is_staff', 'is_active', 'date_joined', 'groups', 'user_permissions',)
+        exclude = ('is_superuser', 'is_staff', 'is_active', 'date_joined', 'groups', 'user_permissions','password')
         extra_kwargs = {
             'username': {
                 'validators': [UnicodeUsernameValidator()],
