@@ -6,14 +6,15 @@ import { formatDate } from "common/date";
 import { statusLabels } from "logic/Reservation";
 import { styleLabels } from "logic/Styles";
 import { Button, Icon } from "antd";
-import { calculateTotalPrice, calculateDepositPrice } from "./reservations";
+import { calculateDepositPrice } from "./reservations";
 import history from "common/router/history"
 
 const showContactStatuses = [
     "PAID",
     "PROCESSING",
     "COMPLETED",
-    "CLOSED"
+    "CLOSED",
+    "REVIEWED"
 ];
 
 class JobDetails extends React.Component {
@@ -115,8 +116,8 @@ class JobDetails extends React.Component {
                                 ))}
                             </ul>
                         </div>
-                        <Content label="Total Price" content={`${calculateTotalPrice(currentJob.job_reservation)}THB`} />
-                        <Content label="Deposit" content={`${calculateDepositPrice(currentJob.job_reservation)}THB`} />
+                        <Content label="Total Price" content={`${currentJob.job_total_price}THB`} />
+                        <Content label="Deposit" content={`${calculateDepositPrice(currentJob.job_total_price)}THB`} />
                         <Content label="Expected Complete Date" content={formatDate(currentJob.job_expected_complete_date)} />
                         <div className="mb-3">
                             <b className="d-block mb-1">Job Description</b>

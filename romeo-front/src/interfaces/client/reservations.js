@@ -20,24 +20,12 @@ import {
 
 const { confirm } = Modal;
 
-export const calculateTotalPrice = (job_reservation) => {
-    let out = 0;
-    job_reservation.forEach(e => out += e.job_avail_time.photographer_price);
-    return out
+export const calculateLeftoverPrice = (job_total_price) => {
+    return ((job_total_price * 70/100)*100)/100
 }
 
-export const calculateLeftoverPrice = (job_reservation) => {
-    let out = 0;
-    job_reservation.forEach(e => out += e.job_avail_time.photographer_price);
-    out = ((out * 70/100)*100)/100
-    return out
-}
-
-export const calculateDepositPrice = (job_reservation) => {
-    let out = 0;
-    job_reservation.forEach(e => out += e.job_avail_time.photographer_price);
-    out = ((out * 30/100)*100)/100
-    return out
+export const calculateDepositPrice = (job_total_price) => {
+    return ((job_total_price * 30/100)*100)/100
 }
 
 function hasErrors(fieldsError) {
@@ -115,7 +103,10 @@ class Reservations extends React.Component {
         },{
             title: 'Title',
             dataIndex: 'job_title',
-            key: 'job_title'
+            key: 'job_title',
+            render: title => (
+                <div style={{ minWidth: 200 }}>{title}</div>
+            )
         },{
             title: (getCurrentClient() && getCurrentClient().type === 1) ? "Customer" : "Photographer",
             dataIndex: 'job_photographer',
@@ -148,17 +139,17 @@ class Reservations extends React.Component {
             }
         },{
             title: 'Total Price',
-            dataIndex: 'job_reservation',
-            key: 'job_reservation_1',
+            dataIndex: 'job_total_price',
+            key: 'job_total_price',
             render: (e) => {
-                return <span>{calculateTotalPrice(e)}</span>
+                return <span>{e}THB</span>
             }
         },{
             title: 'Status',
             dataIndex: 'job_status',
             key: 'job_status',
             render: status => {
-                return <b>{status ? statusLabels[status] : "Closed"}</b>
+                return <b style={{whiteSpace: 'nowrap'}}>{status ? statusLabels[status] : "Closed"}</b>
             }
         },{
             title: '',
@@ -192,7 +183,7 @@ class Reservations extends React.Component {
                 // Photographer Side
                 switch (record.job_status) {
                     case "PENDING": return (
-                        <React.Fragment>
+                        <div className="d-flex" style={{ margin: "0 -4px" }}>
                             <Button 
                                 onClick={() => proceed(record, 1, null)} 
                                 type="primary" 
@@ -205,7 +196,7 @@ class Reservations extends React.Component {
                                 className="ma-1"
                                 shape="round"
                             >Decline</Button>
-                        </React.Fragment>
+                        </div>
                     );
                     case "DECLINED": return (<span/>);
                     case "CANCELLED": return (<span/>);
@@ -219,7 +210,7 @@ class Reservations extends React.Component {
                         </Button>
                     );
                     case "PAID": return (
-                        <React.Fragment>
+                        <div className="d-flex" style={{ margin: "0 -4px" }}>
                             <Button 
                                 onClick={() => proceed(record,1,null)}
                                 shape="round"
@@ -238,7 +229,7 @@ class Reservations extends React.Component {
                                     Cancel
                                 </Button>
                             )}
-                        </React.Fragment>
+                        </div>
                     );
                     case "PROCESSING": return (
                         <Button 
@@ -297,19 +288,17 @@ class Reservations extends React.Component {
                 // Customer Side
                 switch (record.job_status) {
                     case "PENDING": return (
-                        <React.Fragment>
-                            <Button 
-                                onClick={() => this.showDeleteConfirm(record, 2)} 
-                                type="danger" 
-                                className="ma-1"
-                                shape="round"
-                            >Cancel</Button>
-                        </React.Fragment>
+                        <Button 
+                            onClick={() => this.showDeleteConfirm(record, 2)} 
+                            type="danger" 
+                            className="ma-1"
+                            shape="round"
+                        >Cancel</Button>
                     );
                     case "DECLINED": return (<span/>);
                     case "CANCELLED": return (<span/>);
                     case "MATCHED": return (
-                        <React.Fragment>
+                        <div className="d-flex" style={{ margin: "0 -4px" }}>
                             <CheckoutCreditCard
                                 job={record}
                                 amount={calculateDepositPrice(record.job_reservation)}
@@ -321,7 +310,7 @@ class Reservations extends React.Component {
                                 className="ma-1"
                                 shape="round"
                             >Cancel</Button>
-                        </React.Fragment>
+                        </div>
                     );
                     case "PAID": return (
                         moment(record.job_start_date).subtract(1, 'days').isBefore(new Date()) ? (
@@ -345,7 +334,7 @@ class Reservations extends React.Component {
                         />
                     );
                     case "CLOSED": return (
-                        <React.Fragment>
+                        <div className="d-flex" style={{ margin: "0 -4px" }}>
                             <a href={record.job_url} target="_blank" rel="noopener noreferrer">
                                 <Button shape="round" type="primary" className="ma-1">See Photos</Button>
                             </a>
@@ -359,7 +348,7 @@ class Reservations extends React.Component {
                             >
                                 Write a Review
                             </Button>
-                        </React.Fragment>
+                        </div>
                     );
                     case "REVIEWED": return (
                         <a href={record.job_url} target="_blank" rel="noopener noreferrer">
