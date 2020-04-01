@@ -250,10 +250,10 @@ class PhotographerSerializer(WritableNestedModelSerializer):
                     equipment_instance = Equipment.objects.create(equipment_name=equipment_data['equipment_name'])
                 instance.photographer_equipment.add(equipment_instance)
 
-        # photographer_avail_time
+        # # photographer_avail_time
         if 'photographer_avail_time' in validated_data:
             instance.photographer_avail_time.clear()
-            avail_list = []
+        #     avail_list = []
             for avail_time_data in validated_data.pop('photographer_avail_time'):
                 avail_time_data = dict(avail_time_data)
                 try :
@@ -264,34 +264,34 @@ class PhotographerSerializer(WritableNestedModelSerializer):
                     avail_time_instance = AvailTime.objects.create(**avail_time_data)
                 instance.photographer_avail_time.add(avail_time_instance)            
             
-                # check if fullday/fulldaynight
-                avail_date=avail_time_data['avail_date']
-                photographer_price2=(avail_time_data['photographer_price'])/2
-                photographer_price3=(avail_time_data['photographer_price'])/3
-                if avail_time_data['avail_time'] == 'FULL_DAY':
-                    avail_list.append({'avail_date': avail_date, 'avail_time': 'HALF_DAY_MORNING', \
-                    'photographer_price': photographer_price2})
-                    avail_list.append({'avail_date': avail_date, 'avail_time': 'HALF_DAY_NOON', \
-                    'photographer_price': photographer_price2})
-                elif avail_time_data['avail_time'] == 'FULL_DAY_NIGHT':
-                    avail_list.append({'avail_date': avail_date, 'avail_time': 'HALF_DAY_MORNING', \
-                    'photographer_price': photographer_price3})
-                    avail_list.append({'avail_date': avail_date, 'avail_time': 'HALF_DAY_NOON', \
-                    'photographer_price': photographer_price3})
-                    avail_list.append({'avail_date': avail_date, 'avail_time': 'FULL_DAY', \
-                    'photographer_price': 2*photographer_price3})
-                    avail_list.append({'avail_date': avail_date, 'avail_time': 'NIGHT', \
-                    'photographer_price': photographer_price3})
+        #         # check if fullday/fulldaynight
+        #         avail_date=avail_time_data['avail_date']
+        #         photographer_price2=(avail_time_data['photographer_price'])/2
+        #         photographer_price3=(avail_time_data['photographer_price'])/3
+        #         if avail_time_data['avail_time'] == 'FULL_DAY':
+        #             avail_list.append({'avail_date': avail_date, 'avail_time': 'HALF_DAY_MORNING', \
+        #             'photographer_price': photographer_price2})
+        #             avail_list.append({'avail_date': avail_date, 'avail_time': 'HALF_DAY_NOON', \
+        #             'photographer_price': photographer_price2})
+        #         elif avail_time_data['avail_time'] == 'FULL_DAY_NIGHT':
+        #             avail_list.append({'avail_date': avail_date, 'avail_time': 'HALF_DAY_MORNING', \
+        #             'photographer_price': photographer_price3})
+        #             avail_list.append({'avail_date': avail_date, 'avail_time': 'HALF_DAY_NOON', \
+        #             'photographer_price': photographer_price3})
+        #             avail_list.append({'avail_date': avail_date, 'avail_time': 'FULL_DAY', \
+        #             'photographer_price': 2*photographer_price3})
+        #             avail_list.append({'avail_date': avail_date, 'avail_time': 'NIGHT', \
+        #             'photographer_price': photographer_price3})
 
-            # for full day:add 2halfs, full day night: add 3parts
-            for avail_time_data in avail_list:
-                try :
-                    avail_time_instance = AvailTime.objects.get(avail_date=avail_time_data['avail_date'],
-                                                                avail_time=avail_time_data['avail_time'],
-                                                                photographer_price=avail_time_data['photographer_price'])
-                except :
-                    avail_time_instance = AvailTime.objects.create(**avail_time_data)
-                instance.photographer_avail_time.add(avail_time_instance)
+        #     # for full day:add 2halfs, full day night: add 3parts
+        #     for avail_time_data in avail_list:
+        #         try :
+        #             avail_time_instance = AvailTime.objects.get(avail_date=avail_time_data['avail_date'],
+        #                                                         avail_time=avail_time_data['avail_time'],
+        #                                                         photographer_price=avail_time_data['photographer_price'])
+        #         except :
+        #             avail_time_instance = AvailTime.objects.create(**avail_time_data)
+        #         instance.photographer_avail_time.add(avail_time_instance)
 
 
         # photographer_last_online_time
