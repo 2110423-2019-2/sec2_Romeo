@@ -5,6 +5,7 @@ from .permissions import IsUser
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.shortcuts import get_object_or_404
 from django.db.models import Q, Avg, Case, IntegerField, Value, When, Sum
+from django.http import HttpResponseBadRequest
 import datetime
 import os
 import omise
@@ -137,7 +138,7 @@ class PaymentViewSet(viewsets.ModelViewSet):
         data['payment_customer'] = job.values_list('job_customer__profile__user__username', flat=True)[0]
         data['payment_photographer'] = job.values_list('job_photographer__profile__user__username', flat=True)[0]
         data['payment_job'] = jid
-        amount = job.values_list('job_total_price', flat=True)[0]
+        amount = job.annotate(job_total_price=Sum('job_reservation__job_avail_time__photographer_price')).values_list('job_total_price', flat=True)[0]
         job_status = job.values_list('job_status', flat=True)[0]
         if job_status == "MATCHED" :
             amount = amount * 0.3
@@ -160,7 +161,7 @@ class PaymentViewSet(viewsets.ModelViewSet):
         try :
             charge = omise.Charge.create(amount=int(amount)*100, currency="thb", card=cardtoken)
         except Exception as e :
-            return Response(data=str(e))
+            return HttpResponseBadRequest(str(e))
 
         #Update Job Status
         PaymentSerializer.update(self, job, validated_data=data)
