@@ -176,7 +176,7 @@ class PhotographerSerializer(WritableNestedModelSerializer):
             photographer.photographer_style.add(style_instance)
 
         # add avail time
-        avail_list = []
+        # avail_list = []
         for avail_time_data in validated_data.pop('photographer_avail_time'):
             avail_time_data = dict(avail_time_data)
             try :
@@ -187,34 +187,34 @@ class PhotographerSerializer(WritableNestedModelSerializer):
                 avail_time_instance = AvailTime.objects.create(**avail_time_data)
             photographer.photographer_avail_time.add(avail_time_instance)
 
-            avail_date=avail_time_data['avail_date']
-            photographer_price2=(avail_time_data['photographer_price'])/2
-            photographer_price3=(avail_time_data['photographer_price'])/3
-            if avail_time_data['avail_time'] == 'FULL_DAY':
-                avail_list.append({'avail_date': avail_date, 'avail_time': 'HALF_DAY_MORNING', \
-                'photographer_price': photographer_price2})
-                avail_list.append({'avail_date': avail_date, 'avail_time': 'HALF_DAY_NOON', \
-                'photographer_price': photographer_price2})
-            elif avail_time_data['avail_time'] == 'FULL_DAY_NIGHT':
-                avail_list.append({'avail_date': avail_date, 'avail_time': 'HALF_DAY_MORNING', \
-                'photographer_price': photographer_price3})
-                avail_list.append({'avail_date': avail_date, 'avail_time': 'HALF_DAY_NOON', \
-                'photographer_price': photographer_price3})
-                avail_list.append({'avail_date': avail_date, 'avail_time': 'FULL_DAY', \
-                'photographer_price': 2*photographer_price3})
-                avail_list.append({'avail_date': avail_date, 'avail_time': 'NIGHT', \
-                'photographer_price': photographer_price3})
+            # avail_date=avail_time_data['avail_date']
+            # photographer_price2=(avail_time_data['photographer_price'])/2
+            # photographer_price3=(avail_time_data['photographer_price'])/3
+            # if avail_time_data['avail_time'] == 'FULL_DAY':
+            #     avail_list.append({'avail_date': avail_date, 'avail_time': 'HALF_DAY_MORNING', \
+            #     'photographer_price': photographer_price2})
+            #     avail_list.append({'avail_date': avail_date, 'avail_time': 'HALF_DAY_NOON', \
+            #     'photographer_price': photographer_price2})
+            # elif avail_time_data['avail_time'] == 'FULL_DAY_NIGHT':
+            #     avail_list.append({'avail_date': avail_date, 'avail_time': 'HALF_DAY_MORNING', \
+            #     'photographer_price': photographer_price3})
+            #     avail_list.append({'avail_date': avail_date, 'avail_time': 'HALF_DAY_NOON', \
+            #     'photographer_price': photographer_price3})
+            #     avail_list.append({'avail_date': avail_date, 'avail_time': 'FULL_DAY', \
+            #     'photographer_price': 2*photographer_price3})
+            #     avail_list.append({'avail_date': avail_date, 'avail_time': 'NIGHT', \
+            #     'photographer_price': photographer_price3})
 
-        # for full day:add 2halfs, full day night: add 3parts
-        for avail_time_data in avail_list:
-            # avail_time_data = dict(avail_time_data)
-            try :
-                avail_time_instance = AvailTime.objects.get(avail_date=avail_time_data['avail_date'],
-                                                            avail_time=avail_time_data['avail_time'],
-                                                            photographer_price=avail_time_data['photographer_price'])
-            except :
-                avail_time_instance = AvailTime.objects.create(**avail_time_data)
-            photographer.photographer_avail_time.add(avail_time_instance)
+        # # for full day:add 2halfs, full day night: add 3parts
+        # for avail_time_data in avail_list:
+        #     # avail_time_data = dict(avail_time_data)
+        #     try :
+        #         avail_time_instance = AvailTime.objects.get(avail_date=avail_time_data['avail_date'],
+        #                                                     avail_time=avail_time_data['avail_time'],
+        #                                                     photographer_price=avail_time_data['photographer_price'])
+        #     except :
+        #         avail_time_instance = AvailTime.objects.create(**avail_time_data)
+        #     photographer.photographer_avail_time.add(avail_time_instance)
 
         profile.save()
         photographer.save()
@@ -250,10 +250,10 @@ class PhotographerSerializer(WritableNestedModelSerializer):
                     equipment_instance = Equipment.objects.create(equipment_name=equipment_data['equipment_name'])
                 instance.photographer_equipment.add(equipment_instance)
 
-        # photographer_avail_time
+        # # photographer_avail_time
         if 'photographer_avail_time' in validated_data:
             instance.photographer_avail_time.clear()
-            avail_list = []
+        #     avail_list = []
             for avail_time_data in validated_data.pop('photographer_avail_time'):
                 avail_time_data = dict(avail_time_data)
                 try :
@@ -264,34 +264,34 @@ class PhotographerSerializer(WritableNestedModelSerializer):
                     avail_time_instance = AvailTime.objects.create(**avail_time_data)
                 instance.photographer_avail_time.add(avail_time_instance)            
             
-                # check if fullday/fulldaynight
-                avail_date=avail_time_data['avail_date']
-                photographer_price2=(avail_time_data['photographer_price'])/2
-                photographer_price3=(avail_time_data['photographer_price'])/3
-                if avail_time_data['avail_time'] == 'FULL_DAY':
-                    avail_list.append({'avail_date': avail_date, 'avail_time': 'HALF_DAY_MORNING', \
-                    'photographer_price': photographer_price2})
-                    avail_list.append({'avail_date': avail_date, 'avail_time': 'HALF_DAY_NOON', \
-                    'photographer_price': photographer_price2})
-                elif avail_time_data['avail_time'] == 'FULL_DAY_NIGHT':
-                    avail_list.append({'avail_date': avail_date, 'avail_time': 'HALF_DAY_MORNING', \
-                    'photographer_price': photographer_price3})
-                    avail_list.append({'avail_date': avail_date, 'avail_time': 'HALF_DAY_NOON', \
-                    'photographer_price': photographer_price3})
-                    avail_list.append({'avail_date': avail_date, 'avail_time': 'FULL_DAY', \
-                    'photographer_price': 2*photographer_price3})
-                    avail_list.append({'avail_date': avail_date, 'avail_time': 'NIGHT', \
-                    'photographer_price': photographer_price3})
+        #         # check if fullday/fulldaynight
+        #         avail_date=avail_time_data['avail_date']
+        #         photographer_price2=(avail_time_data['photographer_price'])/2
+        #         photographer_price3=(avail_time_data['photographer_price'])/3
+        #         if avail_time_data['avail_time'] == 'FULL_DAY':
+        #             avail_list.append({'avail_date': avail_date, 'avail_time': 'HALF_DAY_MORNING', \
+        #             'photographer_price': photographer_price2})
+        #             avail_list.append({'avail_date': avail_date, 'avail_time': 'HALF_DAY_NOON', \
+        #             'photographer_price': photographer_price2})
+        #         elif avail_time_data['avail_time'] == 'FULL_DAY_NIGHT':
+        #             avail_list.append({'avail_date': avail_date, 'avail_time': 'HALF_DAY_MORNING', \
+        #             'photographer_price': photographer_price3})
+        #             avail_list.append({'avail_date': avail_date, 'avail_time': 'HALF_DAY_NOON', \
+        #             'photographer_price': photographer_price3})
+        #             avail_list.append({'avail_date': avail_date, 'avail_time': 'FULL_DAY', \
+        #             'photographer_price': 2*photographer_price3})
+        #             avail_list.append({'avail_date': avail_date, 'avail_time': 'NIGHT', \
+        #             'photographer_price': photographer_price3})
 
-            # for full day:add 2halfs, full day night: add 3parts
-            for avail_time_data in avail_list:
-                try :
-                    avail_time_instance = AvailTime.objects.get(avail_date=avail_time_data['avail_date'],
-                                                                avail_time=avail_time_data['avail_time'],
-                                                                photographer_price=avail_time_data['photographer_price'])
-                except :
-                    avail_time_instance = AvailTime.objects.create(**avail_time_data)
-                instance.photographer_avail_time.add(avail_time_instance)
+        #     # for full day:add 2halfs, full day night: add 3parts
+        #     for avail_time_data in avail_list:
+        #         try :
+        #             avail_time_instance = AvailTime.objects.get(avail_date=avail_time_data['avail_date'],
+        #                                                         avail_time=avail_time_data['avail_time'],
+        #                                                         photographer_price=avail_time_data['photographer_price'])
+        #         except :
+        #             avail_time_instance = AvailTime.objects.create(**avail_time_data)
+        #         instance.photographer_avail_time.add(avail_time_instance)
 
 
         # photographer_last_online_time
@@ -310,6 +310,7 @@ class PhotographerSerializer(WritableNestedModelSerializer):
 
 class CustomerSerializer(serializers.ModelSerializer):
     profile = ProfileSerializer(required=True, partial=True)
+    # fav_photographers = PhotographerSerializer(required=True, partial=True)
     # jobs_by_customer = JobSerializer(many=True)
 
     class Meta:
@@ -353,7 +354,6 @@ class NotificationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Notification
         fields = '__all__'
-        ordering = ('-timestamp')
     
     def create(self, validated_data):
         notification = Notification.objects.create(**validated_data)
@@ -377,8 +377,10 @@ class JobReservationSerializer(serializers.ModelSerializer):
 class JobSerializer(serializers.ModelSerializer):
     job_customer = serializers.CharField(source='job_customer.profile.user.username')
     job_photographer = serializers.CharField(source='job_photographer.profile.user.username')
+    # job_customer = CustomerSerializer(required=True, partial=True)
+    # job_photographer = PhotographerSerializer(required=True, partial=True)
     job_reservation = JobReservationSerializer(many=True, required=False, partial=True)
-    job_total_price = serializers.FloatField(read_only=True)
+    # job_total_price = serializers.FloatField(read_only=True)
 
     class Meta:
         model = JobInfo
@@ -412,7 +414,6 @@ class JobSerializer(serializers.ModelSerializer):
 
             # check if reservation date and time is valid
             is_vaild = False
-            total_price = 0
             week_days = ("MONDAY","TUESDAY","WEDNESDAY","THURSDAY","FRIDAY","SATURDAY","SUNDAY")
             for avail_time_instance in job_photographer.photographer_avail_time.all():
                 if avail_time_instance.avail_date == week_days[photoshoot_date.weekday()] and avail_time_instance.avail_time == photoshoot_time:
@@ -421,35 +422,35 @@ class JobSerializer(serializers.ModelSerializer):
                                               Q(job_reservation__photoshoot_date=photoshoot_date) & #old: no photoshoot_time
                                               Q(job_reservation__photoshoot_time=photoshoot_time) &
                                               Q(job_status='MATCHED')).exists(): #reconsider for more job_status
-                        raise serializers.ValidationError('''The photographer has already had a job on your selected date and time''')                   
-                    if photoshoot_time == 'FULL_DAY' or photoshoot_time == 'FULL_DAY_NIGHT':
-                        if JobInfo.objects.filter(Q(job_photographer__profile__user__username=job_photographer_username) &
-                                              Q(job_reservation__photoshoot_date=photoshoot_date) &
-                                              (Q(job_reservation__photoshoot_time='HALF_DAY_MORNING') |
-                                              Q(job_reservation__photoshoot_time='HALF_DAY_NOON')) &
-                                              Q(job_status='MATCHED')).exists():
-                            raise serializers.ValidationError('''The photographer has already accepted half day job(s) on your selected date''')
-                        if photoshoot_time == 'FULL_DAY_NIGHT' :
-                            if JobInfo.objects.filter(Q(job_photographer__profile__user__username=job_photographer_username) &
-                                              Q(job_reservation__photoshoot_date=photoshoot_date) &
-                                              (Q(job_reservation__photoshoot_time='FULL_DAY') |
-                                              Q(job_reservation__photoshoot_time='NIGHT')) &
-                                              Q(job_status='MATCHED')).exists(): 
-                                raise serializers.ValidationError('''The photographer has already accepted a full day or night job on your selected date''')
-                    elif photoshoot_time == 'NIGHT' :
-                        if JobInfo.objects.filter(Q(job_photographer__profile__user__username=job_photographer_username) &
-                                              Q(job_reservation__photoshoot_date=photoshoot_date) &
-                                              Q(job_reservation__photoshoot_time='FULL_DAY_NIGHT') &
-                                              Q(job_status='MATCHED')).exists():
-                            raise serializers.ValidationError('''The photographer has already accepted a full day&night job on your selected date''')
-                    else:
-                        if JobInfo.objects.filter(Q(job_photographer__profile__user__username=job_photographer_username) &
-                                              Q(job_reservation__photoshoot_date=photoshoot_date) &
-                                              (Q(job_reservation__photoshoot_time='FULL_DAY') |
-                                              Q(job_reservation__photoshoot_time='FULL_DAY_NIGHT')) &
-                                              Q(job_status='MATCHED')).exists():
-                            raise serializers.ValidationError('''The photographer has already accepted a full day (&night) job on your selected date''')
-                ##########################################################################
+                        raise serializers.ValidationError('''The photographer is not available on your selected date and time''')                   
+                    # if photoshoot_time == 'FULL_DAY' or photoshoot_time == 'FULL_DAY_NIGHT':
+                    #     if JobInfo.objects.filter(Q(job_photographer__profile__user__username=job_photographer_username) &
+                    #                           Q(job_reservation__photoshoot_date=photoshoot_date) &
+                    #                           (Q(job_reservation__photoshoot_time='HALF_DAY_MORNING') |
+                    #                           Q(job_reservation__photoshoot_time='HALF_DAY_NOON')) &
+                    #                           Q(job_status='MATCHED')).exists():
+                    #         raise serializers.ValidationError('''The photographer is not available on your selected date and time''')
+                    #     if photoshoot_time == 'FULL_DAY_NIGHT' :
+                    #         if JobInfo.objects.filter(Q(job_photographer__profile__user__username=job_photographer_username) &
+                    #                           Q(job_reservation__photoshoot_date=photoshoot_date) &
+                    #                           (Q(job_reservation__photoshoot_time='FULL_DAY') |
+                    #                           Q(job_reservation__photoshoot_time='NIGHT')) &
+                    #                           Q(job_status='MATCHED')).exists(): 
+                    #             raise serializers.ValidationError('''The photographer is not available on your selected date and time''')
+                    # elif photoshoot_time == 'NIGHT' :
+                    #     if JobInfo.objects.filter(Q(job_photographer__profile__user__username=job_photographer_username) &
+                    #                           Q(job_reservation__photoshoot_date=photoshoot_date) &
+                    #                           Q(job_reservation__photoshoot_time='FULL_DAY_NIGHT') &
+                    #                           Q(job_status='MATCHED')).exists():
+                    #         raise serializers.ValidationError('''The photographer is not available on your selected date and time''')
+                    # else:
+                    #     if JobInfo.objects.filter(Q(job_photographer__profile__user__username=job_photographer_username) &
+                    #                           Q(job_reservation__photoshoot_date=photoshoot_date) &
+                    #                           (Q(job_reservation__photoshoot_time='FULL_DAY') |
+                    #                           Q(job_reservation__photoshoot_time='FULL_DAY_NIGHT')) &
+                    #                           Q(job_status='MATCHED')).exists():
+                    #         raise serializers.ValidationError('''The photographer is not available on your selected date and time''')
+
                     try :
                         reservation_instance = JobReservation.objects.get(photoshoot_date=photoshoot_date,
                                                                           photoshoot_time=photoshoot_time,
@@ -459,23 +460,21 @@ class JobSerializer(serializers.ModelSerializer):
                                                                              photoshoot_time=photoshoot_time,
                                                                              job_avail_time=avail_time_instance)
                 ##########################################################################
-                    total_price += reservation_instance.job_avail_time.photographer_price
+                    # total_price += avail_time_instance.photographer_price
                     reservation_list.append(reservation_instance)
                     
                     is_vaild = True
-            # print("\n\n\n\n\n",)
             if not is_vaild:
                 raise serializers.ValidationError('''Your selected date and time for reservation is invalid for the photographer, please checkout photographer's available time''')
-        job_info = JobInfo.objects.create(job_customer=job_customer, 
-                                        job_photographer=job_photographer, 
-                                        job_total_price=total_price,
-                                        job_title=validated_data.pop('job_title'), 
+        job_info = JobInfo.objects.create(job_title=validated_data.pop('job_title'), 
                                         job_description=validated_data.pop('job_description'), 
+                                        job_customer=job_customer, 
+                                        job_photographer=job_photographer, 
                                         job_status='PENDING',
                                         job_style=validated_data.pop('job_style'),
                                         job_location=validated_data.pop('job_location'),
                                         job_expected_complete_date=validated_data.pop('job_expected_complete_date'),
-                                        job_special_requirement=validated_data.pop('job_special_requirement'))                             
+                                        job_special_requirement=validated_data.pop('job_special_requirement'))
         job_info.job_reservation.add(*reservation_list)
         job_info.save()
 
@@ -550,3 +549,34 @@ class PaymentSerializer(serializers.ModelSerializer):
             instance.update(job_status="PAID")
         elif validated_data['payment_status'] == "REMAINING" :
             instance.update(job_status="CLOSED")
+
+
+class GetFavPhotographersSerializer(serializers.ModelSerializer):
+    # profile = ProfileSerializer(required=True, partial=True)
+    fav_photographers = PhotographerSerializer(required=True, partial=True,many = True)
+
+    class Meta:
+        model = Customer
+        fields = '__all__'
+
+
+class GetPaymentToPhotographerSerializer(serializers.ModelSerializer):
+    payment_job = JobSerializer(required=True, partial=True)
+
+    class Meta:
+        model = Payment
+        fields = '__all__'
+
+class GetPaymentToCustomerSerializer(serializers.ModelSerializer):
+    payment_job = JobSerializer(required=True, partial=True)
+
+    class Meta:
+        model = Payment
+        fields = '__all__'
+
+
+
+
+
+
+
