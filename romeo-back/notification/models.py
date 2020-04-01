@@ -14,7 +14,8 @@ NOTI_STATUS_CHOICES = [('PENDING', 'Pending'),
                       ('CANCELLED_BY_CUSTOMER', 'Cancelled by customer'),
                       ('PROCESSING', 'Processing Photos'),
                       ('COMPLETED', 'Completed'),
-                      ('CLOSED', 'Closed')]
+                      ('CLOSED', 'Closed'),
+                      ('REVIEWED', 'Reviewed')]
 
 NOTI_READ_CHOICES = [('UNREAD', 'Unread'),
                       ('READ', 'Read')]

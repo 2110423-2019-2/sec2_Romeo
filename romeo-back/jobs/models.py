@@ -14,7 +14,8 @@ JOB_STATUS_CHOICES = [('PENDING', 'Pending'),
                       ('CANCELLED_BY_CUSTOMER', 'Cancelled by customer'),
                       ('PROCESSING', 'Processing Photos'),
                       ('COMPLETED', 'Completed'),
-                      ('CLOSED', 'Closed')]
+                      ('CLOSED', 'Closed'),
+                      ('REVIEWED', 'Reviewed')]
 
 TIME_CHOICES = [('HALF_DAY_MORNING', "Half-day(Morning-Noon)"),
                      ('HALF_DAY_NOON', "Half-day(Noon-Evening)"),

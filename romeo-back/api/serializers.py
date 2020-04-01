@@ -494,7 +494,7 @@ class JobSerializer(serializers.ModelSerializer):
                 noti_action = 'CANCEL'
             else: noti_action = 'UPDATE'
 
-            if instance.job_status == 'CANCELLED_BY_CUSTOMER' or instance.job_status == 'PAID' or instance.job_status == 'CLOSED' :
+            if instance.job_status == 'CANCELLED_BY_CUSTOMER' or instance.job_status == 'PAID' or instance.job_status == 'CLOSED' or instance.job_status == 'REVIEWED' :
                 NotificationSerializer.create(self,validated_data={'noti_job_id': instance.job_id, 'noti_receiver':instance.job_photographer.profile, \
                 'noti_actor':instance.job_customer.profile, 'noti_action':noti_action, 'noti_status':instance.job_status, 'noti_read':'UNREAD'})
             else:
