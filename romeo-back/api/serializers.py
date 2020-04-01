@@ -493,7 +493,7 @@ class JobSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError('The job has already been cancelled or declined')
             elif instance.job_status == 'REVIEWED':
                 raise serializers.ValidationError('This job is done')
-            elif instance.job_status == 'PENDING' and updated_status not in ['DECLINED', 'MATCHED'] :
+            elif instance.job_status == 'PENDING' and updated_status not in ['DECLINED', 'MATCHED', 'CANCELLED_BY_CUSTOMER'] :
                 raise serializers.ValidationError('The job cannot be updated to this status')
             elif instance.job_status == 'MATCHED' and updated_status not in ['PAID', 'CANCELLED_BY_PHOTOGRAPHER', \
                  'CANCELLED_BY_CUSTOMER'] :
