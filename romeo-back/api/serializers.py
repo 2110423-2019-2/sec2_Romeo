@@ -480,7 +480,7 @@ class JobSerializer(serializers.ModelSerializer):
         job_info.save()
 
         # Create a notification
-        NotificationSerializer.create(self,validated_data={'noti_receiver':job_photographer.profile, \
+        NotificationSerializer.create(self,validated_data={'noti_job_id': job_info.job_id, 'noti_receiver':job_photographer.profile, \
         'noti_actor':job_customer.profile, 'noti_action':'CREATE', 'noti_status':job_status, 'noti_read': 'UNREAD'})
 
         return job_info
@@ -495,10 +495,10 @@ class JobSerializer(serializers.ModelSerializer):
             else: noti_action = 'UPDATE'
 
             if instance.job_status == 'CANCELLED_BY_CUSTOMER' or instance.job_status == 'PAID' or instance.job_status == 'CLOSED' :
-                NotificationSerializer.create(self,validated_data={'noti_receiver':instance.job_photographer.profile, \
+                NotificationSerializer.create(self,validated_data={'noti_job_id': instance.job_id, 'noti_receiver':instance.job_photographer.profile, \
                 'noti_actor':instance.job_customer.profile, 'noti_action':noti_action, 'noti_status':instance.job_status, 'noti_read':'UNREAD'})
             else:
-                NotificationSerializer.create(self,validated_data={'noti_receiver':instance.job_customer.profile, \
+                NotificationSerializer.create(self,validated_data={'noti_job_id': instance.job_id, 'noti_receiver':instance.job_customer.profile, \
                 'noti_actor':instance.job_photographer.profile, 'noti_action': noti_action, 'noti_status':instance.job_status, 'noti_read':'UNREAD'})
         #insert job url
         if 'job_url' in validated_data:
