@@ -378,7 +378,7 @@ class JobSerializer(serializers.ModelSerializer):
     # job_customer = CustomerSerializer(required=True, partial=True)
     # job_photographer = PhotographerSerializer(required=True, partial=True)
     job_reservation = JobReservationSerializer(many=True, required=False, partial=True)
-    job_total_price = serializers.FloatField()
+    job_total_price = serializers.FloatField(read_only=True)
 
     class Meta:
         model = JobInfo
