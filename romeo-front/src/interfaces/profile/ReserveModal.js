@@ -67,7 +67,6 @@ class ReserveModal extends React.Component {
                     job_start_date: jobStartDate,
                     job_expected_complete_date: selectedJobEndDate,
                     job_special_requirement: jobSpecialReq ? jobDescription : "",
-                    job_total_price: -1,
                     job_url: null
                 }
                 Axios.post("/api/jobs/", req).then(res => {
