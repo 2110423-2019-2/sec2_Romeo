@@ -26,7 +26,7 @@ class CustomUserProfile(models.Model):
 
     def __str__(self):
         return self.user.username
-
+    
     class Meta:
         verbose_name = "Profile"
         verbose_name_plural = "Profiles"
