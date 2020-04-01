@@ -279,5 +279,6 @@ class ReviewViewSet(viewsets.ModelViewSet):
 class GetFavPhotographersViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Customer.objects.all()
     serializer_class = GetFavPhotographersSerializer
+    lookup_field = 'profile__user__username'
     # filter_backends = [filters.SearchFilter]
     # search_fields = ['profile_id__profile__user__username']
