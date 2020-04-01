@@ -347,8 +347,8 @@ class CustomerSerializer(serializers.ModelSerializer):
 
 
 class NotificationSerializer(serializers.ModelSerializer):
-    noti_receiver = ProfileSerializer(required=True, partial=True)
-    noti_actor = ProfileSerializer(required=True, partial=True)
+    noti_actor = serializers.CharField(source='noti_actor.user.username')
+    noti_receiver = serializers.CharField(source='noti_receiver.user.username')
 
     class Meta:
         model = Notification
@@ -362,9 +362,10 @@ class NotificationSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         if 'noti_read' in validated_data:
-            instance.noti_read = validated_data.pop('noti_read')
-        instance.save()
-        return instance
+            for noti_instance in Notification.objects.filter(noti_receiver__user__username = instance.noti_receiver):
+                    noti_instance.noti_read = validated_data['noti_read']
+                    noti_instance.save()
+            return noti_instance
 
 class JobReservationSerializer(serializers.ModelSerializer):
     job_avail_time = AvailTimeSerializer(required=False, partial=True)
