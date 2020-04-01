@@ -5,7 +5,7 @@ from djoser.serializers import UserCreateSerializer as BaseUserRegistrationSeria
 from rest_framework.validators import UniqueValidator
 from drf_writable_nested.serializers import WritableNestedModelSerializer
 from drf_writable_nested.mixins import UniqueFieldsMixin, NestedUpdateMixin
-from django.db.models import Q
+from django.db.models import Q, Sum
 # Import App Models
 from photographers.models import Photographer, Photo, AvailTime, Equipment, Style
 from customers.models import Customer
@@ -26,7 +26,6 @@ class UserSerializer(serializers.ModelSerializer):
                 'validators': [UnicodeUsernameValidator()],
             }
         }
-
 
     def create(self, validated_data):
         user = CustomUser.objects.create_user(username=validated_data['username'],
@@ -373,18 +372,18 @@ class JobReservationSerializer(serializers.ModelSerializer):
         model = JobReservation
         fields = '__all__'
 
-
 class JobSerializer(serializers.ModelSerializer):
     job_customer = serializers.CharField(source='job_customer.profile.user.username')
     job_photographer = serializers.CharField(source='job_photographer.profile.user.username')
     # job_customer = CustomerSerializer(required=True, partial=True)
     # job_photographer = PhotographerSerializer(required=True, partial=True)
     job_reservation = JobReservationSerializer(many=True, required=False, partial=True)
-    # job_total_price = serializers.FloatField(read_only=True)
+    job_total_price = serializers.FloatField()
 
     class Meta:
         model = JobInfo
         fields = '__all__'
+
 
     # Override default create method to auto create nested profile from photographer
     def create(self, validated_data):
@@ -487,24 +486,46 @@ class JobSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         # job_status
         if 'job_status' in validated_data:
-            instance.job_status = validated_data.pop('job_status')
+            updated_status = validated_data.pop('job_status')
+            if instance.job_status == 'DECLINED' or instance.job_status == 'CANCELLED_BY_CUSTOMER' \
+                 or instance.job_status == 'CANCELLED_BY_PHOTOGRAPHER':
+                raise serializers.ValidationError('The job has already been cancelled or declined')
+            elif instance.job_status == 'REVIEWED':
+                raise serializers.ValidationError('This job is done')
+            elif instance.job_status == 'PENDING' and updated_status not in ['DECLINED', 'MATCHED', 'CANCELLED_BY_CUSTOMER'] :
+                raise serializers.ValidationError('The job cannot be updated to this status')
+            elif instance.job_status == 'MATCHED' and updated_status not in ['PAID', 'CANCELLED_BY_PHOTOGRAPHER', \
+                 'CANCELLED_BY_CUSTOMER'] :
+                raise serializers.ValidationError('The job cannot be updated to this status')
+            elif instance.job_status == 'PAID' and updated_status not in ['PROCESSING', 'CANCELLED_BY_PHOTOGRAPHER', \
+                 'CANCELLED_BY_CUSTOMER'] :
+                raise serializers.ValidationError('The job cannot be updated to this status')
+            elif instance.job_status == 'PROCESSING' and updated_status not in ['COMPLETED'] :
+                raise serializers.ValidationError('The job cannot be updated to this status')
+            elif instance.job_status == 'COMPLETED' and updated_status not in ['CLOSED'] :
+                raise serializers.ValidationError('The job cannot be updated to this status')
+            elif instance.job_status == 'CLOSED' and updated_status not in ['REVIEWED'] :
+                raise serializers.ValidationError('The job cannot be updated to this status')
+            else :
+            # instance.job_status = validated_data.pop('job_status')
+                instance.job_status = updated_status
             # Create a notification
-            if instance.job_status == 'CANCELLED_BY_CUSTOMER' or instance.job_status == 'CANCELLED_BY_PHOTOGRAPHER' :
-                noti_action = 'CANCEL'
-            else: noti_action = 'UPDATE'
+                if instance.job_status == 'CANCELLED_BY_CUSTOMER' or instance.job_status == 'CANCELLED_BY_PHOTOGRAPHER' :
+                    noti_action = 'CANCEL'
+                else: noti_action = 'UPDATE'
 
-            if instance.job_status == 'CANCELLED_BY_CUSTOMER' or instance.job_status == 'PAID' or instance.job_status == 'CLOSED' or instance.job_status == 'REVIEWED' :
-                NotificationSerializer.create(self,validated_data={'noti_job_id': instance.job_id, 'noti_receiver':instance.job_photographer.profile, \
-                'noti_actor':instance.job_customer.profile, 'noti_action':noti_action, 'noti_status':instance.job_status, 'noti_read':'UNREAD'})
-            else:
-                NotificationSerializer.create(self,validated_data={'noti_job_id': instance.job_id, 'noti_receiver':instance.job_customer.profile, \
-                'noti_actor':instance.job_photographer.profile, 'noti_action': noti_action, 'noti_status':instance.job_status, 'noti_read':'UNREAD'})
-        #insert job url
-        if 'job_url' in validated_data:
-            instance.job_url = validated_data.pop('job_url')
+                if instance.job_status == 'CANCELLED_BY_CUSTOMER' or instance.job_status == 'PAID' or instance.job_status == 'CLOSED' or instance.job_status == 'REVIEWED' :
+                    NotificationSerializer.create(self,validated_data={'noti_job_id': instance.job_id, 'noti_receiver':instance.job_photographer.profile, \
+                    'noti_actor':instance.job_customer.profile, 'noti_action':noti_action, 'noti_status':instance.job_status, 'noti_read':'UNREAD'})
+                else:
+                    NotificationSerializer.create(self,validated_data={'noti_job_id': instance.job_id, 'noti_receiver':instance.job_customer.profile, \
+                    'noti_actor':instance.job_photographer.profile, 'noti_action': noti_action, 'noti_status':instance.job_status, 'noti_read':'UNREAD'})
+            #insert job url
+            if 'job_url' in validated_data:
+                instance.job_url = validated_data.pop('job_url')
 
-        instance.save()
-        return instance
+            instance.save()
+            return instance
 
 class GetJobsSerializer(serializers.ModelSerializer):
     job_customer = CustomerSerializer(required=True, partial=True)
