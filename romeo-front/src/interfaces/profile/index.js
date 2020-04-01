@@ -95,10 +95,10 @@ class Profile extends React.Component {
             favorited
         } = this.state;
         const { username } = this.props.match.params;
-        // if (currentPhotographer && (currentPhotographer.profile.username === username 
-        //     && currentPhotographer.profile.user_type !== 1)) {
-        //     return <Redirect to="/"/>
-        // }
+        if (currentClient && (currentClient.profile.user.username === username 
+            && currentClient.profile.user.user_type !== 1)) {
+            return <Redirect to="/"/>
+        }
         
         const { isAuth } = this.props;
 

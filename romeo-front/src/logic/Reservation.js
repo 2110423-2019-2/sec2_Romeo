@@ -1,4 +1,3 @@
-import history from "common/router/history";
 import Axios from "axios";
 
 export const statusLabels = {
@@ -11,7 +10,8 @@ export const statusLabels = {
     COMPLETED: "Completed",
     CLOSED: "Closed",
     CANCELLED_BY_CUSTOMER: "Cancelled by Customer",
-    CANCELLED_BY_PHOTOGRAPHER: "Cancelled by Photographer"
+    CANCELLED_BY_PHOTOGRAPHER: "Cancelled by Photographer",
+    REVIEWED: "Closed"
 }
 
 export const decline = (job, actorType) => {

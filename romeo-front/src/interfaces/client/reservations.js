@@ -105,7 +105,7 @@ class Reservations extends React.Component {
         const { getFieldDecorator, getFieldsError, getFieldError, isFieldTouched } = this.props.form;
         const linkError = isFieldTouched('link') && getFieldError('link');
 
-        const columns = [,{
+        const columns = [{
             title: 'ID',
             dataIndex: 'job_id',
             key: 'job_id',
@@ -275,6 +275,19 @@ class Reservations extends React.Component {
                             Change URL
                         </Button>
                     );
+                    case "REVIEWED": return (
+                        <Button 
+                            onClick={() => this.setState({ 
+                                showURLModal: true,
+                                link: record.job_url,
+                                selectedJob: record
+                            })}
+                            shape="round"
+                            type="primary"
+                        >
+                            Change URL
+                        </Button>
+                    );
                     default: return <span/>
                 }
             } else {
@@ -330,7 +343,7 @@ class Reservations extends React.Component {
                     );
                     case "CLOSED": return (
                         <React.Fragment>
-                            <a href={record.job_url} target="_blank">
+                            <a href={record.job_url} target="_blank" rel="noopener noreferrer">
                                 <Button shape="round" type="primary" className="ma-1">See Photos</Button>
                             </a>
                             <Button 
@@ -344,6 +357,11 @@ class Reservations extends React.Component {
                                 Write a Review
                             </Button>
                         </React.Fragment>
+                    );
+                    case "REVIEWED": return (
+                        <a href={record.job_url} target="_blank" rel="noopener noreferrer">
+                            <Button shape="round" type="primary" className="ma-1">See Photos</Button>
+                        </a>
                     );
                     default: return <span/>
                 }

@@ -6,7 +6,6 @@ import { formatDate } from "common/date";
 import { statusLabels } from "logic/Reservation";
 import { styleLabels } from "logic/Styles";
 import { Button, Icon } from "antd";
-import { Link } from "react-router-dom";
 import { calculateTotalPrice, calculateDepositPrice } from "./reservations";
 import history from "common/router/history"
 
@@ -140,7 +139,7 @@ class JobDetails extends React.Component {
                             {
                                 getCurrentClient().type === 1 ? (
                                     (currentJob.job_status === "COMPLETED" || currentJob.job_status === "CLOSED") ? (
-                                        <a href={currentJob.job_url} target="_blank">
+                                        <a href={currentJob.job_url} target="_blank" rel="noopener noreferrer">
                                             <Button type="primary" shape="round">
                                                 See Photos
                                             </Button>
@@ -148,7 +147,7 @@ class JobDetails extends React.Component {
                                     ) : ( <span className="t-color-light">Not Available.</span> )
                                 ) : (
                                     (currentJob.job_status === "CLOSED") ? (
-                                        <a href={currentJob.job_url} target="_blank">
+                                        <a href={currentJob.job_url} target="_blank" rel="noopener noreferrer">
                                             <Button type="primary" shape="round" className="mt-2">
                                                 See Photos
                                             </Button>

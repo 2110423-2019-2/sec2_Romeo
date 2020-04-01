@@ -28,5 +28,6 @@ export const styleLabels = {
     PRODUCT: "Product",
     FASHION: "Fashion",
     EVENT: "Event",
-    WEDDING: "Wedding"
+    WEDDING: "Wedding",
+    NONE: "None"
 }

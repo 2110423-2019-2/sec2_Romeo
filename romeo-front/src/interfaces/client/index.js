@@ -91,11 +91,6 @@ class ClientLanding extends React.Component {
         );
     }
 }
-
-const RedirectTo404 = () => (
-    <Redirect to="/not-found" />
-)
-
 const RedirectToEdit = () => (
     <Redirect to="/client/edit" />
 )
