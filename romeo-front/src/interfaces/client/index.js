@@ -11,6 +11,7 @@ import { getCurrentClient } from "common/auth";
 
 import { Menu } from 'antd';
 import Notifications from "./notifications";
+import Favorites from "./favorites";
 
 class ClientLanding extends React.Component {
     render() {
@@ -43,6 +44,15 @@ class ClientLanding extends React.Component {
                                     to="/client/edit-profile"
                                 >
                                         Edit Profile
+                                </NavLink>
+                            )}
+                            { type === 2 && (
+                                <NavLink 
+                                    className="ant-menu-item" 
+                                    activeClassName="ant-menu-item-selected"
+                                    to="/client/favorites"
+                                >
+                                        Favorite Photographers
                                 </NavLink>
                             )}
                             <NavLink 
@@ -82,6 +92,7 @@ class ClientLanding extends React.Component {
                     <Route path="/client/reservations/:jobId" component={JobDetails} />
                     <Route path="/client/reservations" component={Reservations} />
                     <Route path="/client/calendar" component={Calendar} />
+                    <Route path="/client/favorites" component={Favorites} />
                     <Route path="/client/notifications" component={Notifications} />
                     <Route path="/client/edit-portfolio" component={EditPortfolio} />
                     <Route path="/client/edit-profile" component={EditProfile} />
@@ -91,11 +102,6 @@ class ClientLanding extends React.Component {
         );
     }
 }
-
-const RedirectTo404 = () => (
-    <Redirect to="/not-found" />
-)
-
 const RedirectToEdit = () => (
     <Redirect to="/client/edit" />
 )

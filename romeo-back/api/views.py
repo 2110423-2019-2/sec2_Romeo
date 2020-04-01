@@ -5,6 +5,7 @@ from .permissions import IsUser
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.shortcuts import get_object_or_404
 from django.db.models import Q, Avg, Case, IntegerField, Value, When, Sum
+from django.http import HttpResponseBadRequest
 import datetime
 import os
 import omise
@@ -12,7 +13,7 @@ import omise
 # Import Serializers of apps
 from .serializers import PhotographerSerializer, CustomerSerializer, JobSerializer, JobReservationSerializer, UserSerializer, \
     PhotoSerializer, AvailTimeSerializer, EquipmentSerializer, ProfileSerializer, StyleSerializer, NotificationSerializer, ChangePasswordSerializer, \
-        ReviewSerializer, PaymentSerializer, GetJobsSerializer
+        ReviewSerializer, PaymentSerializer, GetJobsSerializer, GetPaymentToPhotographerSerializer, GetPaymentToCustomerSerializer, GetFavPhotographersSerializer
 # Import models of apps for queryset
 from photographers.models import Photographer, Photo, AvailTime, Equipment, Style
 from customers.models import Customer
@@ -160,7 +161,7 @@ class PaymentViewSet(viewsets.ModelViewSet):
         try :
             charge = omise.Charge.create(amount=int(amount)*100, currency="thb", card=cardtoken)
         except Exception as e :
-            return Response(data=str(e))
+            return HttpResponseBadRequest(str(e))
 
         #Update Job Status
         PaymentSerializer.update(self, job, validated_data=data)
@@ -173,6 +174,19 @@ class PaymentViewSet(viewsets.ModelViewSet):
 
         return Response(data="Payment Successful.")
 
+class GetPaymentToPhotographerViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Payment.objects.all()
+    serializer_class = GetPaymentToPhotographerSerializer
+
+    def get_queryset(self):
+        return Payment.objects.exclude(payment_job__job_status="CANCELLED_BY_PHOTOGRAPHER")
+
+class GetPaymentToCustomerViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Payment.objects.all()
+    serializer_class = GetPaymentToCustomerSerializer
+
+    def get_queryset(self):
+        return Payment.objects.filter(payment_job__job_status="CANCELLED_BY_PHOTOGRAPHER")
 
 class EquipmentViewSet(viewsets.ModelViewSet):
     serializer_class = EquipmentSerializer
@@ -197,7 +211,7 @@ class JobsViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return JobInfo.objects.annotate(
-            job_total_price = Sum('job_reservation__job_avail_time__photographer_price')
+            job_total_price=Sum('job_reservation__job_avail_time__photographer_price')
         )
 
 class GetjobsViewSet(viewsets.ReadOnlyModelViewSet):
@@ -205,6 +219,11 @@ class GetjobsViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = GetJobsSerializer
     filter_backends = [filters.SearchFilter]
     search_fields = ['job_photographer__profile__user__username','job_customer__profile__user__username'] 
+
+    def get_queryset(self):
+        return JobInfo.objects.annotate(
+            job_total_price=Sum('job_reservation__job_avail_time__photographer_price')
+        )    
 
 class JobReservationViewSet(viewsets.ModelViewSet):
     queryset = JobReservation.objects.all()
@@ -261,4 +280,11 @@ class ReviewViewSet(viewsets.ModelViewSet):
     permission_classes = [AllowAny]
     lookup_field = 'reviewJob__job_id'
     filter_backends = [filters.SearchFilter]
-    search_fields = ['reviewJob__job_photographer__profile__user__username']
+    search_fields = ['reviewJob__job_photographer__profile__user__username','reviewJob__job_customer__profile__user__username']
+
+class GetFavPhotographersViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Customer.objects.all()
+    serializer_class = GetFavPhotographersSerializer
+    lookup_field = 'profile__user__username'
+    # filter_backends = [filters.SearchFilter]
+    # search_fields = ['profile_id__profile__user__username']

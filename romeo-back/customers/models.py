@@ -1,6 +1,7 @@
 from django.db import models
 from users.models import CustomUserProfile
 from photographers.models import Photographer
+# from favPhotographers.models import FavPhotographer
 # Create your models here.
 
 
@@ -11,3 +12,5 @@ class Customer(models.Model):
     def __str__(self):
         return self.profile.user.username
 
+# class Fav_Pho(models.Model):
+    

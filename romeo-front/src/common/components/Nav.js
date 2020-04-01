@@ -1,32 +1,43 @@
 import React from "react";
 import { Link } from "react-router-dom"
-import { Button, Dropdown, Menu, Icon, Tag, notification } from 'antd';
+import { Button, Dropdown, Menu, Icon, Tag, Badge } from 'antd';
 import logo from "assets/logo.png";
 import { connect } from "react-redux";
 import { signOut } from "common/actions/auth";
 import history from "common/router/history";
 import SignInRegModal from "interfaces/signinreg/modal";
-import { receiveNotifications, getNotificationText } from "logic/Notifications";
+import { receiveNotifications, getNotificationText, readNotifications, countUnread } from "logic/Notifications";
 
 class Nav extends React.Component {
     state = {
         showSignIn: false,
-        notifications: []
+        notifications: [],
+        unreadCount: 0
+    }
+    readNoti = async () => {
+        const { notifications } = this.state;
+        const read = await readNotifications(notifications);
+        this.setState({ notifications: read.reverse() });
+
+        this.setState({ unreadCount: 0 });
     }
     async componentDidMount() {
         const currentClient = JSON.parse(localStorage.getItem('currentClient'))
         if (this.props.isAuth && currentClient) {
             const n = await receiveNotifications(currentClient.username);
-            this.setState({ notifications: n });
+            this.setState({ notifications: n.reverse() });
+
+            const unreadCount = countUnread(n.reverse().slice(0,5));
+            this.setState({ unreadCount });
         }
     }
     render() {
-        const { showSignIn, notifications } = this.state;
+        const { showSignIn, notifications, unreadCount } = this.state;
         const { signOut, isAuth, transparent } = this.props;
         const currentClient = JSON.parse(localStorage.getItem('currentClient'))
         return (
             <nav className={`main-nav ${transparent ? "transparent" : ""}`}>
-                <div className="container d-flex align-center justify-space-between">
+                <div className="container d-flex align-center justify-space-between" style={{ maxWidth: 'initial' }}>
                     <Link to="/">
                         <div className="logo">
                             <img src={logo} alt="" />
@@ -42,27 +53,27 @@ class Nav extends React.Component {
                                                 <Icon type="bell" className="mr-2"/><b>Notifications</b>
                                             </Menu.Item>
                                             { notifications && notifications.length > 0 && (
-                                                <Menu.Item>
+                                                <Menu.Item onClick={() => this.readNoti()}>
                                                     <span className="t-color-primary">Mark All as Read</span>
                                                 </Menu.Item>
                                             )}
                                             <Menu.Divider/>
                                             { notifications && notifications.length > 0 ? 
                                                 notifications.slice(0,4).map((e,i) => (
-                                                    <Menu.Item 
+                                                    <Link to="/client/reservations/">
+                                                        <div 
                                                             key={`notif${e.noti_timestamp + i}`} 
                                                             className="pb-2 pt-2"
                                                             style={{ borderBottom: '1px solid #efefef' }}
                                                         >
-                                                            <Link to="/client/reservations">
-                                                                <div className="d-flex align-center" style={{ whiteSpace: "initial" }}>
-                                                                    <div className="mr-2">
-                                                                        { getNotificationText(e.noti_actor, e.noti_status) }
-                                                                    </div>
-                                                                { e.front_new && <Tag color="#f50">New</Tag> }
+                                                            <div className="d-flex align-center pl-3 pr-2" style={{ whiteSpace: "initial" }}>
+                                                                <div className="mr-3">
+                                                                    { getNotificationText(e.noti_actor, e.noti_status) }
                                                                 </div>
-                                                            </Link>
-                                                    </Menu.Item>
+                                                            { e.noti_read !== "READ" && <Tag color="#f50">New</Tag> }
+                                                            </div>
+                                                        </div>
+                                                    </Link>
                                                 )
                                             ) : (
                                                 <Menu.Item>
@@ -76,13 +87,15 @@ class Nav extends React.Component {
                                     )} 
                                     trigger={['click']}
                                 >
-                                    <Button 
-                                        type="default" 
-                                        shape="circle" 
-                                        icon="bell" 
-                                        size="large" 
-                                        className="mr-2"
-                                    />
+                                    <Badge count={unreadCount} overflowCount={5} offset={[-10,5]}>
+                                        <Button 
+                                            type="default" 
+                                            shape="circle" 
+                                            icon="bell" 
+                                            size="large" 
+                                            className="mr-2"
+                                        />
+                                    </Badge>
                                 </Dropdown>
                             </div>
                             <div>
@@ -120,6 +133,9 @@ class Nav extends React.Component {
                                                 <Icon type="user" className="mr-2"/><b>{currentClient.username}</b>
                                             </Menu.Item>
                                             <Menu.Divider />
+                                            <Menu.Item key="cus6">
+                                                <Link to="/client/favorites">Favorite Photographers</Link>
+                                            </Menu.Item>
                                             <Menu.Item key="cus1">
                                                 <Link to="/client/reservations">My Reservations</Link>
                                             </Menu.Item>

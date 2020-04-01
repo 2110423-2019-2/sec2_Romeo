@@ -6,7 +6,7 @@ import { timeLabels } from "logic/Calendar"
 import moment from "moment";
 import Axios from "axios";
 import history from "common/router/history";
-import { availableStyles, styleLabels } from "logic/Styles";
+import { styleLabels } from "logic/Styles";
 
 function hasErrors(fieldsError) {
     return Object.keys(fieldsError).some(field => fieldsError[field]);
@@ -22,7 +22,6 @@ class ReserveModal extends React.Component {
         style: ""
     }
     componentDidMount() {
-        const { currentClient, currentPhotographer} = this.props;
         this.props.form.validateFields();
         this.mapSelectedTimes();
     }
@@ -38,11 +37,15 @@ class ReserveModal extends React.Component {
     handleReserve = () => {
         const { jobStartDate, selectedJobEndDate, times, style } = this.state;
         const { currentClient, currentPhotographer} = this.props;
-        if (!style || style === "") {
-            this.setState({
-                styleError: true
-            });
-            return;
+        if ( currentPhotographer.photographer_style.length > 0 ) {
+            if (!style || style === "") {
+                this.setState({
+                    styleError: true
+                });
+                return;
+            }
+        } else {
+            this.setState({ style: "NONE" })
         }
         this.props.form.validateFields((err, values) => {
             if (!err) {
@@ -58,13 +61,12 @@ class ReserveModal extends React.Component {
                     job_reservation: times,
                     job_title: jobTitle,
                     job_location: jobLocation,
-                    job_style: style,
+                    job_style: style === "" ? "NONE" : style,
                     job_description: jobDescription ? jobDescription : "",
                     job_status: "PENDING",
                     job_start_date: jobStartDate,
                     job_expected_complete_date: selectedJobEndDate,
                     job_special_requirement: jobSpecialReq ? jobDescription : "",
-                    job_total_price: -1,
                     job_url: null
                 }
                 Axios.post("/api/jobs/", req).then(res => {
@@ -155,35 +157,39 @@ class ReserveModal extends React.Component {
                                 />,
                             )}
                         </Form.Item>
-                        <label>Job Style</label><br/>
-                        <b className="d-block mb-1">
-                            Selected Style:{' '}
-                            {(style && style !== "") ? styleLabels[style] : "None"}
-                        </b>
-                        <Dropdown overlay={() => (
-                            <Form className="pa-3">
-                                <Radio.Group 
-                                    value={style}
-                                    onChange={e => this.setState({ style: e.target.value })} 
-                                    className="vertical"
+                        { currentPhotographer.photographer_style.length > 0 && (
+                            <React.Fragment>
+                                <label>Job Style</label><br/>
+                                <b className="d-block mb-1">
+                                    Selected Style:{' '}
+                                    {(style && style !== "") ? styleLabels[style] : "None"}
+                                </b>
+                                <Dropdown overlay={() => (
+                                    <Form className="pa-3">
+                                        <Radio.Group 
+                                            value={style}
+                                            onChange={e => this.setState({ style: e.target.value })} 
+                                            className="vertical"
+                                        >
+                                            { currentPhotographer.photographer_style.map((e,i) => (
+                                                <Radio 
+                                                    value={e} 
+                                                    key={e+i} 
+                                                    style={{display: 'block'}}
+                                                >{styleLabels[e]}</Radio>
+                                            )) }
+                                        </Radio.Group>
+                                    </Form>
+                                    )} 
+                                    trigger={['click']}
                                 >
-                                    { availableStyles.map((e,i) => (
-                                        <Radio 
-                                            value={e.value} 
-                                            key={e.value+i} 
-                                            style={{display: 'block'}}
-                                        >{e.label}</Radio>
-                                    )) }
-                                </Radio.Group>
-                            </Form>
-                            )} 
-                            trigger={['click']}
-                        >
-                            <Button type="primary">
-                                <span>Select One</span>
-                                <Icon type="down" />
-                            </Button>
-                        </Dropdown>
+                                    <Button type="primary">
+                                        <span>Select One</span>
+                                        <Icon type="down" />
+                                    </Button>
+                                </Dropdown>
+                            </React.Fragment>
+                        )}
                         <div className="pb-3"/>
                         <label>Job Description</label>
                         <Form.Item className="mt-1">

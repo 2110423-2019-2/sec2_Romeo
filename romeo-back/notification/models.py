@@ -14,13 +14,15 @@ NOTI_STATUS_CHOICES = [('PENDING', 'Pending'),
                       ('CANCELLED_BY_CUSTOMER', 'Cancelled by customer'),
                       ('PROCESSING', 'Processing Photos'),
                       ('COMPLETED', 'Completed'),
-                      ('CLOSED', 'Closed')]
+                      ('CLOSED', 'Closed'),
+                      ('REVIEWED', 'Reviewed')]
 
 NOTI_READ_CHOICES = [('UNREAD', 'Unread'),
                       ('READ', 'Read')]
 
 class Notification(models.Model): 
     noti_id = models.AutoField(primary_key=True)
+    noti_job_id = models.IntegerField()
     noti_receiver = models.ForeignKey(CustomUserProfile,blank=False,related_name='noti_receiver',on_delete=models.CASCADE)
     noti_actor = models.ForeignKey(CustomUserProfile,blank=False,related_name='noti_actor',on_delete=models.CASCADE)
     noti_action = models.CharField(max_length=100)

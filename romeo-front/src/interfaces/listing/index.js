@@ -3,13 +3,13 @@ import { connect } from "react-redux";
 import { Parallax } from 'react-parallax';
 import Card from "./Card";
 import Axios from "axios";
-import { Input, Skeleton, Card as AntCard, Avatar, Icon, Dropdown, Form, Radio, Button, Menu, DatePicker} from "antd";
+import { Input, Skeleton, Card as AntCard, Avatar, Icon, Dropdown, 
+    Form, Radio, Button, DatePicker} from "antd";
 import { getCurrentClientInfo } from "common/auth";
 import { availableStyles } from "logic/Styles"
 import { availableSorts } from "logic/Listing"
 import { timeLabels } from "logic/Calendar"
 import { formatSnakeDate } from "common/date";
-import moment from "moment"; 
 
 class Listing extends React.Component {
 

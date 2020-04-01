@@ -14,7 +14,8 @@ JOB_STATUS_CHOICES = [('PENDING', 'Pending'),
                       ('CANCELLED_BY_CUSTOMER', 'Cancelled by customer'),
                       ('PROCESSING', 'Processing Photos'),
                       ('COMPLETED', 'Completed'),
-                      ('CLOSED', 'Closed')]
+                      ('CLOSED', 'Closed'),
+                      ('REVIEWED', 'Reviewed')]
 
 TIME_CHOICES = [('HALF_DAY_MORNING', "Half-day(Morning-Noon)"),
                      ('HALF_DAY_NOON', "Half-day(Noon-Evening)"),
@@ -55,6 +56,7 @@ class JobInfo(models.Model):
     job_special_requirement = models.CharField(max_length=400, blank=True, null=True)
     job_reservation = models.ManyToManyField(JobReservation, null=True)
     job_url = models.URLField(max_length = 200, null=True, blank=True)
+
     # is_reviewed
 
     def __str__(self):
