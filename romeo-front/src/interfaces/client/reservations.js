@@ -75,7 +75,10 @@ class Reservations extends React.Component {
                 reviewDetail: review,
                 rateJob: rating*2
             });
-            if (res.data) window.location.reload();
+            if (res.data) {
+                const p = await proceed(selectedJob,2,null);
+                if (p.data) window.location.reload();
+            }
         } catch (err) {
             console.log(err);
         }

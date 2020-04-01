@@ -11,7 +11,7 @@ export const statusLabels = {
     CLOSED: "Closed",
     CANCELLED_BY_CUSTOMER: "Cancelled by Customer",
     CANCELLED_BY_PHOTOGRAPHER: "Cancelled by Photographer",
-    REVIEWED: "Closed"
+    REVIEWED: "Reviewed"
 }
 
 export const decline = (job, actorType) => {
@@ -61,6 +61,11 @@ export const proceed = async (job, actorType, data) => {
                 job_status: "CLOSED"
             })
         }
+        if (job.job_status === "CLOSED") {
+            await Axios.patch(`/api/jobs/${job.job_id}/`, {
+                job_status: "REVIEWED"
+            })
+        }
     }
     window.location.reload();
 }
@@ -78,7 +83,9 @@ export const createCreditCardCharge = async (job, token) => {
                 "Content-Type": "application/json"
             }
         });
-        if (res.data) window.location.reload();
+        if (res.data) {
+            window.location.reload();
+        }
     } catch (err) {
         console.log(err);
     }

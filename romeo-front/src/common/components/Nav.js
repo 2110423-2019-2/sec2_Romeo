@@ -60,7 +60,7 @@ class Nav extends React.Component {
                                             <Menu.Divider/>
                                             { notifications && notifications.length > 0 ? 
                                                 notifications.slice(0,4).map((e,i) => (
-                                                    <Link to={`/client/reservations/${e.job_id}`}>
+                                                    <Link to="/client/reservations/">
                                                         <div 
                                                             key={`notif${e.noti_timestamp + i}`} 
                                                             className="pb-2 pt-2"
