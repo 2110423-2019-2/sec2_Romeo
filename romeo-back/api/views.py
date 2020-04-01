@@ -12,7 +12,7 @@ import omise
 # Import Serializers of apps
 from .serializers import PhotographerSerializer, CustomerSerializer, JobSerializer, JobReservationSerializer, UserSerializer, \
     PhotoSerializer, AvailTimeSerializer, EquipmentSerializer, ProfileSerializer, StyleSerializer, NotificationSerializer, ChangePasswordSerializer, \
-        ReviewSerializer, PaymentSerializer, GetJobsSerializer, GetPaymentToPhotographerSerializer, GetPaymentToCustomerSerializer
+        ReviewSerializer, PaymentSerializer, GetJobsSerializer, GetPaymentToPhotographerSerializer, GetPaymentToCustomerSerializer, GetFavPhotographersSerializer
 # Import models of apps for queryset
 from photographers.models import Photographer, Photo, AvailTime, Equipment, Style
 from customers.models import Customer
@@ -274,4 +274,11 @@ class ReviewViewSet(viewsets.ModelViewSet):
     permission_classes = [AllowAny]
     lookup_field = 'reviewJob__job_id'
     filter_backends = [filters.SearchFilter]
-    search_fields = ['reviewJob__job_photographer__profile__user__username']
+    search_fields = ['reviewJob__job_photographer__profile__user__username','reviewJob__job_customer__profile__user__username']
+
+class GetFavPhotographersViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Customer.objects.all()
+    serializer_class = GetFavPhotographersSerializer
+    lookup_field = 'profile__user__username'
+    # filter_backends = [filters.SearchFilter]
+    # search_fields = ['profile_id__profile__user__username']
