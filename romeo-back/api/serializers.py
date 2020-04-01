@@ -5,7 +5,7 @@ from djoser.serializers import UserCreateSerializer as BaseUserRegistrationSeria
 from rest_framework.validators import UniqueValidator
 from drf_writable_nested.serializers import WritableNestedModelSerializer
 from drf_writable_nested.mixins import UniqueFieldsMixin, NestedUpdateMixin
-from django.db.models import Q
+from django.db.models import Q, Sum
 # Import App Models
 from photographers.models import Photographer, Photo, AvailTime, Equipment, Style
 from customers.models import Customer
@@ -20,13 +20,12 @@ import datetime
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        exclude = ('is_superuser', 'is_staff', 'is_active', 'date_joined', 'groups', 'user_permissions',)
+        exclude = ('is_superuser', 'is_staff', 'is_active', 'date_joined', 'groups', 'user_permissions', 'password',)
         extra_kwargs = {
             'username': {
                 'validators': [UnicodeUsernameValidator()],
             }
         }
-
 
     def create(self, validated_data):
         user = CustomUser.objects.create_user(username=validated_data['username'],
@@ -372,16 +371,16 @@ class JobReservationSerializer(serializers.ModelSerializer):
         model = JobReservation
         fields = '__all__'
 
-
 class JobSerializer(serializers.ModelSerializer):
     job_customer = serializers.CharField(source='job_customer.profile.user.username')
     job_photographer = serializers.CharField(source='job_photographer.profile.user.username')
     job_reservation = JobReservationSerializer(many=True, required=False, partial=True)
-    # job_total_price = serializers.FloatField(read_only=True)
+    job_total_price = serializers.FloatField()
 
     class Meta:
         model = JobInfo
         fields = '__all__'
+
 
     # Override default create method to auto create nested profile from photographer
     def create(self, validated_data):
