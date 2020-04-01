@@ -220,6 +220,11 @@ class GetjobsViewSet(viewsets.ReadOnlyModelViewSet):
     filter_backends = [filters.SearchFilter]
     search_fields = ['job_photographer__profile__user__username','job_customer__profile__user__username'] 
 
+    def get_queryset(self):
+        return JobInfo.objects.annotate(
+            job_total_price=Sum('job_reservation__job_avail_time__photographer_price')
+        )    
+
 class JobReservationViewSet(viewsets.ModelViewSet):
     queryset = JobReservation.objects.all()
     serializer_class = JobReservationSerializer
