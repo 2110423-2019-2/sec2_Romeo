@@ -133,6 +133,9 @@ class Nav extends React.Component {
                                                 <Icon type="user" className="mr-2"/><b>{currentClient.username}</b>
                                             </Menu.Item>
                                             <Menu.Divider />
+                                            <Menu.Item key="cus6">
+                                                <Link to="/client/favorites">Favorite Photographers</Link>
+                                            </Menu.Item>
                                             <Menu.Item key="cus1">
                                                 <Link to="/client/reservations">My Reservations</Link>
                                             </Menu.Item>

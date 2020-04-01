@@ -34,7 +34,7 @@ class Reviews extends React.Component {
                         </div>
                     ) : (
                         <span className="t-color-light d-block pb-3" style={{ fontStyle: 'italic' }}>
-                            No reviews available yet.
+                            No reviews yet.
                         </span>
                     )
                 }
