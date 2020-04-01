@@ -411,6 +411,7 @@ class JobSerializer(serializers.ModelSerializer):
 
             # check if reservation date and time is valid
             is_vaild = False
+            total_price = 0
             week_days = ("MONDAY","TUESDAY","WEDNESDAY","THURSDAY","FRIDAY","SATURDAY","SUNDAY")
             for avail_time_instance in job_photographer.photographer_avail_time.all():
                 if avail_time_instance.avail_date == week_days[photoshoot_date.weekday()] and avail_time_instance.avail_time == photoshoot_time:
@@ -457,21 +458,23 @@ class JobSerializer(serializers.ModelSerializer):
                                                                              photoshoot_time=photoshoot_time,
                                                                              job_avail_time=avail_time_instance)
                 ##########################################################################
-                    # total_price += avail_time_instance.photographer_price
+                    total_price += reservation_instance.job_avail_time.photographer_price
                     reservation_list.append(reservation_instance)
                     
                     is_vaild = True
+            # print("\n\n\n\n\n",)
             if not is_vaild:
                 raise serializers.ValidationError('''Your selected date and time for reservation is invalid for the photographer, please checkout photographer's available time''')
-        job_info = JobInfo.objects.create(job_title=validated_data.pop('job_title'), 
-                                        job_description=validated_data.pop('job_description'), 
-                                        job_customer=job_customer, 
+        job_info = JobInfo.objects.create(job_customer=job_customer, 
                                         job_photographer=job_photographer, 
+                                        job_total_price=total_price,
+                                        job_title=validated_data.pop('job_title'), 
+                                        job_description=validated_data.pop('job_description'), 
                                         job_status='PENDING',
                                         job_style=validated_data.pop('job_style'),
                                         job_location=validated_data.pop('job_location'),
                                         job_expected_complete_date=validated_data.pop('job_expected_complete_date'),
-                                        job_special_requirement=validated_data.pop('job_special_requirement'))
+                                        job_special_requirement=validated_data.pop('job_special_requirement'))                             
         job_info.job_reservation.add(*reservation_list)
         job_info.save()
 
