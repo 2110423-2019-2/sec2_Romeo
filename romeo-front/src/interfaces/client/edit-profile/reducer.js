@@ -7,28 +7,15 @@ import { SET_CURRENT_EQUIPMENT,
 const initialState = {
     currentEquipment: [],
     currentStyles: [],
-    currentAvailTimes: [{
-        day: "MONDAY",
-        time: "NOT_AVAILABLE"
-    },{
-        day: "TUESDAY",
-        time: "NOT_AVAILABLE"
-    },{
-        day: "WEDNESDAY",
-        time: "NOT_AVAILABLE"
-    },{
-        day: "THURSDAY",
-        time: "NOT_AVAILABLE"
-    },{
-        day: "FRIDAY",
-        time: "NOT_AVAILABLE"
-    },{
-        day: "SATURDAY",
-        time: "NOT_AVAILABLE"
-    },{
-        day: "SUNDAY",
-        time: "NOT_AVAILABLE"
-    }],
+    currentAvailTimes: {
+        MONDAY: {},
+        TUESDAY: {},
+        WEDNESDAY: {},
+        THURSDAY: {},
+        FRIDAY: {},
+        SATURDAY: {},
+        SUNDAY: {}
+    },
     fieldErrors: false
 };
 
