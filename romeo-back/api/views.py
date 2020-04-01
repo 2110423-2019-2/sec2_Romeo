@@ -12,7 +12,7 @@ import omise
 # Import Serializers of apps
 from .serializers import PhotographerSerializer, CustomerSerializer, JobSerializer, JobReservationSerializer, UserSerializer, \
     PhotoSerializer, AvailTimeSerializer, EquipmentSerializer, ProfileSerializer, StyleSerializer, NotificationSerializer, ChangePasswordSerializer, \
-        ReviewSerializer, PaymentSerializer, GetJobsSerializer
+        ReviewSerializer, PaymentSerializer, GetJobsSerializer, GetPaymentToPhotographerSerializer, GetPaymentToCustomerSerializer
 # Import models of apps for queryset
 from photographers.models import Photographer, Photo, AvailTime, Equipment, Style
 from customers.models import Customer
@@ -173,6 +173,19 @@ class PaymentViewSet(viewsets.ModelViewSet):
 
         return Response(data="Payment Successful.")
 
+class GetPaymentToPhotographerViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Payment.objects.all()
+    serializer_class = GetPaymentToPhotographerSerializer
+
+    def get_queryset(self):
+        return Payment.objects.exclude(payment_job__job_status="CANCELLED_BY_PHOTOGRAPHER")
+
+class GetPaymentToCustomerViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Payment.objects.all()
+    serializer_class = GetPaymentToCustomerSerializer
+
+    def get_queryset(self):
+        return Payment.objects.filter(payment_job__job_status="CANCELLED_BY_PHOTOGRAPHER")
 
 class EquipmentViewSet(viewsets.ModelViewSet):
     serializer_class = EquipmentSerializer

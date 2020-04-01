@@ -378,7 +378,7 @@ class JobSerializer(serializers.ModelSerializer):
     job_customer = serializers.CharField(source='job_customer.profile.user.username')
     job_photographer = serializers.CharField(source='job_photographer.profile.user.username')
     job_reservation = JobReservationSerializer(many=True, required=False, partial=True)
-    job_total_price = serializers.FloatField(read_only=True)
+    # job_total_price = serializers.FloatField(read_only=True)
 
     class Meta:
         model = JobInfo
@@ -550,3 +550,17 @@ class PaymentSerializer(serializers.ModelSerializer):
             instance.update(job_status="PAID")
         elif validated_data['payment_status'] == "REMAINING" :
             instance.update(job_status="CLOSED")
+
+class GetPaymentToPhotographerSerializer(serializers.ModelSerializer):
+    payment_job = JobSerializer(required=True, partial=True)
+
+    class Meta:
+        model = Payment
+        fields = '__all__'
+
+class GetPaymentToCustomerSerializer(serializers.ModelSerializer):
+    payment_job = JobSerializer(required=True, partial=True)
+
+    class Meta:
+        model = Payment
+        fields = '__all__'
