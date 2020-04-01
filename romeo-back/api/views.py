@@ -137,7 +137,7 @@ class PaymentViewSet(viewsets.ModelViewSet):
         data['payment_customer'] = job.values_list('job_customer__profile__user__username', flat=True)[0]
         data['payment_photographer'] = job.values_list('job_photographer__profile__user__username', flat=True)[0]
         data['payment_job'] = jid
-        amount = job.annotate(job_total_price=Sum('job_reservation__job_avail_time__photographer_price')).values_list('job_total_price', flat=True)[0]
+        amount = job.values_list('job_total_price', flat=True)[0]
         job_status = job.values_list('job_status', flat=True)[0]
         if job_status == "MATCHED" :
             amount = amount * 0.3
@@ -195,10 +195,10 @@ class JobsViewSet(viewsets.ModelViewSet):
     filter_backends = [filters.SearchFilter]
     search_fields = ['job_photographer__profile__user__username','job_customer__profile__user__username']
 
-    def get_queryset(self):
-        return JobInfo.objects.annotate(
-            job_total_price = Sum('job_reservation__job_avail_time__photographer_price')
-        )
+    # def get_queryset(self):
+    #     return JobInfo.objects.annotate(
+    #         job_total_price = Sum('job_reservation__job_avail_time__photographer_price')
+    #     )
 
 class GetjobsViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = JobInfo.objects.all()
