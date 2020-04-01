@@ -3,8 +3,7 @@ from rest_framework.routers import DefaultRouter
 from .views import PhotographerViewSet, PhotoViewSet, EquipmentViewSet, PhotoViewSet, AvailTimeViewSet, \
     StyleViewSet, CustomerViewSet, JobsViewSet, JobReservationViewSet, UserViewSet, ProfileViewSet, \
     NotificationViewSet, PhotographerSearchViewSet, ChangePasswordViewSet, ReviewViewSet, PaymentViewSet,\
-    RegisterViewSet, GetjobsViewSet, GetPaymentToCustomerViewSet, GetPaymentToPhotographerViewSet
-    RegisterViewSet, GetjobsViewSet, GetFavPhotographersViewSet
+    RegisterViewSet, GetjobsViewSet, GetPaymentToCustomerViewSet, GetPaymentToPhotographerViewSet, GetFavPhotographersViewSet
 
 
 router = DefaultRouter()

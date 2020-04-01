@@ -560,6 +560,19 @@ class GetFavPhotographersSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class GetPaymentToPhotographerSerializer(serializers.ModelSerializer):
+    payment_job = JobSerializer(required=True, partial=True)
+
+    class Meta:
+        model = Payment
+        fields = '__all__'
+
+class GetPaymentToCustomerSerializer(serializers.ModelSerializer):
+    payment_job = JobSerializer(required=True, partial=True)
+
+    class Meta:
+        model = Payment
+        fields = '__all__'
 
 
 
