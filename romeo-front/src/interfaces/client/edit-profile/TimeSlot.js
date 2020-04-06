@@ -82,7 +82,6 @@ class TimeSlot extends React.Component {
                             }
                             onClick={() => this.addAvailTime()}
                         >
-                            {parseInt(currentPrice) !== NaN}
                             Add Available Time <Icon type="plus"/>
                         </Button>
                     </div>

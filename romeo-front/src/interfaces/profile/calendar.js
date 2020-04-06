@@ -1,7 +1,7 @@
 import React from "react";
 import { Calendar, Tag, Tooltip, Button, Icon } from 'antd';
 import moment from "moment";
-import { dayIndex, defaultDays, timeLabels } from "logic/Calendar";
+import { timeLabels } from "logic/Calendar";
 import Axios from "axios";
 import ReserveModal from "./ReserveModal";
 import { formatDashedDate } from "common/date";
@@ -9,132 +9,164 @@ import { formatDashedDate } from "common/date";
 class JobCalendar extends React.Component {
     state = {
         today: moment(new Date()),
-        calOutput: defaultDays,
+        calOutput: {
+            MONDAY: {},
+            TUESDAY: {},
+            WEDNESDAY: {},
+            THURSDAY: {},
+            FRIDAY: {},
+            SATURDAY: {},
+            SUNDAY: {}
+        },
         showReserveModal: false,
         selectedTimes: {},
-        unavailableDays: []
+        unavailableTimes: {}
     };
     async componentDidMount() {
         const { currentPhotographer } = this.props;
         const { photographer_avail_time } = currentPhotographer;
 
-        const res = await Axios.get("/api/jobs?search="+currentPhotographer.profile.user.username);
-        if (res.data) {
-            const jobs = res.data;
-            let out = [];
-            jobs.forEach(j => {
-                if (j.job_status === "MATCHED" || j.job_status === "PAID" || j.job_status === "PROCESSING") {
-                    j.job_reservation.forEach(jr => {
-                        out.push(jr.photoshoot_date)
-                    })
-                }
-            });
-            this.setState({ unavailableDays: out })
+        try {
+            const res = await Axios.get("/api/jobs?search="+currentPhotographer.profile.user.username);
+            if (res.data) {
+                const jobs = res.data;
+                let out = {};
+                jobs.forEach(j => {
+                    if (j.job_status === "MATCHED" || j.job_status === "PAID" || j.job_status === "PROCESSING") {
+                        j.job_reservation.forEach(jr => {
+                            out[jr.photoshoot_date][jr.photoshoot_time] = true;
+                        })
+                    }
+                });
+                this.setState({ unavailableTimes: out })
+            }
+        } catch (err) {
+            console.log(err);
         }
 
-        let out = [...this.state.calOutput];
-        photographer_avail_time.forEach((e,i) => {
-            out.splice(dayIndex[e.avail_date],1)
-            out.splice(dayIndex[e.avail_date],0,e)
+        let out = {...this.state.calOutput};
+        photographer_avail_time.forEach(e => {
+            out[e.avail_date][e.avail_time] = {
+                avail_date: e.avail_date,
+                avail_time: e.avail_time,
+                photographer_price: e.photographer_price
+            }
         });
-        this.setState({ calOutput: out });
+        this.setState({ out });
     }
-    selectTime = (data, value) => {
+    selectTime = (data) => {
+        // console.log(data);
         let out = {...this.state.selectedTimes};
-        if (out[moment(value)]) {
-            delete out[moment(value)]
+        if (out[data.photoshoot_date]) {
+            if (out[data.photoshoot_date][data.avail_time]) {
+                delete out[data.photoshoot_date][data.avail_time]
+            } else {
+                out[data.photoshoot_date][data.avail_time] = data
+            }
         } else {
-            out[moment(value)] = data;
+            out[data.photoshoot_date] = {};
+            out[data.photoshoot_date][data.avail_time] = data
         }
         this.setState({ selectedTimes: out});
     }
     dateCellRender = (value) => {
         const listData = this.getListData(value);
         const { enableReserve } = this.props;
-        const { selectedTimes, unavailableDays } = this.state;
+        const { selectedTimes } = this.state;
+        // console.log(listData);
         return (
-        
           <div>
             { enableReserve ? (
-                (listData.content && !unavailableDays.includes(formatDashedDate(value))) && (
-                    <Tooltip title={selectedTimes[value] ? "Unselect" : "Select Time"}>
-                        <Tag 
-                            color={selectedTimes[value] ? "#51bba8" : ""}
-                            style={{ whiteSpace: 'normal' }} 
-                            onClick={() => this.selectTime(listData.data, value)}
-                        >
-                            {listData.content}
-                        </Tag>
-                    </Tooltip>
+                (listData.content && 
+                    listData.content.map((e,i) => {
+                        const isSelected = selectedTimes[e.photoshoot_date] ? selectedTimes[e.photoshoot_date][e.avail_time] : false
+                        return (
+                            <Tooltip 
+                                title={isSelected ? "Unselect" : "Select Time"} 
+                                key={i+value} 
+                                className="mb-1"
+                            >
+                                <Tag 
+                                    color={isSelected ? "#51bba8" : ""}
+                                    style={{ whiteSpace: 'normal', cursor: 'pointer' }} 
+                                    onClick={() => this.selectTime(e, value)}
+                                >
+                                    {e.label}
+                                </Tag>
+                            </Tooltip>
+                        )
+                    })
                 )
             ) : (
-                (listData.content && !unavailableDays.includes(formatDashedDate(value))) && (
-                    <Tag 
-                        color="green" 
-                        style={{ whiteSpace: 'normal' }}
-                        
-                    >
-                        {listData.content}
-                    </Tag>
+                (listData.content && (
+                    listData.content.map((e,i) => {
+                        return (
+                            <Tag 
+                                color="green"
+                                style={{ whiteSpace: 'normal' }} 
+                                key={i + value}
+                                className="mb-1"
+                            >
+                                {e.label}
+                            </Tag>
+                        )
+                    })
                 )
-            )}
+            ))}
           </div>
         );
     }
-    getLabel = (avail_time) => {
-        if (timeLabels[avail_time.avail_time]) {
-            if (avail_time.photographer_price) {
-                return timeLabels[avail_time.avail_time] + ", Price: " + avail_time.photographer_price
-            }
-            return timeLabels[avail_time.avail_time]
+    getContent = (day, date) => {
+        const { unavailableTimes } = this.state;
+        const d = formatDashedDate(date)
+        let out = [];
+        if (day) {
+            Object.keys(day).forEach(t => {
+                const r = day[t];
+                if ( !unavailableTimes[d] 
+                || !unavailableTimes[d][r.avail_time] ) {
+                    out.push({
+                        ...r,
+                        photoshoot_date: d,
+                        label:timeLabels[r.avail_time] + ", Price: " + r.photographer_price
+                    });
+                }
+            })
+            return out;
         }
         return null;
     }
-    componentWillUnmount() {
-        this.setState({
-            calOutput: defaultDays
-        })
-    }
-
     getListData = (value) => {
         const { calOutput } = this.state;
         if (moment(value).subtract(1,"days").isBefore(new Date())) {
             return {
-                content: null,
-                data: null
+                content: null
             }
         }
         switch (value.day()) {
             case 0: return {
-                content: this.getLabel(calOutput[6]),
-                data: calOutput[6]
+                content: this.getContent(calOutput.SUNDAY, value),
             };
             case 1: return {
-                content: this.getLabel(calOutput[0]),
-                data: calOutput[0]
+                content: this.getContent(calOutput.MONDAY, value),
             };
             case 2: return {
-                content: this.getLabel(calOutput[1]),
-                data: calOutput[1]
+                content: this.getContent(calOutput.TUESDAY, value),
             };
             case 3: return {
-                content: this.getLabel(calOutput[2]),
-                data: calOutput[2]
+                content: this.getContent(calOutput.WEDNESDAY, value),
             };
             case 4: return {
-                content: this.getLabel(calOutput[3]),
-                data: calOutput[3]
+                content: this.getContent(calOutput.THURSDAY, value),
             };
             case 5: return {
-                content: this.getLabel(calOutput[4]),
-                data: calOutput[4]
+                content: this.getContent(calOutput.FRIDAY, value),
             };
             case 6: return {
-                content: this.getLabel(calOutput[5]),
-                data: calOutput[5]
+                content: this.getContent(calOutput.SATURDAY, value),
             };
             default: return {
-                content: ""
+                content: null
             }
         }
     }
