@@ -35,7 +35,7 @@ class Reservations extends React.Component {
     async componentDidMount() {
         const res = await Axios.get("/api/getjobs?search=" + getCurrentClient().username);
         this.setState({
-            reservations: res.data.reverse(),
+            reservations: res.data.sort((a,b) => b.job_id - a.job_id),
         });
     }
     state = {
@@ -301,7 +301,7 @@ class Reservations extends React.Component {
                         <div className="d-flex" style={{ margin: "0 -4px" }}>
                             <CheckoutCreditCard
                                 job={record}
-                                amount={calculateDepositPrice(record.job_reservation)}
+                                amount={calculateDepositPrice(record.job_total_price)}
                                 createCreditCardCharge={createCreditCardCharge}
                             />
                             <Button 
@@ -329,7 +329,7 @@ class Reservations extends React.Component {
                     case "COMPLETED": return (
                         <CheckoutCreditCard
                             job={record}
-                            amount={calculateLeftoverPrice(record.job_reservation)}
+                            amount={calculateLeftoverPrice(record.job_total_price)}
                             createCreditCardCharge={createCreditCardCharge}
                         />
                     );

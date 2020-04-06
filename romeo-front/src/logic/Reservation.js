@@ -4,14 +4,14 @@ export const statusLabels = {
     PENDING: "Pending",
     DECLINED: "Declined",
     MATCHED: "Matched",
-    PAID: "Paid",
+    PAID: "Deposit Paid",
     CANCELLED: "Cancelled",
     PROCESSING: "Processing Photos",
     COMPLETED: "Completed",
-    CLOSED: "Closed",
+    CLOSED: "Fully Paid and Closed",
     CANCELLED_BY_CUSTOMER: "Cancelled by Customer",
     CANCELLED_BY_PHOTOGRAPHER: "Cancelled by Photographer",
-    REVIEWED: "Reviewed"
+    REVIEWED: "Fully Paid and Reviewed"
 }
 
 export const decline = (job, actorType) => {
