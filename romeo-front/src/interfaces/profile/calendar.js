@@ -1,5 +1,6 @@
 import React from "react";
-import { Calendar, Tag, Tooltip, Button, Icon } from 'antd';
+import { Calendar, Tag, Tooltip, Button, Icon,
+Form, Dropdown, Radio, Menu } from 'antd';
 import moment from "moment";
 import { timeLabels } from "logic/Calendar";
 import Axios from "axios";
@@ -34,7 +35,29 @@ class JobCalendar extends React.Component {
                 jobs.forEach(j => {
                     if (j.job_status === "MATCHED" || j.job_status === "PAID" || j.job_status === "PROCESSING") {
                         j.job_reservation.forEach(jr => {
+                            out[jr.photoshoot_date] = {}
                             out[jr.photoshoot_date][jr.photoshoot_time] = true;
+                            if (jr.photoshoot_time === "HALF_DAY_MORNING") {
+                                out[jr.photoshoot_date]["FULL_DAY"] = true;
+                                out[jr.photoshoot_date]["FULL_DAY_NIGHT"] = true;
+                            }
+                            if (jr.photoshoot_time === "HALF_DAY_NOON") {
+                                out[jr.photoshoot_date]["FULL_DAY"] = true;
+                                out[jr.photoshoot_date]["FULL_DAY_NIGHT"] = true;
+                            }
+                            if (jr.photoshoot_time === "FULL_DAY") {
+                                out[jr.photoshoot_date]["HALF_DAY_MORNING"] = true;
+                                out[jr.photoshoot_date]["HALF_DAY_NOON"] = true;
+                            }
+                            if (jr.photoshoot_time === "NIGHT") {
+                                out[jr.photoshoot_date]["FULL_DAY_NIGHT"] = true;
+                            }
+                            if (jr.photoshoot_time === "FULL_DAY_NIGHT") {
+                                out[jr.photoshoot_date]["HALF_DAY_MORNING"] = true;
+                                out[jr.photoshoot_date]["HALF_DAY_NOON"] = true;
+                                out[jr.photoshoot_date]["FULL_DAY"] = true;
+                                out[jr.photoshoot_date]["NIGHT"] = true;
+                            }
                         })
                     }
                 });
@@ -54,18 +77,17 @@ class JobCalendar extends React.Component {
         });
         this.setState({ out });
     }
-    selectTime = (data) => {
-        // console.log(data);
+    selectTime = (e) => {
         let out = {...this.state.selectedTimes};
+        let data = e.target.value;
         if (out[data.photoshoot_date]) {
-            if (out[data.photoshoot_date][data.avail_time]) {
-                delete out[data.photoshoot_date][data.avail_time]
+            if (data.avail_time !== null) {
+                out[data.photoshoot_date] = data;
             } else {
-                out[data.photoshoot_date][data.avail_time] = data
+                delete out[data.photoshoot_date];
             }
         } else {
-            out[data.photoshoot_date] = {};
-            out[data.photoshoot_date][data.avail_time] = data
+            out[data.photoshoot_date] = data
         }
         this.setState({ selectedTimes: out});
     }
@@ -73,44 +95,96 @@ class JobCalendar extends React.Component {
         const listData = this.getListData(value);
         const { enableReserve } = this.props;
         const { selectedTimes } = this.state;
+        const date = formatDashedDate(value);
+        const isSelected = selectedTimes[date] ? true : false
         // console.log(listData);
         return (
           <div>
             { enableReserve ? (
-                (listData.content && 
-                    listData.content.map((e,i) => {
-                        const isSelected = selectedTimes[e.photoshoot_date] ? selectedTimes[e.photoshoot_date][e.avail_time] : false
-                        return (
-                            <Tooltip 
-                                title={isSelected ? "Unselect" : "Select Time"} 
-                                key={i+value} 
-                                className="mb-1"
-                            >
-                                <Tag 
-                                    color={isSelected ? "#51bba8" : ""}
-                                    style={{ whiteSpace: 'normal', cursor: 'pointer' }} 
-                                    onClick={() => this.selectTime(e, value)}
-                                >
-                                    {e.label}
-                                </Tag>
-                            </Tooltip>
-                        )
-                    })
-                )
-            ) : (
-                (listData.content && (
-                    listData.content.map((e,i) => {
-                        return (
+                ((listData.content && listData.content.length > 0) && 
+                    (isSelected ? (
+                        <Tooltip title="Unselect">
                             <Tag 
-                                color="green"
-                                style={{ whiteSpace: 'normal' }} 
-                                key={i + value}
-                                className="mb-1"
+                                color="#51bba8"
+                                style={{ whiteSpace: 'normal', cursor: 'pointer' }} 
+                                onClick={() => this.selectTime({
+                                    target: {
+                                        value: {
+                                            photoshoot_date: date,
+                                            avail_time: null
+                                        }
+                                    }
+                                })}
                             >
-                                {e.label}
+                                <b>Selected</b><br/>
+                                <span className="d-block">
+                                    {timeLabels[selectedTimes[date].avail_time]},{' '}
+                                    Price: {selectedTimes[date].photographer_price}
+                                </span>
                             </Tag>
-                        )
-                    })
+                        </Tooltip>
+                    ) : (
+                        <Tooltip title="Select">
+                            <Dropdown trigger={['click']} overlay={() => (
+                                <Form className="pa-3">
+                                    <Radio.Group 
+                                        onChange={this.selectTime} 
+                                        value={this.state.selectedTimes[date]}
+                                        className="vertical"
+                                    >
+                                        { listData.content.map((e,i) => (
+                                            <Radio 
+                                                value={e} 
+                                                key={i + e.photoshoot_date + e.avail_time}
+                                                style={{display: 'block'}}
+                                            >
+                                                {e.label}
+                                            </Radio>
+                                        ))}
+                                    </Radio.Group>
+                                </Form>
+                            )}>
+                                <Tag 
+                                    style={{ whiteSpace: 'normal', cursor: 'pointer' }}
+                                >
+                                    <b>Available</b>
+                                    {
+                                        listData.content.map((e,i) => {
+                                            return (
+                                                <span 
+                                                    className="d-block mb-1"
+                                                    key={i + value}
+                                                >
+                                                    {e.label}
+                                                </span>
+                                            )
+                                        })
+                                    }
+                                </Tag>
+                            </Dropdown>
+                        </Tooltip>
+                    )
+                ))
+            ) : (
+                ((listData.content && listData.content.length > 0) && (
+                    <Tag 
+                        color="green"
+                        style={{ whiteSpace: 'normal' }} 
+                    >
+                        <b>Available</b><br/>
+                        {
+                            listData.content.map((e,i) => {
+                                return (
+                                    <span 
+                                        className="d-block mb-1"
+                                        key={i + value}
+                                    >
+                                        {e.label}
+                                    </span>
+                                )
+                            })
+                        }
+                    </Tag>
                 )
             ))}
           </div>

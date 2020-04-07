@@ -69,18 +69,22 @@ class UserCalendar extends React.Component {
             <div>
                 {mappedJobs[formatDashedDate(value)] && mappedJobs[formatDashedDate(value)].map((e,i) => (
                     <Link to={`/client/reservations/${e.job_id}`} key={`JobId:${e.job_id}`}>
-                        <Tag color={e.photoshoot_time ? "green" : "red"} style={{ whiteSpace: 'initial', cursor: 'pointer' }}>
+                        <Tag 
+                            color={e.photoshoot_time ? "green" : "red"} 
+                            style={{ whiteSpace: 'initial', cursor: 'pointer' }}
+                            className="mb-1"
+                        >
                             {
                                 e.photoshoot_time ? (
-                                    <span>{timeLabels[e.photoshoot_time]},</span>
+                                    <b>{timeLabels[e.photoshoot_time]},</b>
                                 ) : (
-                                    <span>Complete Photos,</span>
+                                    <b>Complete Photos,</b>
                                 )
                             }<br/>
                             { currentClient.type === 1 ? (
-                                <span>Customer: {e.customer}</span>
+                                <span>Customer: <b>{e.customer}</b></span>
                             ) : (
-                                <span>Photographer: {e.photographer}</span>
+                                <span>Photographer: <b>{e.photographer}</b></span>
                             )}
                         </Tag>
                     </Link>
