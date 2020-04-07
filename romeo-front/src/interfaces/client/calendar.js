@@ -30,17 +30,34 @@ class UserCalendar extends React.Component {
         jobs.forEach(j => {
             if (j.job_status === "PAID" || j.job_status === "PROCESSING" || j.job_status === "COMPLETED") {
                 j.job_reservation.forEach(jr => {
-                    out[jr.photoshoot_date] = {
-                        photoshoot_time: jr.photoshoot_time,
+                    if (out[jr.photoshoot_date]) {
+                        out[jr.photoshoot_date].push({
+                            photoshoot_time: jr.photoshoot_time,
+                            photographer: j.job_photographer,
+                            customer: j.job_customer,
+                            job_id: j.job_id
+                        });
+                    } else {
+                        out[jr.photoshoot_date] = [{
+                            photoshoot_time: jr.photoshoot_time,
+                            photographer: j.job_photographer,
+                            customer: j.job_customer,
+                            job_id: j.job_id
+                        }]
+                    }
+                })
+                if (out[j.job_expected_complete_date]) {
+                    out[j.job_expected_complete_date].push({
                         photographer: j.job_photographer,
                         customer: j.job_customer,
                         job_id: j.job_id
-                    };
-                })
-                out[j.job_expected_complete_date] = {
-                    photographer: j.job_photographer,
-                    customer: j.job_customer,
-                    job_id: j.job_id
+                    })
+                } else {
+                    out[j.job_expected_complete_date] = [{
+                        photographer: j.job_photographer,
+                        customer: j.job_customer,
+                        job_id: j.job_id
+                    }]
                 }
             }
         });
@@ -50,24 +67,28 @@ class UserCalendar extends React.Component {
         const { mappedJobs, currentClient } = this.state;
         return (
             <div>
-                {mappedJobs[formatDashedDate(value)] && (
-                    <Link to={`/client/reservations/${mappedJobs[formatDashedDate(value)].job_id}`}>
-                        <Tag color={mappedJobs[formatDashedDate(value)].photoshoot_time ? "green" : "red"} style={{ whiteSpace: 'initial', cursor: 'pointer' }}>
+                {mappedJobs[formatDashedDate(value)] && mappedJobs[formatDashedDate(value)].map((e,i) => (
+                    <Link to={`/client/reservations/${e.job_id}`} key={`JobId:${e.job_id}`}>
+                        <Tag 
+                            color={e.photoshoot_time ? "green" : "red"} 
+                            style={{ whiteSpace: 'initial', cursor: 'pointer' }}
+                            className="mb-1"
+                        >
                             {
-                                mappedJobs[formatDashedDate(value)].photoshoot_time ? (
-                                    <span>{timeLabels[mappedJobs[formatDashedDate(value)].photoshoot_time]},</span>
+                                e.photoshoot_time ? (
+                                    <b>{timeLabels[e.photoshoot_time]},</b>
                                 ) : (
-                                    <span>Complete Photos,</span>
+                                    <b>Complete Photos,</b>
                                 )
                             }<br/>
                             { currentClient.type === 1 ? (
-                                <span>Customer: {mappedJobs[formatDashedDate(value)].customer}</span>
+                                <span>Customer: <b>{e.customer}</b></span>
                             ) : (
-                                <span>Photographer: {mappedJobs[formatDashedDate(value)].photographer}</span>
+                                <span>Photographer: <b>{e.photographer}</b></span>
                             )}
                         </Tag>
                     </Link>
-                )}
+                ))}
             </div>
         )
     }

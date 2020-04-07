@@ -1,17 +1,9 @@
 import React from "react";
-import { Radio, Form, Tag } from "antd";
+import { Button, Icon, Form, Tag } from "antd";
 import { connect } from "react-redux";
 import { setCurrentAvailTimes } from "./actions";
-import { defaultDays, dayIndex } from "logic/Calendar";
-
-const options = [
-    { label: 'Half-Day (Morning-Noon)', value: 'HALF_DAY_MORNING' },
-    { label: 'Half-Day (Noon-Evening)', value: 'HALF_DAY_NOON' },
-    { label: 'Full-Day', value: 'FULL_DAY' },
-    { label: 'Night', value: 'NIGHT'},
-    { label: 'Full-Day and Night', value: "FULL_DAY_NIGHT"},
-    { label: 'Not Available', value: "NOT_AVAILABLE"}
-  ];
+import TimeSlot from "./TimeSlot";
+import { timeLabels } from "logic/Calendar";
 
 const days = [{
     label: "Monday",
@@ -51,81 +43,129 @@ const days = [{
 }]
 
 class AvailTimes extends React.Component {
-   
-    onChange = (e, day) => {
-        const { currentAvailTimes, setCurrentAvailTimes } = this.props;
-        setCurrentAvailTimes([
-            ...currentAvailTimes.slice(0,day.index),
-            {
-                ...currentAvailTimes[day.index],
-                avail_date: day.value,
-                avail_time: e.target.value
-            },
-            ...currentAvailTimes.slice(day.index+1,7)
-        ]);
-    }
-
-    onPriceUpdate = (e, day) => {
-        const { currentAvailTimes, setCurrentAvailTimes } = this.props;
-        setCurrentAvailTimes([
-            ...currentAvailTimes.slice(0,day.index),
-            {
-                ...currentAvailTimes[day.index],
-                photographer_price: e.target.value,
-            },
-            ...currentAvailTimes.slice(day.index+1,7)
-        ]);
-    }
-
     componentDidMount() {
-        const { currentClient } = this.props;
+        const { currentClient, setCurrentAvailTimes } = this.props;
         let availTimes = currentClient.photographer_avail_time;
-        if (!availTimes) availTimes = [];
-        // Fill In Empty Times
-        let out = [...defaultDays];
-        availTimes.forEach((e,i) => {
-            out.splice(dayIndex[e.avail_date],1)
-            out.splice(dayIndex[e.avail_date],0,e)
+        if (availTimes) {
+            let currentAvailTimes = {...this.props.currentAvailTimes}
+            availTimes.forEach(e => {
+                currentAvailTimes[e.avail_date][e.avail_time] = {
+                    photographer_price: e.photographer_price,
+                    avail_time: e.avail_time,
+                    avail_date: e.avail_date,
+                    id: e.id,
+                }
+            });
+            setCurrentAvailTimes(currentAvailTimes)
+            this.setChoices();
+        }
+        
+    }
+
+    setChoices = () => {
+        let currentAvailTimes = {...this.props.currentAvailTimes}
+        console.log(currentAvailTimes);
+        let c = {
+            MONDAY: {...timeLabels},
+            TUESDAY: {...timeLabels},
+            WEDNESDAY: {...timeLabels},
+            THURSDAY: {...timeLabels},
+            FRIDAY: {...timeLabels},
+            SATURDAY: {...timeLabels},
+            SUNDAY: {...timeLabels}
+        }
+        Object.keys(currentAvailTimes).forEach((day,i) => {
+            const times = currentAvailTimes[day]
+            Object.keys(times).forEach((time, it) => {
+                if (c[day][time]) delete c[day][time];
+            });
         })
-        const { setCurrentAvailTimes } = this.props;
-        setCurrentAvailTimes(out);
+        this.setState({ choices: c });
+    }
+
+    componentDidUpdate(prevProps, prevState) {
+        if (prevProps !== this.props) {
+            if (prevProps.currentAvailTimes !== this.props.currentAvailTimes) {
+                this.setState({ showAdd: {
+                    MONDAY: false,
+                    TUESDAY: false,
+                    WEDNESDAY: false,
+                    THURSDAY: false,
+                    FRIDAY: false,
+                    SATURDAY: false,
+                    SUNDAY: false
+                }});
+                this.setChoices();
+            }
+        }
+    }
+
+    toggleAdd = (day) => {
+        let out = {...this.state.showAdd};
+        out[day] = true;
+        this.setState({ showAdd: out });
+    }
+
+    state = {
+        showAdd: {
+            MONDAY: false,
+            TUESDAY: false,
+            WEDNESDAY: false,
+            THURSDAY: false,
+            FRIDAY: false,
+            SATURDAY: false,
+            SUNDAY: false
+        },
+        choices: {
+            MONDAY: {...timeLabels},
+            TUESDAY: {...timeLabels},
+            WEDNESDAY: {...timeLabels},
+            THURSDAY: {...timeLabels},
+            FRIDAY: {...timeLabels},
+            SATURDAY: {...timeLabels},
+            SUNDAY: {...timeLabels}
+        }
     }
 
     render() {
         const { currentAvailTimes } = this.props;
-
+        const { showAdd, choices } = this.state
         return (
             <React.Fragment>
                 <h3>Available Times</h3>
                 <Form>
                     { days.map((e,i) => (
-                        <div className="snippet secondary" key={i+e.value}>
-                            <Tag color={e.color}>{e.label}</Tag>
-                            <Radio.Group 
-                                options={options} 
-                                value={currentAvailTimes[e.index].avail_time} 
-                                onChange={(ev) => this.onChange(ev, e)} 
-                            />
-                            <div>
-                                <b>Price</b>
-                                <div className="ant-row ant-form-item mb-0">
-                                    <div className="ant-col ant-form-item-control-wrapper">
-                                        <div className="ant-form-item-control has-success">
-                                            <span className="ant-form-item-children">
-                                                <input 
-                                                    placeholder="Price" 
-                                                    type="number" 
-                                                    className="ant-input"
-                                                    onChange={(ev) => this.onPriceUpdate(ev, e)} 
-                                                    value={currentAvailTimes[e.index].photographer_price !== undefined ? 
-                                                        currentAvailTimes[e.index].photographer_price
-                                                    : "0" }
-                                                    disabled={currentAvailTimes[e.index].avail_time === "NOT_AVAILABLE"}
-                                                />
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
+                        <div className="snippet secondary d-block" key={i+e.value}>
+                            <div style={{ paddingTop: 8 }}/>
+                            <Tag color={e.color} style={{ fontSize: 14, padding: 4, marginBottom: 16 }}>{e.label}</Tag>
+                            <div className="d-flex flex-wrap align-start" style={{ maxWidth: '100%' }}>
+                                { Object.keys(currentAvailTimes[e.value]).map((t,it) => (
+                                    <TimeSlot 
+                                        key={it + currentAvailTimes[e.value][t].avail_date}
+                                        data={{ 
+                                            avail_time: currentAvailTimes[e.value][t].avail_time, 
+                                            photographer_price: currentAvailTimes[e.value][t].photographer_price,
+                                            avail_date: currentAvailTimes[e.value][t].avail_date,
+                                        }}
+                                        editEnabled={false}
+                                    />
+                                ))}
+                                <TimeSlot 
+                                    editEnabled={true}
+                                    className={showAdd[e.value] ? "" : "d-none"}
+                                    data={{ 
+                                        avail_date: e.value,
+                                    }}
+                                    choices={choices[e.value]}
+                                />
+                                {
+                                    showAdd[e.value] || (
+                                        <Button className="mb-2" onClick={() => this.toggleAdd(e.value)}>
+                                            Add Available Time
+                                            <Icon type="plus" />
+                                        </Button>
+                                    )
+                                }
                             </div>
                         </div>
                     ))}

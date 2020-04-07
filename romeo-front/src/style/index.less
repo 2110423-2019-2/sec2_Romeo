@@ -33,6 +33,7 @@ main.main-content {
                 margin: auto;
                 padding-left: 0 !important;
                 width: 85%;
+                max-width: initial !important;
             }
         }
         &.portfolio-container {
@@ -121,4 +122,15 @@ h1,h2,h3,h4,h5,h6,b,strong {
 .ant-table {
     max-width: 100%;
     overflow-x: scroll;
+}
+.ant-fullcalendar-fullscreen .ant-fullcalendar-month, .ant-fullcalendar-fullscreen .ant-fullcalendar-date {
+    height: 100% !important;
+    min-height: 116px;
+}
+.ant-fullcalendar-fullscreen .ant-fullcalendar-content {
+    height: auto !important;
+}
+.ant-fullcalendar-last-month-cell, .ant-fullcalendar-next-month-btn-day  {
+    pointer-events: none;
+    visibility: hidden;
 }

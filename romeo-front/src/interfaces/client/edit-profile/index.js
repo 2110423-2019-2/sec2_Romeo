@@ -41,11 +41,12 @@ class EditProfile extends React.Component {
 
         // Adjust avail times
         let out = [];
-        currentAvailTimes.forEach((e,i) => {
-            if (e.avail_time !== "NOT_AVAILABLE") {
-                out.push(e);
-            }
-        })
+        Object.keys(currentAvailTimes).forEach((day,i) => {
+            Object.keys(currentAvailTimes[day]).forEach((time,i) => {
+                out.push(currentAvailTimes[day][time])
+            })
+        });
+        console.log(out);
 
         const request = {
             photographer_equipment: currentEquipment,
