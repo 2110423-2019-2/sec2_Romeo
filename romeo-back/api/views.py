@@ -13,7 +13,8 @@ import omise
 # Import Serializers of apps
 from .serializers import PhotographerSerializer, CustomerSerializer, JobSerializer, JobReservationSerializer, UserSerializer, \
     PhotoSerializer, AvailTimeSerializer, EquipmentSerializer, ProfileSerializer, StyleSerializer, NotificationSerializer, ChangePasswordSerializer, \
-        ReviewSerializer, PaymentSerializer, GetJobsSerializer, GetPaymentToPhotographerSerializer, GetPaymentToCustomerSerializer, GetFavPhotographersSerializer
+    ReviewSerializer, PaymentSerializer, GetJobsSerializer, GetPaymentToPhotographerSerializer, GetPaymentToCustomerSerializer, GetFavPhotographersSerializer,\
+    UserSerializer
 # Import models of apps for queryset
 from photographers.models import Photographer, Photo, AvailTime, Equipment, Style
 from customers.models import Customer
@@ -237,7 +238,7 @@ class UserViewSet(viewsets.ModelViewSet):
     # permission_classes = [AllowAny]
     lookup_field = 'username'
     filter_backends = [filters.SearchFilter]
-    search_fields = ['username']
+    search_fields = ['username']    
 
 class ChangePasswordViewSet(mixins.UpdateModelMixin,viewsets.GenericViewSet):
     queryset = CustomUser.objects.all()
@@ -247,6 +248,7 @@ class ChangePasswordViewSet(mixins.UpdateModelMixin,viewsets.GenericViewSet):
 
 class RegisterViewSet(mixins.CreateModelMixin,viewsets.GenericViewSet):
     permission_classes = [AllowAny]
+    serializer_class = ProfileSerializer
 
     def create(self, request, *args, **kwargs):
         user_type = request.data['profile']['user']['user_type']
