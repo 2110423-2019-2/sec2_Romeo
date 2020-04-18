@@ -1,6 +1,6 @@
 import React from "react";
 import { Calendar, Tag, Tooltip, Button, Icon,
-Form, Dropdown, Radio, Menu } from 'antd';
+Form, Dropdown, Radio } from 'antd';
 import moment from "moment";
 import { timeLabels } from "logic/Calendar";
 import Axios from "axios";

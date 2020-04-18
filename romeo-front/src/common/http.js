@@ -11,8 +11,10 @@ export default () => {
 		Axios.defaults.headers.common["Authorization"] = "Bearer " + localStorage.getItem("token");
 	}
 	Axios.interceptors.response.use(null, function(err) {
-		store.dispatch(setError(err.response.data));
-		console.log(err.response);
+		if (err.response) {
+			store.dispatch(setError(err.response.data));
+			console.log(err.response);
+		}
 		console.warn(err);
 		if (err.status === 403) {
 			removeAuthToken();
