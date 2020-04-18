@@ -1,0 +1,18 @@
+version: '3.5'
+services:
+  romeo-front:
+    container_name: romeo-front
+    build:
+      context: ./romeo-front
+      dockerfile: Dockerfile
+    volumes:
+      - '.:/usr/src/romeo-front'
+      - '/usr/src/romeo-front/node_modules'
+    ports:
+      - '5001:5000'
+    environment:
+      - NODE_ENV=${NODE_ENV}
+      - REACT_APP_ACCESS_KEY_ID=${REACT_APP_ACCESS_KEY_ID}
+      - REACT_APP_ACCESS_SECRET_KEY=${REACT_APP_ACCESS_SECRET_KEY}
+      - REACT_APP_OMISE_PUBLIC_KEY=${REACT_APP_OMISE_PUBLIC_KEY}
+      - REACT_APP_OMISE_SECRET_KEY=${REACT_APP_OMISE_SECRET_KEY}
