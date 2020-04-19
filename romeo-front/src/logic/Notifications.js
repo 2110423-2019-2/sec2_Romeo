@@ -45,7 +45,6 @@ export const readNotifications = async (notifications) => {
         const res = await Axios.patch("/api/notification/"+notifications[0].noti_id+"/",{
             noti_read: "READ"
         });
-        console.log(res.data);
         if (res.data) {
             notifications.forEach(e => e.noti_read = "READ");
             return notifications

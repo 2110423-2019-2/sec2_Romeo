@@ -34,9 +34,11 @@ function hasErrors(fieldsError) {
 class Reservations extends React.Component {
     async componentDidMount() {
         const res = await Axios.get("/api/getjobs?search=" + getCurrentClient().username);
-        this.setState({
-            reservations: res.data.sort((a,b) => b.job_id - a.job_id),
-        });
+        if (res.data) {
+            this.setState({
+                reservations: res.data.sort((a,b) => b.job_id - a.job_id),
+            });
+        }
     }
     state = {
         reservations: [],

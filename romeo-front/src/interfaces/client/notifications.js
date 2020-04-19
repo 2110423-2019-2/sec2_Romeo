@@ -39,8 +39,10 @@ class Notifications extends React.Component {
     async componentDidMount () {
         const currentClient = getCurrentClient();
         const res = await Axios.get("/api/notification/?search=" + currentClient.username);
-        const read = await readNotifications(res.data.sort((a,b) => a.noti_id - b.noti_id));
-        this.setState({ notifications: read.reverse() });
+        if (res.data) {
+            const read = await readNotifications(res.data.sort((a,b) => a.noti_id - b.noti_id));
+            this.setState({ notifications: read.reverse() });
+        }
     }
     state = {
         notifications: [],

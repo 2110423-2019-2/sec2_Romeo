@@ -6,8 +6,8 @@ services:
       context: ./romeo-front
       dockerfile: Dockerfile
     volumes:
-      - '.:/usr/src/romeo-front'
-      - '/usr/src/romeo-front/node_modules'
+      - ./:/usr/src/romeo-front
+      - /usr/src/romeo-front/node_modules
     ports:
       - '5001:5000'
     environment:

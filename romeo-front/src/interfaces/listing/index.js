@@ -34,31 +34,34 @@ class Listing extends React.Component {
     componentDidMount = async () => {
         this.setState({ loading: true })
         const res =  await Axios.get("/api/photographersearch");
-        console.log(res);
         const currentClient = await getCurrentClientInfo();
-        this.setState({
-            photographers: res.data.results,
-            pagination: {
-                next: res.data.next,
-                prev: res.data.previous
-            },
-            loading: false,
-            currentClient
-        });
+        if (res.data) {
+            this.setState({
+                photographers: res.data.results,
+                pagination: {
+                    next: res.data.next,
+                    prev: res.data.previous
+                },
+                loading: false,
+                currentClient
+            });
+        } 
     }
 
     onPaginationClick = async (np) => {
         const { next, prev } = this.state.pagination;
         this.setState({ loading: true });
         const res =  await Axios.get(np === 0 ? next : prev);
-        this.setState({
-            photographers: res.data.results,
-            pagination: {
-                next: res.data.next,
-                prev: res.data.previous
-            },
-            loading: false,
-        });
+        if (res.data) {
+            this.setState({
+                photographers: res.data.results,
+                pagination: {
+                    next: res.data.next,
+                    prev: res.data.previous
+                },
+                loading: false,
+            });
+        }
     }
 
     searchPhotographers = async (value) => {
@@ -100,14 +103,16 @@ class Listing extends React.Component {
                 user: value
             })
         );
-        this.setState({
-            photographers: res.data.results,
-            pagination: {
-                next: res.data.next,
-                prev: res.data.previous
-            },
-            loading: false
-        });
+        if (res.data) {
+            this.setState({
+                photographers: res.data.results,
+                pagination: {
+                    next: res.data.next,
+                    prev: res.data.previous
+                },
+                loading: false
+            });
+        }
     }
 
     onStyleChange = async (e) => {
@@ -124,14 +129,16 @@ class Listing extends React.Component {
                 style: e.target.value
             })
         );
-        this.setState({
-            photographers: res.data.results,
-            pagination: {
-                next: res.data.next,
-                prev: res.data.previous
-            },
-            loading: false
-        });
+        if (res.data) {
+            this.setState({
+                photographers: res.data.results,
+                pagination: {
+                    next: res.data.next,
+                    prev: res.data.previous
+                },
+                loading: false
+            });
+        }
     }
 
     onSortChange = async (e) => {
@@ -148,14 +155,16 @@ class Listing extends React.Component {
                 sort: e.target.value
             })
         );
-        this.setState({
-            photographers: res.data.results,
-            pagination: {
-                next: res.data.next,
-                prev: res.data.previous
-            },
-            loading: false
-        });
+        if (res.data) {
+            this.setState({
+                photographers: res.data.results,
+                pagination: {
+                    next: res.data.next,
+                    prev: res.data.previous
+                },
+                loading: false
+            });
+        }
     }
 
     onDayTypeChange = async (e) =>{
@@ -172,14 +181,16 @@ class Listing extends React.Component {
                 time: e.target.value
             })
         );
-        this.setState({
-            photographers: res.data.results,
-            pagination: {
-                next: res.data.next,
-                prev: res.data.previous
-            },
-            loading: false
-        });
+        if (res.data) {
+            this.setState({
+                photographers: res.data.results,
+                pagination: {
+                    next: res.data.next,
+                    prev: res.data.previous
+                },
+                loading: false
+            });
+        }
     }
     onDateChange = async (date, dateString) => {
         this.setState({ 
@@ -195,14 +206,16 @@ class Listing extends React.Component {
                 date: formatSnakeDate(date)
             })
         );
-        this.setState({
-            photographers: res.data.results,
-            pagination: {
-                next: res.data.next,
-                prev: res.data.previous
-            },
-            loading: false
-        });
+        if (res.data) {
+            this.setState({
+                photographers: res.data.results,
+                pagination: {
+                    next: res.data.next,
+                    prev: res.data.previous
+                },
+                loading: false
+            });
+        }
     }
     render() {
         const {photographers, params, loading, pagination} = this.state;
