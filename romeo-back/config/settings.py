@@ -113,7 +113,7 @@ DATABASES = {
         'NAME': 'romeo-database',
         'USER': 'root',
         'PASSWORD': '1834',
-        'HOST': 'localhost',
+        'HOST': 'db',
         'PORT': '3306',
     }
 }

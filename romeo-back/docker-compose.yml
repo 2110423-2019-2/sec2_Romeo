@@ -1,0 +1,22 @@
+version: '3'
+
+services:
+  db:
+    image: mysql:5.7
+    ports:
+      - '3306:3306'
+    environment:
+      - MYSQL_HOST=localhost
+      - MYSQL_DATABASE= 'romeo-database'
+      - MYSQL_USER= 'root'
+      - MYSQL_PASSWORD= 'travrvn620'
+      - MYSQL_ROOT_PASSWORD= 'travrvn620'
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/usr/src/romeo-back
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
