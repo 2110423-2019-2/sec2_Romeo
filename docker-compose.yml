@@ -16,3 +16,22 @@ services:
       - REACT_APP_ACCESS_SECRET_KEY=${REACT_APP_ACCESS_SECRET_KEY}
       - REACT_APP_OMISE_PUBLIC_KEY=${REACT_APP_OMISE_PUBLIC_KEY}
       - REACT_APP_OMISE_SECRET_KEY=${REACT_APP_OMISE_SECRET_KEY}
+  db:
+    image: mysql:5.7
+    ports:
+      - '3306:3306'
+    environment:
+      - MYSQL_HOST=localhost
+      - MYSQL_DATABASE=romeo-database
+      - MYSQL_PASSWORD=1834
+      - MYSQL_ROOT_PASSWORD=1834
+  romeo-back:
+    container_name: romeo-back
+    build: ./romeo-back
+    command: python ./romeo-back/manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/usr/src/romeo-back
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
