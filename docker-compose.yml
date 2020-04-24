@@ -10,7 +10,7 @@ services:
       - /usr/src/romeo-front/node_modules
       - /usr/src/romeo-front/build
     ports:
-      - '5001:5000'
+      - '80:5000'
     environment:
       - NODE_ENV=${NODE_ENV}
       - REACT_APP_ACCESS_KEY_ID=${REACT_APP_ACCESS_KEY_ID}
