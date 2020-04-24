@@ -5,7 +5,7 @@ import { removeAuthToken } from "./auth";
 import { setAuth } from "./actions/auth";
 
 export default () => {
-	Axios.defaults.baseURL = "http://localhost:8000";
+	Axios.defaults.baseURL = "http://34.87.73.25:8000";
 	Axios.defaults.headers.common["Content-Type"] = "application/json";
 	if (localStorage.getItem("token")) {
 		Axios.defaults.headers.common["Authorization"] = "Bearer " + localStorage.getItem("token");

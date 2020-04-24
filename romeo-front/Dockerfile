@@ -26,5 +26,3 @@ COPY . /usr/src/romeo-front
 RUN yarn build
 
 RUN yarn global add serve
-
-CMD ["serve", "-s", "/usr/src/romeo-front/build"]
