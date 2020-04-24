@@ -10,6 +10,7 @@ COPY ./src ./src
 
 # add `/app/node_modules/.bin` to $PATH
 ENV PATH /usr/src/romeo-front/node_modules/.bin:$PATH
+ENV PATH /usr/src/romeo-front/build:$PATH
 
 # install app dependencies
 COPY ./package.json .
@@ -26,4 +27,4 @@ RUN yarn build
 
 RUN yarn global add serve
 
-CMD ["serve", "-s", "romeo-front/build"]doc
+CMD ["serve", "-s", "/usr/src/romeo-front/build"]
