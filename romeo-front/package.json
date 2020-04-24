@@ -11,6 +11,7 @@
     "aws-sdk": "^2.615.0",
     "axios": "^0.19.2",
     "less": "^3.10.3",
+    "lessc": "^1.0.2",
     "moment": "^2.24.0",
     "node-env": "^0.1.6",
     "normalize.css": "^8.0.1",
@@ -22,11 +23,12 @@
     "react-redux": "^7.1.3",
     "react-router": "^5.1.2",
     "react-router-dom": "^5.1.2",
-    "react-scripts": "3.4.0",
+    "react-scripts": "^3.4.0",
     "react-scroll": "^1.7.16",
     "redux": "^4.0.5",
     "redux-thunk": "^2.3.0",
-    "thunk": "^0.0.1"
+    "thunk": "^0.0.1",
+    "yarn": "^1.22.4"
   },
   "scripts": {
     "start": "react-scripts start",
