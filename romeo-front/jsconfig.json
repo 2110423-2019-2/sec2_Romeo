@@ -8,5 +8,9 @@
         "assets": ["/assets"],
         "logic": ["/logic"]
       }
-    }
+    },
+    "include": [
+      "./node_module/cypress",
+      "cypress/**/*.js"
+    ]
   }

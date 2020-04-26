@@ -226,6 +226,7 @@ class Edit extends React.Component {
                                     placeholder="Social Security Number"
                                     type="text"
                                     maxLength={13}
+                                    disabled="disabled"
                                 />,
                             )}
                         </Form.Item>

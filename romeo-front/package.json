@@ -10,6 +10,7 @@
     "antd": "^3.26.8",
     "aws-sdk": "^2.615.0",
     "axios": "^0.19.2",
+    "cypress": "^4.4.1",
     "less": "^3.10.3",
     "moment": "^2.24.0",
     "node-env": "^0.1.6",
@@ -24,6 +25,7 @@
     "react-router-dom": "^5.1.2",
     "react-scripts": "3.4.0",
     "react-scroll": "^1.7.16",
+    "react-test-renderer": "^16.13.1",
     "redux": "^4.0.5",
     "redux-thunk": "^2.3.0",
     "thunk": "^0.0.1"
@@ -51,6 +53,8 @@
     ]
   },
   "devDependencies": {
+    "cypress-file-upload": "^4.0.6",
+    "cypress-multi-reporters": "^1.2.4",
     "react-app-rewired": "^2.1.5"
   }
 }
