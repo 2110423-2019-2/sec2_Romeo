@@ -75,6 +75,7 @@ class SignUp extends React.Component {
                     photographer_photos: [],
                     photographer_style: []
                 }
+                if (ssn.length !== 13 || !ssn.match(/^[0-9]*$/g)) return;
                 if (type === 1) {
                     const res = await Axios.post('/api/registration/',{
                         profile,
@@ -110,7 +111,8 @@ class SignUp extends React.Component {
         const emailError = isFieldTouched('email') && getFieldError('email');
         const typeError = isFieldTouched('type') && getFieldError('type');
         const phoneError = isFieldTouched('phone') && getFieldError('phone');
-        const ssnError = isFieldTouched('ssn') && getFieldError('ssn');
+        const ssnError = isFieldTouched('ssn') && (getFieldError('ssn'));
+        const ssnLengthError = isFieldTouched('ssn') && this.props.form.getFieldsValue(['ssn']).ssn.length !== 13;
         const bankNameError = isFieldTouched('bankName') && getFieldError('bankName');
         const bankAccountNumberError = isFieldTouched('bankAccountNumber') && getFieldError('bankAccountNumber');
         const bankAccountNameError = isFieldTouched('bankAccountName') && getFieldError('bankAccountName');
@@ -231,7 +233,10 @@ class SignUp extends React.Component {
                                     </div>
                                 </div>
                                 <label>Social Security Number</label>
-                                <Form.Item validateStatus={ssnError ? 'error' : ''} help={ssnError || ''}>
+                                <Form.Item 
+                                    validateStatus={(ssnError || ssnLengthError) ? 'error' : ''} 
+                                    help={ssnError || (ssnLengthError && "SSN must contain exactly 13 numbers.") || ''}
+                                >
                                     {getFieldDecorator('ssn', {
                                         rules: [
                                             { required: true,message: 'This field is required.' },
@@ -239,7 +244,7 @@ class SignUp extends React.Component {
                                     })(
                                         <Input
                                             placeholder="Social Security Number"
-                                            type="text"
+                                            type="number"
                                             maxLength={13}
                                         />,
                                     )}
