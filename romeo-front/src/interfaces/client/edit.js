@@ -41,6 +41,7 @@ class Edit extends React.Component {
                 } = values;
 
                 const url = user_type === 1 ? "/api/photographers" : "/api/customers"
+                if (ssn.length !== 13 || !ssn.match(/^[0-9]*$/g)) return;
                 Axios.patch(`${url}/${username}/`, {
                     profile: {
                         user: {
@@ -99,6 +100,7 @@ class Edit extends React.Component {
             const emailError = isFieldTouched('email') && getFieldError('email');
             const phoneError = isFieldTouched('phone') && getFieldError('phone');
             const ssnError = isFieldTouched('ssn') && getFieldError('ssn');
+            const ssnLengthError = isFieldTouched('ssn') && this.props.form.getFieldsValue(['ssn']).ssn.length !== 13;
             const bankNameError = isFieldTouched('bankName') && getFieldError('bankName');
             const bankAccountNumberError = isFieldTouched('bankAccountNumber') && getFieldError('bankAccountNumber');
             const bankAccountNameError = isFieldTouched('bankAccountName') && getFieldError('bankAccountName');
@@ -213,20 +215,19 @@ class Edit extends React.Component {
                         </div>
                         <label>Social Security Number</label>
                         <Form.Item 
-                            validateStatus={ssnError ? 'error' : ''} 
-                            help={ssnError || ''}
+                            validateStatus={(ssnError || ssnLengthError) ? 'error' : ''} 
+                            help={ssnError || (ssnLengthError && "SSN must contain exactly 13 numbers.") || ''}
                         >
                             {getFieldDecorator('ssn', {
                                 rules: [
-                                    { required: true,message: 'This field is required.' },
+                                    { required: true, message: 'This field is required.' }
                                 ],
                                 initialValue: ssn
                             })(
                                 <Input
                                     placeholder="Social Security Number"
-                                    type="text"
+                                    type="number"
                                     maxLength={13}
-                                    disabled="disabled"
                                 />,
                             )}
                         </Form.Item>
