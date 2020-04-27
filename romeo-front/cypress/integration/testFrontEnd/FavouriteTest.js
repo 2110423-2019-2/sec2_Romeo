@@ -1,6 +1,6 @@
-import { wait } from "@testing-library/react"
-
 describe('Test Favourite Photographer', function() {
+
+    Cypress.config('pageLoadTimeout', 10000)
 
     beforeEach(function() { 
 

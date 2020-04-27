@@ -1,4 +1,7 @@
 describe('Test Login', function() {
+
+    Cypress.config('pageLoadTimeout', 10000)
+    
     beforeEach(function() { 
         cy.visit('localhost:3000')
         cy.title().should('eq', 'Photo-Bro')

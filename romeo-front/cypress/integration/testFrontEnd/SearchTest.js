@@ -1,4 +1,7 @@
 describe('Test Search by filter', function() {
+
+    Cypress.config('pageLoadTimeout', 10000)
+    
     it('TC 6.1-01 Search with any length and filters', function() {
         cy.visit('localhost:3000')
         cy.title().should('eq', 'Photo-Bro')
