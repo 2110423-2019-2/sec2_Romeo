@@ -11,7 +11,7 @@ describe('Test Register', function(){
     })
 
     it('TC 1.1-01 Signup with all fields valid', function(){
-        cy.get('form').within(($form) => {
+        cy.get('form').within(($form) => {                                  //uses in other tests as photographer
             cy.get('input').eq(0).type('test')
             cy.get('input').eq(1).type('test123@gmail.com')
             cy.get('input').eq(2).type('test1234')
@@ -33,7 +33,7 @@ describe('Test Register', function(){
         cy.contains('Account Information').should('be.visible')
 
         cy.get('form').within(($form) => {
-            cy.get('input').eq(0).type('qwer')
+            cy.get('input').eq(0).type('qwer')                              //uses in other tests as customer
             cy.get('input').eq(1).type('qwer123@gmail.com')
             cy.get('input').eq(2).type('qwer')
             cy.get('.ant-select-selection').click().type('{downarrow}{enter}')
