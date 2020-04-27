@@ -22,7 +22,7 @@ describe('Test Favourite Photographer', function() {
         cy.get('.ant-btn-icon-only').last().click()
         cy.get('.ant-dropdown-menu-item').eq(1).click()
         cy.contains('You do not have any favorite photographers.').should('be.visible')
-        cy.wait(2000)
+        cy.wait(1500)
         cy.visit('localhost:3000')
         cy.contains('test').should('be.visible')
         cy.visit('http://localhost:3000/profile/test')
@@ -30,14 +30,14 @@ describe('Test Favourite Photographer', function() {
         cy.get('.ant-btn-icon-only').last().click()
         cy.get('.ant-dropdown-menu-item').eq(1).click()
         cy.contains('test').should('be.visible')
-        cy.wait(2000)
+        cy.wait(1500)
     })
-    it('TC 5.1-01 Add favourite photographer', function() {
+    it('TC 5.1-02 Remove favourite photographer', function() {
        
         cy.get('.ant-btn-icon-only').last().click()
         cy.get('.ant-dropdown-menu-item').eq(1).click()
         cy.contains('test').should('be.visible')
-        cy.wait(2000)
+        cy.wait(1500)
         cy.visit('localhost:3000')
         cy.contains('test').should('be.visible')
         cy.visit('http://localhost:3000/profile/test')
@@ -45,7 +45,7 @@ describe('Test Favourite Photographer', function() {
         cy.get('.ant-btn-icon-only').last().click()
         cy.get('.ant-dropdown-menu-item').eq(1).click()
         cy.contains('You do not have any favorite photographers.').should('be.visible')
-        cy.wait(2000)
+        cy.wait(1500)
     })
     
 })
