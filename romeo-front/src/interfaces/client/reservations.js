@@ -78,12 +78,14 @@ class Reservations extends React.Component {
         const paid = record.job_status === "PAID";
         let content = "";
         if (paid) {
-            content = userType === 2 ? "Your paid deposit will not be refunded." : "The deposit will be refunded to the customer"
+            content = userType === 2 ? "Your paid deposit will not be refunded." : "The deposit will be refunded to the customer."
         } else {
-            content = "You will need to make a reservation again if you change your mind."
+            content = userType === 2 ? 
+                "You will need to make a reservation again if you change your mind." : 
+                "Are you sure to cancel this job?"
         }
         confirm({
-          title: 'Are you sure cancel',
+          title: 'Are you sure?',
           content,
           okText: 'Yes',
           okType: 'danger',

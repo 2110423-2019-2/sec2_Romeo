@@ -119,11 +119,11 @@ class Profile extends React.Component {
                                     type="danger" 
                                     size="large" 
                                     shape="round" 
-                                    ghost={(currentClient && favorited) ? false : true}
+                                    ghost={(currentClient && favorited) ? true : false}
                                     className="mt-2"
                                     onClick={() => this.toggleFav()}
                                 >
-                                    Favorite <Icon type="heart" theme='outlined' />
+                                    {(currentClient && favorited) ? 'Unfavorite' : 'Favorite' } <Icon type="heart" theme='outlined' />
                                 </Button>
                             )} 
                             <Divider/>
