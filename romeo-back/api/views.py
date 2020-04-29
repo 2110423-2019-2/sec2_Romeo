@@ -158,7 +158,7 @@ class PaymentViewSet(viewsets.ModelViewSet):
         with open(tokenfile, "r") as f :
             token = f.read()
         if not token : return Response(data="Server Token Error")
-        omise.api_secret = token
+        omise.api_secret = token.strip()
         try :
             charge = omise.Charge.create(amount=int(amount)*100, currency="thb", card=cardtoken)
         except Exception as e :
