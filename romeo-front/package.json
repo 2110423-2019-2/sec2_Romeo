@@ -9,7 +9,7 @@
     "@testing-library/user-event": "^7.1.2",
     "antd": "^3.26.8",
     "aws-sdk": "^2.615.0",
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "cypress": "^4.4.1",
     "less": "^3.10.3",
     "moment": "^2.24.0",
